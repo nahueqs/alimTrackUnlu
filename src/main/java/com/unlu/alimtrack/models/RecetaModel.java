@@ -14,7 +14,7 @@ import java.time.Instant;
 public class RecetaModel {
     @Id
     @Column(name = "id_receta", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -27,47 +27,29 @@ public class RecetaModel {
     @JoinColumn(name = "creado_por", nullable = false)
     private UsuarioModel creadoPor;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "fecha_creacion")
-    private Instant fechaCreacion;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public Instant getFechaCreacion() {
+        return fechaCreacion;
     }
 
     public UsuarioModel getCreadoPor() {
         return creadoPor;
     }
 
-    public void setCreadoPor(UsuarioModel creadoPor) {
-        this.creadoPor = creadoPor;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public Instant getFechaCreacion() {
-        return fechaCreacion;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setFechaCreacion(Instant fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
+    public Long getId() {
+        return id;
     }
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "fecha_creacion")
+    private Instant fechaCreacion;
+
+
 }

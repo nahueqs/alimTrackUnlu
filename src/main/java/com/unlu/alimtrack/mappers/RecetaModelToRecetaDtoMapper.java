@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(uses = UsuarioModelToUsuarioDtoMapper.class)
 public interface RecetaModelToRecetaDtoMapper {
-    RecetaDTO recetaModelToRecetaDTO(RecetaModel receta);
+    RecetaDTO recetaModelToRecetaDTO2(RecetaModel receta);
 }

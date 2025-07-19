@@ -9,19 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/receta")
+@RequestMapping("/recetas")
 public class RecetaController {
     @Autowired
     RecetaService recetaService;
 
-    @GetMapping("/recetas1")
+    @GetMapping
     public ArrayList<RecetaDTO> getAllRecetasDTOS() {
         return recetaService.getAllRecetasDTOS();
-    }
-
-    @GetMapping("/recetas2")
-    public ArrayList<RecetaDTO> getAllRecetasDTOS2() {
-        return  recetaService.getAllRecetasDTOS();
     }
 
     @GetMapping("/test")

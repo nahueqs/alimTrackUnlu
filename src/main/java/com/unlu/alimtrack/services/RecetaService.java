@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.RecetaDTO;
+import com.unlu.alimtrack.dtos.RecetaDTO2;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,11 +32,11 @@ public class RecetaService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
     //@Transactional(readOnly = true)
-    public ArrayList<RecetaDTO> getAllRecetas2() {
+    public ArrayList<RecetaDTO2> getAllRecetas2() {
         System.out.println("Ejecutando getAllRecetas2");
         return  recetaRepository.findAll()
                 .stream()
-                .map(RecetaDTO::new)
+                .map(RecetaDTO2::new)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 

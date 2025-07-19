@@ -14,8 +14,13 @@ public class RecetaController {
     @Autowired
     RecetaService recetaService;
 
-    @GetMapping
+    @GetMapping("/recetas1")
     public ArrayList<RecetaDTO> getAllRecetasDTOS() {
+        return recetaService.getAllRecetasDTOS();
+    }
+
+    @GetMapping("/recetas2")
+    public ArrayList<RecetaDTO> getAllRecetasDTOS2() {
         return  recetaService.getAllRecetasDTOS();
     }
 

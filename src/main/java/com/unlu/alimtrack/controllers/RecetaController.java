@@ -2,7 +2,6 @@ package com.unlu.alimtrack.controllers;
 
 
 import com.unlu.alimtrack.dtos.RecetaDTO;
-import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.services.RecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,8 @@ public class RecetaController {
     RecetaService recetaService;
 
     @GetMapping
-    public ArrayList<RecetaDTO> getAllRecetas() {
-        return  recetaService.getAllRecetas();
+    public ArrayList<RecetaDTO> getAllRecetasDTOS() {
+        return  recetaService.getAllRecetasDTOS();
     }
 
     @GetMapping("/test")

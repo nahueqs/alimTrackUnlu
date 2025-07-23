@@ -6,9 +6,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface UsuarioModelToUsuarioDtoMapper {
+public interface UsuarioModelToDtoMapper {
 
-    UsuarioModelToUsuarioDtoMapper mapper = Mappers.getMapper(UsuarioModelToUsuarioDtoMapper.class);
+    UsuarioModelToDtoMapper mapper = Mappers.getMapper(UsuarioModelToDtoMapper.class);
 
     UsuarioDto usuarioModelToUsuarioDTO(UsuarioModel model);
 }

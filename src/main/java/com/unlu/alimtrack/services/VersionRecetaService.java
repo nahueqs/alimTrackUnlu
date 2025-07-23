@@ -1,18 +1,13 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.RecetaDto;
 import com.unlu.alimtrack.dtos.VersionRecetaDto;
-import com.unlu.alimtrack.mappers.RecetaModelToRecetaDtoMapper;
-import com.unlu.alimtrack.mappers.VersionRecetaModelToVersionRecetaDtoMapper;
-import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.mappers.VersionRecetaModelToDtoMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,11 +21,13 @@ public class VersionRecetaService {
     public List<VersionRecetaDto> getAllVersiones() {
         List<VersionRecetaModel> versiones =  versionRecetaRespository.findAll();
         return versiones.stream().filter(Objects::nonNull).map(
-                VersionRecetaModelToVersionRecetaDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
+                VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
     }
 
-
-
-
+    @Transactional(readOnly = true)
+    public VersionRecetaDto getVersionById(Long idReceta,  Long idVersion) {
+        VersionRecetaModel model = versionRecetaRespository.findByIdRecetaPadreAndIdVersion(idReceta,idVersion);
+        return VersionRecetaModelToDtoMapper.mapper.versionRecetaModelToVersionRecetaDto(model);
+    }
 
 }

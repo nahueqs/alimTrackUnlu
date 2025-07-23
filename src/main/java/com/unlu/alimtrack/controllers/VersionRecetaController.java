@@ -27,6 +27,11 @@ public class VersionRecetaController {
         return versionRecetaService.getVersionById(idReceta, idVersion);
     }
 
+    @GetMapping("/{idReceta}/versiones/")
+    public List<VersionRecetaDto> getVersionesByIdReceta(@PathVariable Long idReceta) {
+        return versionRecetaService.getVersionesByIdReceta(idReceta);
+    }
+
 
 
 

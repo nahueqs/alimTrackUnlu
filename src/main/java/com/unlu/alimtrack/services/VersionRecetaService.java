@@ -20,7 +20,7 @@ public class VersionRecetaService {
     @Transactional(readOnly = true)
     public List<VersionRecetaDto> getAllVersiones() {
         List<VersionRecetaModel> versiones =  versionRecetaRespository.findAll();
-        return versiones.stream().filter(Objects::nonNull).map(
+        return versiones.stream().map(
                 VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
     }
 
@@ -30,4 +30,10 @@ public class VersionRecetaService {
         return VersionRecetaModelToDtoMapper.mapper.versionRecetaModelToVersionRecetaDto(model);
     }
 
+    @Transactional(readOnly = true)
+    public List<VersionRecetaDto> getVersionesByIdReceta(Long idReceta) {
+        List<VersionRecetaModel> versiones = versionRecetaRespository.getVersionesByIdReceta(idReceta);
+        return versiones.stream().map(
+                VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
+    }
 }

@@ -6,6 +6,7 @@ import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,17 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+
     public UsuarioDto getUsuarioDtoById(Long id) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
         return UsuarioModelToUsuarioDtoMapper.mapper.usuarioModelToUsuarioDTO(usuarioModel);
     }
 
+    public void modificarUsuario(UsuarioModel usuarioModel) {
+        usuarioRepository.save(usuarioModel);
+    }
+
+    public void borrarUsuario(Long id) {
+        usuarioRepository.deleteById(id);
+    }
 }

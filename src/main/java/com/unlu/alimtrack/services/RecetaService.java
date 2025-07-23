@@ -29,4 +29,10 @@ public class RecetaService {
         RecetaModel recetaModel = recetaRepository.findById(id).orElse(null);
         return RecetaModelToRecetaDtoMapper.mapper.recetaModelToRecetaDTO2(recetaModel);
     }
+
+    public void updateReceta(RecetaModel receta) {
+        recetaRepository.save(receta);
+    }
+
+
 }

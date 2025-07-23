@@ -2,21 +2,20 @@ package com.unlu.alimtrack.dtos;
 
 import com.unlu.alimtrack.models.UsuarioModel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UsuarioDTO{
+public class UsuarioDto {
     private Long id;
     private String nombre;
     private String email;
     private Boolean esAdmin = false;
 
-    public UsuarioDTO() {
+    public UsuarioDto() {
     }
 
-    public UsuarioDTO(UsuarioModel usuario) {
+    public UsuarioDto(UsuarioModel usuario) {
         this.id = usuario.getId();
         this.nombre = usuario.getNombre();
         this.email = usuario.getEmail();

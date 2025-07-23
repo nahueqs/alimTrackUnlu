@@ -13,11 +13,4 @@ public class SeccionDto {
     private String tipo;
     private Integer orden;
 
-    public SeccionDto(SeccionModel seccionModel) {
-        this.id = seccionModel.getId();
-        this.idVersion = seccionModel.getIdVersion();
-        this.titulo = seccionModel.getTitulo();
-        this.tipo = seccionModel.getTipo();
-        this.orden = seccionModel.getOrden();
-    }
 }

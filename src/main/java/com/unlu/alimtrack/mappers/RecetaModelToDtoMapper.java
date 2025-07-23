@@ -5,10 +5,10 @@ import com.unlu.alimtrack.models.RecetaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = UsuarioModelToUsuarioDtoMapper.class)
-public interface RecetaModelToRecetaDtoMapper {
+@Mapper(uses = UsuarioModelToDtoMapper.class)
+public interface RecetaModelToDtoMapper {
 
-    RecetaModelToRecetaDtoMapper mapper = Mappers.getMapper(RecetaModelToRecetaDtoMapper.class);
+    RecetaModelToDtoMapper mapper = Mappers.getMapper(RecetaModelToDtoMapper.class);
 
     RecetaDto recetaModelToRecetaDTO(RecetaModel receta);
 }

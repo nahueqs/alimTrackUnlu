@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.dtos;
 
 
-import com.unlu.alimtrack.models.SeccionModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import lombok.Getter;
 

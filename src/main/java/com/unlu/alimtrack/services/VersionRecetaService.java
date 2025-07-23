@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +24,7 @@ public class VersionRecetaService {
     }
 
     @Transactional(readOnly = true)
-    public VersionRecetaDto getVersionById(Long idReceta,  Long idVersion) {
+    public VersionRecetaDto getVersionById(Long idReceta, Long idVersion) {
         VersionRecetaModel model = versionRecetaRespository.findByIdRecetaPadreAndIdVersion(idReceta,idVersion);
         return VersionRecetaModelToDtoMapper.mapper.versionRecetaModelToVersionRecetaDto(model);
     }
@@ -35,5 +34,11 @@ public class VersionRecetaService {
         List<VersionRecetaModel> versiones = versionRecetaRespository.getVersionesByIdReceta(idReceta);
         return versiones.stream().map(
                 VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
+    }
+
+    public VersionRecetaDto saveVersionReceta(Long idReceta, VersionRecetaDto dto) {
+        VersionRecetaModelToDtoMapper mapper = VersionRecetaModelToDtoMapper.mapper;
+        VersionRecetaModel model = mapper.versionRecetaDtoToVersionRecetaModel(dto);
+        return versionRecetaRespository.save(model);
     }
 }

@@ -3,10 +3,7 @@ package com.unlu.alimtrack.controllers;
 import com.unlu.alimtrack.dtos.VersionRecetaDto;
 import com.unlu.alimtrack.services.VersionRecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +27,11 @@ public class VersionRecetaController {
     @GetMapping("/{idReceta}/versiones/")
     public List<VersionRecetaDto> getVersionesByIdReceta(@PathVariable Long idReceta) {
         return versionRecetaService.getVersionesByIdReceta(idReceta);
+    }
+
+    @PostMapping("/{idReceta}/versiones/")
+    public VersionRecetaDto saveVersionReceta(@PathVariable Long idReceta, @RequestBody VersionRecetaDto dto) {
+        return versionRecetaService.saveVersionReceta(idReceta, dto);
     }
 
 

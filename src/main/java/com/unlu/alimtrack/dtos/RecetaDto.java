@@ -12,5 +12,4 @@ public class RecetaDto {
     private String descripcion;
     private UsuarioDto creadoPor; // o ID o nombre
     private Instant fechaCreacion;
-
 }

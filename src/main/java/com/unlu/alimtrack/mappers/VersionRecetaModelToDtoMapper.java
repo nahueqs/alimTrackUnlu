@@ -13,4 +13,9 @@ public interface VersionRecetaModelToDtoMapper {
     @Mapping(target = "idCreadoPor", source = "creadoPor.id")
     @Mapping(target = "idRecetaPadre", source = "recetaPadre.id")
     VersionRecetaDto versionRecetaModelToVersionRecetaDto(VersionRecetaModel versionRecetaModel);
+
+    @Mapping(target = "creadoPor.id", source = "idCreadoPor")
+    @Mapping(target = "recetaPadre.id", source = "idRecetaPadre")
+    VersionRecetaModel versionRecetaDtoToVersionRecetaModel(VersionRecetaDto versionRecetaDto);
+
 }

@@ -1,12 +1,13 @@
 package com.unlu.alimtrack.controllers;
 
 
-import com.unlu.alimtrack.dtos.RecetaDTO;
+import com.unlu.alimtrack.dtos.RecetaDto;
 import com.unlu.alimtrack.services.RecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/recetas")
@@ -15,8 +16,13 @@ public class RecetaController {
     RecetaService recetaService;
 
     @GetMapping
-    public ArrayList<RecetaDTO> getAllRecetasDTOS() {
+    public List<RecetaDto> getAllRecetasDTOS() {
         return recetaService.getAllRecetasDTOS();
+    }
+
+    @GetMapping("/{id}")
+    public RecetaDto getRecetaDtoById(@PathVariable Long id) {
+        return recetaService.getRecetaDtoById(id);
     }
 
     @GetMapping("/test")

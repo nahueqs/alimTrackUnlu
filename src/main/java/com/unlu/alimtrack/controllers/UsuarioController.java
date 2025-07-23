@@ -31,4 +31,14 @@ public class UsuarioController {
         return usuarioService.getUsuarioDtoById(id);
     }
 
+    @PutMapping("/{id}")
+    public void modificarUsuario(@RequestBody UsuarioModel usuarioModel) {
+        usuarioService.modificarUsuario(usuarioModel);
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminarUsuario(@PathVariable Long id) {
+        usuarioService.borrarUsuario(id);
+    }
+
 }

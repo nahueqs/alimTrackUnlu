@@ -2,6 +2,7 @@ package com.unlu.alimtrack.controllers;
 
 
 import com.unlu.alimtrack.dtos.RecetaDto;
+import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.services.RecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,11 @@ public class RecetaController {
     @GetMapping("/{id}")
     public RecetaDto getRecetaDtoById(@PathVariable Long id) {
         return recetaService.getRecetaDtoById(id);
+    }
+
+    @PutMapping("/{id}")
+    public void updateReceta(@RequestBody RecetaModel receta) {
+        recetaService.updateReceta(receta);
     }
 
     @GetMapping("/test")

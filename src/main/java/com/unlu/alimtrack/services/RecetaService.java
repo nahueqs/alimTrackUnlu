@@ -6,9 +6,8 @@ import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,17 +16,16 @@ public class RecetaService {
     @Autowired
     RecetaRepository recetaRepository;
 
-    //@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<RecetaDto> getAllRecetasDTOS() {
         List<RecetaModel> recetas =  recetaRepository.findAll();
-        List<RecetaDto> recetasDtos = recetas.stream().map(
-                RecetaModelToRecetaDtoMapper.mapper::recetaModelToRecetaDTO2).collect(Collectors.toList());
-        return recetasDtos;
+        return recetas.stream().map(
+                RecetaModelToRecetaDtoMapper.mapper::recetaModelToRecetaDTO).collect(Collectors.toList());
     }
 
     public RecetaDto getRecetaDtoById(Long id) {
         RecetaModel recetaModel = recetaRepository.findById(id).orElse(null);
-        return RecetaModelToRecetaDtoMapper.mapper.recetaModelToRecetaDTO2(recetaModel);
+        return RecetaModelToRecetaDtoMapper.mapper.recetaModelToRecetaDTO(recetaModel);
     }
 
     public void updateReceta(RecetaModel receta) {

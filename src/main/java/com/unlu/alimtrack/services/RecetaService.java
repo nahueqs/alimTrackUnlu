@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.RecetaDto;
+import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelToDtoMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
@@ -24,7 +25,7 @@ public class RecetaService {
     }
 
     public RecetaDto getRecetaDtoById(Long id) {
-        RecetaModel recetaModel = recetaRepository.findById(id).orElse(null);
+        RecetaModel recetaModel = recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         return RecetaModelToDtoMapper.mapper.recetaModelToRecetaDTO(recetaModel);
     }
 

@@ -1,7 +1,9 @@
 package com.unlu.alimtrack.services;
 
+import com.unlu.alimtrack.dtos.RecetaDto;
 import com.unlu.alimtrack.dtos.VersionRecetaDto;
 import com.unlu.alimtrack.mappers.VersionRecetaModelToDtoMapper;
+import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class VersionRecetaService {
+
+    private final VersionRecetaRespository versionRecetaRespository;
+    private final RecetaService recetaService;
+
     @Autowired
-    VersionRecetaRespository  versionRecetaRespository;
+    public VersionRecetaService(VersionRecetaRespository versionRecetaRespository,
+                                RecetaService recetaService) {
+        this.versionRecetaRespository = versionRecetaRespository;
+        this.recetaService = recetaService;
+    }
 
     @Transactional(readOnly = true)
     public List<VersionRecetaDto> getAllVersiones() {
@@ -37,8 +47,10 @@ public class VersionRecetaService {
     }
 
     public VersionRecetaDto saveVersionReceta(Long idReceta, VersionRecetaDto dto) {
+        RecetaDto dtoReceta = recetaService.getRecetaDtoById(idReceta);
         VersionRecetaModelToDtoMapper mapper = VersionRecetaModelToDtoMapper.mapper;
         VersionRecetaModel model = mapper.versionRecetaDtoToVersionRecetaModel(dto);
-        return versionRecetaRespository.save(model);
+        versionRecetaRespository.save(model);
+        return dto;
     }
 }

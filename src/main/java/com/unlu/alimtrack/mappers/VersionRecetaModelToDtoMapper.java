@@ -7,8 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface VersionRecetaModelToVersionRecetaDtoMapper {
-    VersionRecetaModelToVersionRecetaDtoMapper mapper = Mappers.getMapper(VersionRecetaModelToVersionRecetaDtoMapper.class);
+public interface VersionRecetaModelToDtoMapper {
+    VersionRecetaModelToDtoMapper mapper = Mappers.getMapper(VersionRecetaModelToDtoMapper.class);
 
     @Mapping(target = "idCreadoPor", source = "creadoPor.id")
     @Mapping(target = "idRecetaPadre", source = "recetaPadre.id")

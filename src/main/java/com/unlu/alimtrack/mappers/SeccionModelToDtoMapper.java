@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface SeccionModelToSeccionDtoMapper {
-    SeccionModelToSeccionDtoMapper mapper = Mappers.getMapper(SeccionModelToSeccionDtoMapper.class);
+public interface SeccionModelToDtoMapper {
+    SeccionModelToDtoMapper mapper = Mappers.getMapper(SeccionModelToDtoMapper.class);
     SeccionDto  seccionModelToSeccionDto(SeccionModel model);
 }

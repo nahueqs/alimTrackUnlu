@@ -30,6 +30,11 @@ public class RecetaController {
         recetaService.updateReceta(receta);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteRecetaById(@PathVariable Long id) {
+        recetaService.deleteRecetaByID(id);
+    }
+
     @GetMapping("/test")
     public String test() {
         return "Controlador funcionando";

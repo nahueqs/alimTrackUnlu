@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.RecetaDto;
-import com.unlu.alimtrack.mappers.RecetaModelToRecetaDtoMapper;
+import com.unlu.alimtrack.mappers.RecetaModelToDtoMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,19 @@ public class RecetaService {
     public List<RecetaDto> getAllRecetasDTOS() {
         List<RecetaModel> recetas =  recetaRepository.findAll();
         return recetas.stream().map(
-                RecetaModelToRecetaDtoMapper.mapper::recetaModelToRecetaDTO).collect(Collectors.toList());
+                RecetaModelToDtoMapper.mapper::recetaModelToRecetaDTO).collect(Collectors.toList());
     }
 
     public RecetaDto getRecetaDtoById(Long id) {
         RecetaModel recetaModel = recetaRepository.findById(id).orElse(null);
-        return RecetaModelToRecetaDtoMapper.mapper.recetaModelToRecetaDTO(recetaModel);
+        return RecetaModelToDtoMapper.mapper.recetaModelToRecetaDTO(recetaModel);
     }
 
     public void updateReceta(RecetaModel receta) {
         recetaRepository.save(receta);
     }
 
-
+    public void deleteRecetaByID(Long id) {
+        recetaRepository.deleteById(id);
+    }
 }

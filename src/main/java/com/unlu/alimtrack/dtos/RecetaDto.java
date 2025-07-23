@@ -13,13 +13,4 @@ public class RecetaDto {
     private UsuarioDto creadoPor; // o ID o nombre
     private Instant fechaCreacion;
 
-    public RecetaDto(RecetaModel receta) {
-        this.id = receta.getId();
-        this.nombre = receta.getNombre();
-        this.descripcion = receta.getDescripcion();
-        this.fechaCreacion = receta.getFechaCreacion();
-        this.creadoPor = new UsuarioDto(receta.getCreadoPor());
-        System.out.println(creadoPor);
-    }
-
 }

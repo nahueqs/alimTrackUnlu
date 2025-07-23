@@ -10,5 +10,5 @@ public interface RecetaModelToRecetaDtoMapper {
 
     RecetaModelToRecetaDtoMapper mapper = Mappers.getMapper(RecetaModelToRecetaDtoMapper.class);
 
-    RecetaDto recetaModelToRecetaDTO2(RecetaModel receta);
+    RecetaDto recetaModelToRecetaDTO(RecetaModel receta);
 }

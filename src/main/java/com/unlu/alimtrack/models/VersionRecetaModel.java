@@ -15,19 +15,17 @@ import java.time.Instant;
 @Table(name = "versionreceta")
 public class VersionRecetaModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_version", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_receta_padre", nullable = false)
-    private RecetaModel RecetaPadre;
+    private RecetaModel recetaPadre;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creado_por", nullable = false)
     private UsuarioModel creadoPor;
-
-    @Column(name = "numero_version", nullable = false)
-    private Integer numeroVersion;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "fecha_creacion")

@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.RecetaDto;
-import com.unlu.alimtrack.dtos.VersionRecetaDto;
-import com.unlu.alimtrack.mappers.VersionRecetaModelToDtoMapper;
+import com.unlu.alimtrack.dtos.request.versionRecetaCreateDto;
+import com.unlu.alimtrack.mappers.VersionRecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,39 +18,50 @@ public class VersionRecetaService {
 
     private final VersionRecetaRespository versionRecetaRespository;
     private final RecetaService recetaService;
+    private final VersionRecetaModelMapper versionRecetaModelMapper;
+    private final UsuarioService usuarioService;
 
     @Autowired
     public VersionRecetaService(VersionRecetaRespository versionRecetaRespository,
-                                RecetaService recetaService) {
+                                RecetaService recetaService, VersionRecetaModelMapper versionRecetaModelMapper, UsuarioService usuarioService) {
         this.versionRecetaRespository = versionRecetaRespository;
         this.recetaService = recetaService;
+        this.versionRecetaModelMapper = versionRecetaModelMapper;
+        this.usuarioService = usuarioService;
     }
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaDto> getAllVersiones() {
-        List<VersionRecetaModel> versiones =  versionRecetaRespository.findAll();
+    public List<versionRecetaCreateDto> getAllVersiones() {
+        List<VersionRecetaModel> versiones = versionRecetaRespository.findAll();
         return versiones.stream().map(
-                VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
+                VersionRecetaModelMapper.mapper::toVersionRecetaDto).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public VersionRecetaDto getVersionById(Long idReceta, Long idVersion) {
-        VersionRecetaModel model = versionRecetaRespository.findByIdRecetaPadreAndIdVersion(idReceta,idVersion);
-        return VersionRecetaModelToDtoMapper.mapper.versionRecetaModelToVersionRecetaDto(model);
+    public versionRecetaCreateDto getVersionById(Long idReceta, Long idVersion) {
+        VersionRecetaModel model = versionRecetaRespository.findByIdRecetaPadreAndIdVersion(idReceta, idVersion);
+        return VersionRecetaModelMapper.mapper.toVersionRecetaDto(model);
     }
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaDto> getVersionesByIdReceta(Long idReceta) {
+    public List<versionRecetaCreateDto> getVersionesByIdReceta(Long idReceta) {
         List<VersionRecetaModel> versiones = versionRecetaRespository.getVersionesByIdReceta(idReceta);
         return versiones.stream().map(
-                VersionRecetaModelToDtoMapper.mapper::versionRecetaModelToVersionRecetaDto).collect(Collectors.toList());
+                VersionRecetaModelMapper.mapper::toVersionRecetaDto).collect(Collectors.toList());
     }
-
-    public VersionRecetaDto saveVersionReceta(Long idReceta, VersionRecetaDto dto) {
-        RecetaDto dtoReceta = recetaService.getRecetaDtoById(idReceta);
-        VersionRecetaModelToDtoMapper mapper = VersionRecetaModelToDtoMapper.mapper;
-        VersionRecetaModel model = mapper.versionRecetaDtoToVersionRecetaModel(dto);
-        versionRecetaRespository.save(model);
+//.orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
+    @Transactional
+    public versionRecetaCreateDto saveVersionReceta(Long idReceta, versionRecetaCreateDto dto) {
+        // si no tiene receta padre tira exception
+        RecetaModel modelRecetaPadre = recetaService.getRecetaModelById(idReceta);
+        // obtengo usuario model usando dto.idCreadoPor
+        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelById(dto.getIdCreadoPor());
+        // mapeo manualmente el dto a un nuevo model
+        VersionRecetaModel versionModelFinal = new VersionRecetaModel();
+        versionModelFinal.setRecetaPadre(modelRecetaPadre);
+        versionModelFinal.setCreadoPor(usuarioCreador);
+        versionModelFinal.setFechaCreacion(dto.getFechaCreacion());
+        versionRecetaRespository.save(versionModelFinal);
         return dto;
     }
 }

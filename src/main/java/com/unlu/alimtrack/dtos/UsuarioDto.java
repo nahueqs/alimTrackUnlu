@@ -1,6 +1,5 @@
 package com.unlu.alimtrack.dtos;
 
-import com.unlu.alimtrack.models.UsuarioModel;
 import lombok.Getter;
 import lombok.Setter;
 

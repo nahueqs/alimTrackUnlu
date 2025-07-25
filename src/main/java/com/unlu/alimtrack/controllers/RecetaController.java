@@ -1,6 +1,5 @@
 package com.unlu.alimtrack.controllers;
 
-
 import com.unlu.alimtrack.dtos.RecetaDto;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.services.RecetaService;
@@ -26,7 +25,7 @@ public class RecetaController {
     }
 
     @PutMapping("/{id}")
-    public void updateReceta(@RequestBody RecetaModel receta) {
+    public void updateReceta2(@RequestBody RecetaDto receta) {
         recetaService.updateReceta(receta);
     }
 

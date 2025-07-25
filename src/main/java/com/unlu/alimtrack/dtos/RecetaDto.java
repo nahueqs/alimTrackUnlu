@@ -1,11 +1,12 @@
 package com.unlu.alimtrack.dtos;
 
-import com.unlu.alimtrack.models.RecetaModel;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
 @Getter
+@Setter
 public class RecetaDto {
     private Long id;
     private String nombre;

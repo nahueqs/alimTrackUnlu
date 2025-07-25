@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -24,6 +23,11 @@ public class UsuarioController {
     public UsuarioModel saveUsuario(@RequestBody UsuarioModel usuarioModel) {
         return usuarioService.saveUsuario(usuarioModel);
     }
+
+    /*@PostMapping
+    public UsuarioDto saveUsuario2(@RequestBody UsuarioDto usuarioDto) {
+        return usuarioService.saveUsuario2(usuarioDto);
+    }*/
 
     @GetMapping("/{id}")
     public UsuarioDto getRecetaDtoById(@PathVariable Long id) {

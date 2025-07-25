@@ -12,25 +12,33 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioModelToDtoMapper mapper;
+
     @Autowired
-    UsuarioRepository usuarioRepository;
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelToDtoMapper mapper) {
+        this.usuarioRepository = usuarioRepository;
+        this.mapper = mapper;
+    }
 
     public List<UsuarioDto> getAllUsuarios() {
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
-        List<UsuarioDto> usuarioDtos = usuarios.stream().map(
-                UsuarioModelToDtoMapper.mapper::usuarioModelToUsuarioDTO).collect(Collectors.toList());
-
-        return usuarioDtos;
+        return usuarios.stream().map(
+                mapper::usuarioModelToUsuarioDTO).collect(Collectors.toList());
     }
 
     public UsuarioModel saveUsuario(UsuarioModel usuario) {
         return usuarioRepository.save(usuario);
     }
 
-
     public UsuarioDto getUsuarioDtoById(Long id) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        return UsuarioModelToDtoMapper.mapper.usuarioModelToUsuarioDTO(usuarioModel);
+        return mapper.usuarioModelToUsuarioDTO(usuarioModel);
+    }
+
+    public UsuarioModel getUsuarioModelById(Long id) {
+        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
+        return usuarioModel;
     }
 
     public void modificarUsuario(UsuarioModel usuarioModel) {
@@ -39,5 +47,12 @@ public class UsuarioService {
 
     public void borrarUsuario(Long id) {
         usuarioRepository.deleteById(id);
+    }
+
+    public UsuarioDto saveUsuario2(UsuarioDto usuarioDto) {
+        UsuarioModel usuarioModel = usuarioRepository.findById(usuarioDto.getId()).orElse(null);
+        mapper.usuarioModelToUsuarioDTO(usuarioModel);
+        usuarioRepository.save(usuarioModel);
+        return usuarioDto;
     }
 }

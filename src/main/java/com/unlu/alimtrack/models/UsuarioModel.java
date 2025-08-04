@@ -27,4 +27,7 @@ public class UsuarioModel {
     @Column(name = "es_admin", nullable = false)
     private Boolean esAdmin = false;
 
+    @Column(name = "contraseña", nullable = false, length = 60)
+    private String contraseña;
+
 }

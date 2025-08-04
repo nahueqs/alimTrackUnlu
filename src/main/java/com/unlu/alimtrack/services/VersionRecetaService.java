@@ -44,8 +44,8 @@ public class VersionRecetaService {
     }
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaCreateDTO> getVersionesByIdReceta(Long idReceta) {
-        List<VersionRecetaModel> versiones = versionRecetaRespository.getVersionesByIdReceta(idReceta);
+    public List<VersionRecetaCreateDTO> getVersionesByIdRecetaPadre(Long idReceta) {
+        List<VersionRecetaModel> versiones = versionRecetaRespository.getVersionesByIdRecetaPadre(idReceta);
         return versiones.stream().map(
                 VersionRecetaModelMapper.mapper::toVersionRecetaDto).collect(Collectors.toList());
     }

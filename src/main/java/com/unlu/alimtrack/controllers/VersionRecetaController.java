@@ -25,8 +25,8 @@ public class VersionRecetaController {
     }
 
     @GetMapping("/{idReceta}/versiones/")
-    public List<VersionRecetaCreateDTO> getVersionesByIdReceta(@PathVariable Long idReceta) {
-        return versionRecetaService.getVersionesByIdReceta(idReceta);
+    public List<VersionRecetaCreateDTO> getVersionesByIdRecetaPadre(@PathVariable Long idReceta) {
+        return versionRecetaService.getVersionesByIdRecetaPadre(idReceta);
     }
 
     @PostMapping("/{idReceta}/versiones/")

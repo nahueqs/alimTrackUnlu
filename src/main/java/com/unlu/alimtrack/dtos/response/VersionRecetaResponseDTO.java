@@ -1,10 +1,11 @@
 package com.unlu.alimtrack.dtos.response;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
-@Getter
-public class VersionRecetaResponseDTO {
+import java.time.Instant;
+
+public record VersionRecetaResponseDTO (@NotNull Long id, Instant fechaCreacion, Long idCreadoPor) {
 
 }

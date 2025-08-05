@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface SeccionModelToDtoMapper {
-    SeccionModelToDtoMapper mapper = Mappers.getMapper(SeccionModelToDtoMapper.class);
+public interface SeccionModelMapper {
+    SeccionModelMapper mapper = Mappers.getMapper(SeccionModelMapper.class);
 
     SeccionDto seccionModelToSeccionDto(SeccionModel model);
 }

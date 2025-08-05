@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.UsuarioDto;
-import com.unlu.alimtrack.mappers.UsuarioModelToDtoMapper;
+import com.unlu.alimtrack.mappers.UsuarioModelMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 @Service
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
-    private final UsuarioModelToDtoMapper mapper;
+    private final UsuarioModelMapper mapper;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelToDtoMapper mapper) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper mapper) {
         this.usuarioRepository = usuarioRepository;
         this.mapper = mapper;
     }

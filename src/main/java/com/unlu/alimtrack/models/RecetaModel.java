@@ -28,26 +28,6 @@ public class RecetaModel {
     @JoinColumn(name = "creado_por", nullable = false)
     private UsuarioModel creadoPor;
 
-    public Instant getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public UsuarioModel getCreadoPor() {
-        return creadoPor;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "fecha_creacion")
     private Instant fechaCreacion;

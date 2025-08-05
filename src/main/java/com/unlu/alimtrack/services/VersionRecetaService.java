@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.request.VersionRecetaCreateDTO;
+import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.mappers.VersionRecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.models.UsuarioModel;
@@ -31,10 +32,12 @@ public class VersionRecetaService {
     }
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaCreateDTO> getAllVersiones() {
+    public List<VersionRecetaResponseDTO> getAllVersiones() {
         List<VersionRecetaModel> versiones = versionRecetaRespository.findAll();
+
         return versiones.stream().map(
-                VersionRecetaModelMapper.mapper::toVersionRecetaDto).collect(Collectors.toList());
+                VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
+
     }
 
     @Transactional(readOnly = true)

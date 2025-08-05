@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.controllers;
 
 import com.unlu.alimtrack.dtos.request.VersionRecetaCreateDTO;
+import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.services.VersionRecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class VersionRecetaController {
 
     //devuelve todas las versiones
     @GetMapping("/v")
-    public List<VersionRecetaCreateDTO> getAllVersiones() {
+    public List<VersionRecetaResponseDTO> getAllVersiones() {
         return versionRecetaService.getAllVersiones();
     }
 

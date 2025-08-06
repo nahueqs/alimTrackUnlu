@@ -8,6 +8,7 @@ import com.unlu.alimtrack.exception.RecursoYaExisteException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +18,12 @@ import java.util.stream.Collectors;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioModelMapper usuarioMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper usuarioMapper) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper usuarioMapper, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UsuarioDto> getAllUsuarios() {
@@ -36,6 +39,8 @@ public class UsuarioService {
             throw new RecursoYaExisteException("El email ya ha sido usado por un usuario existente");
         }
         // crea el usuario y devuelve un response
+        String passwordEncriptada = passwordEncoder.encode(usuarioModel.getContraseña());
+        usuarioModel.setContraseña(passwordEncriptada);
         usuarioRepository.save(usuarioModel);
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
     }
@@ -46,8 +51,7 @@ public class UsuarioService {
     }
 
     public UsuarioModel getUsuarioModelById(Long id) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        return usuarioModel;
+        return usuarioRepository.findById(id).orElse(null);
     }
 
     public void modificarUsuario(UsuarioModel usuarioModel) {
@@ -57,11 +61,5 @@ public class UsuarioService {
     public void borrarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
-
-    public UsuarioDto saveUsuario2(UsuarioDto usuarioDto) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(usuarioDto.getId()).orElse(null);
-        usuarioMapper.usuarioModelToUsuarioDTO(usuarioModel);
-        usuarioRepository.save(usuarioModel);
-        return usuarioDto;
-    }
+    
 }

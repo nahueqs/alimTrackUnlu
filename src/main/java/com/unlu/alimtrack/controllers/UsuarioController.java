@@ -2,6 +2,7 @@ package com.unlu.alimtrack.controllers;
 
 import com.unlu.alimtrack.dtos.UsuarioDto;
 import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
+import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.services.UsuarioService;
@@ -24,7 +25,7 @@ public class UsuarioController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<UsuarioDto>> getAllUsuarios() {
+    public ResponseEntity<List<UsuarioResponseDTO>> getAllUsuarios() {
         return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
 
@@ -40,8 +41,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public void modificarUsuario(@RequestBody UsuarioModel usuarioModel) {
-        usuarioService.modificarUsuario(usuarioModel);
+    public void modificarUsuario(@RequestBody UsuarioModifyDTO modificacion) {
+        usuarioService.modificarUsuario(modificacion);
     }
 
     @DeleteMapping("/{id}")

@@ -12,9 +12,8 @@ public interface RecetaModelMapper {
 
     RecetaModelMapper mapper = Mappers.getMapper(RecetaModelMapper.class);
 
-    RecetaDto recetaModelToRecetaDTO(RecetaModel receta);
-
     RecetaModel recetaDTOToRecetaModel(RecetaDto receta);
+
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     RecetaResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);
 

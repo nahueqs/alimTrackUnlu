@@ -8,7 +8,6 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,6 @@ public class RecetaService {
     private final RecetaRepository recetaRepository;
     private final RecetaModelMapper mapper;
 
-    @Autowired
     public RecetaService(RecetaRepository recetaRepository, RecetaModelMapper mapper) {
         this.recetaRepository = recetaRepository;
         this.mapper = mapper;
@@ -30,12 +28,12 @@ public class RecetaService {
     @Transactional(readOnly = true)
     public List<RecetaResponseDTO> getAllRecetasResponseDTOS() {
         try {
-        List<RecetaModel> recetas = recetaRepository.findAll();
-        if (recetas.isEmpty()) {
-            throw new RecursoNoEncontradoException("No se encontraron recetas");
-        }
-        return recetas.stream().map(
-                mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
+            List<RecetaModel> recetas = recetaRepository.findAll();
+            if (recetas.isEmpty()) {
+                throw new RecursoNoEncontradoException("No se encontraron recetas");
+            }
+            return recetas.stream().map(
+                    mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
         } catch (DataAccessException e) {
             throw new DatabaseException("Error accediendo a la base de datos");
         } catch (Exception e) {
@@ -49,8 +47,7 @@ public class RecetaService {
     }
 
     public RecetaModel getRecetaModelById(Long id) {
-        RecetaModel recetaModel = recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
-        return recetaModel;
+        return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
     public RecetaResponseDTO updateReceta(RecetaDto receta) {
@@ -64,4 +61,6 @@ public class RecetaService {
         recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         recetaRepository.deleteById(id);
     }
+
+
 }

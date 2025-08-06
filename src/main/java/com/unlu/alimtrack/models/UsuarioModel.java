@@ -1,9 +1,6 @@
 package com.unlu.alimtrack.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -15,6 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class UsuarioModel {
     @Id
     @Column(name = "id_usuario", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 100)

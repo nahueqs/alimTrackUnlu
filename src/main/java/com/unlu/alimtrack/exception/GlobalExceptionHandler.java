@@ -14,6 +14,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(RecursoYaExisteException.class)
+    public ResponseEntity<ErrorResponse> handle(RecursoYaExisteException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<String> handleDatabase(DatabaseException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error en base de datos");

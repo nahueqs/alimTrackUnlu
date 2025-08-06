@@ -1,9 +1,14 @@
 package com.unlu.alimtrack.controllers;
 
 import com.unlu.alimtrack.dtos.UsuarioDto;
+import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
+import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.services.UsuarioService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,26 +16,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-    @Autowired
-    UsuarioService usuarioService;
+
+    final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping()
-    public List<UsuarioDto> getAllUsuarios() {
-        return usuarioService.getAllUsuarios();
+    public ResponseEntity<List<UsuarioDto>> getAllUsuarios() {
+        return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
 
     @PostMapping
-    public UsuarioModel saveUsuario(@RequestBody UsuarioModel usuarioModel) {
-        return usuarioService.saveUsuario(usuarioModel);
+    public ResponseEntity<UsuarioResponseDTO> saveUsuario(@RequestBody UsuarioCreateDTO usuario) {
+        UsuarioResponseDTO saved = usuarioService.saveUsuario(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    /*@PostMapping
-    public UsuarioDto saveUsuario2(@RequestBody UsuarioDto usuarioDto) {
-        return usuarioService.saveUsuario2(usuarioDto);
-    }*/
-
     @GetMapping("/{id}")
-    public UsuarioDto getRecetaDtoById(@PathVariable Long id) {
+    public UsuarioDto getUsuarioById(@PathVariable Long id) {
         return usuarioService.getUsuarioDtoById(id);
     }
 

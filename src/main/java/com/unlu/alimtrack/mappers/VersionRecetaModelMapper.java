@@ -11,16 +11,12 @@ import org.mapstruct.factory.Mappers;
 public interface VersionRecetaModelMapper {
     VersionRecetaModelMapper mapper = Mappers.getMapper(VersionRecetaModelMapper.class);
 
-    @Mapping(target = "idCreadoPor", source = "creadoPor.id")
-    VersionRecetaCreateDTO toVersionRecetaDto(VersionRecetaModel versionRecetaModel);
-
-    @Mapping(target = "creadoPor.id", source = "idCreadoPor")
+    @Mapping(target = "creadoPor.id", source = "idUsuarioCreador")
     VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
 
-    @Mapping(target = "usuarioCreador", source = "creadoPor.nombre")
+    @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
     VersionRecetaResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
-
 
 
 }

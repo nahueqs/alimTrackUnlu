@@ -15,7 +15,7 @@ import java.time.Instant;
 @Table(name = "versionreceta")
 public class VersionRecetaModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_version", nullable = false)
     private Long id;
 

@@ -12,8 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/recetas")
 public class RecetaController {
-    @Autowired
-    RecetaService recetaService;
+
+    private final RecetaService recetaService;
+
+    public RecetaController(RecetaService recetaService) {
+        this.recetaService = recetaService;
+    }
 
     @GetMapping
     public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {

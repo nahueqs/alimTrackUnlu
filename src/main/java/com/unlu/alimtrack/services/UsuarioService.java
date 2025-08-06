@@ -1,8 +1,9 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.UsuarioDto;
 import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
+import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.exception.RecursoYaExisteException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
@@ -26,10 +27,13 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UsuarioDto> getAllUsuarios() {
+    public List<UsuarioResponseDTO> getAllUsuarios() {
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
+        if  (usuarios.isEmpty()) {
+            throw new RecursoNoEncontradoException("No hay usuarios guardados");
+        }
         return usuarios.stream().map(
-                usuarioMapper::usuarioModelToUsuarioDTO).collect(Collectors.toList());
+                usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
     }
 
     public UsuarioResponseDTO saveUsuario(UsuarioCreateDTO usuario) {
@@ -45,21 +49,32 @@ public class UsuarioService {
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
     }
 
-    public UsuarioDto getUsuarioDtoById(Long id) {
+    public UsuarioResponseDTO getUsuarioDtoById(Long id) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        return usuarioMapper.usuarioModelToUsuarioDTO(usuarioModel);
+        if (usuarioModel == null) {
+            throw new RecursoNoEncontradoException("Usuario no encontrado");
+        }
+        return usuarioMapper.usuarioModelToUsuarioResponseDTO(usuarioModel);
     }
 
-    public UsuarioModel getUsuarioModelById(Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+    public UsuarioResponseDTO getUsuarioModelById(Long id) {
+        UsuarioModel usuarioModel =  usuarioRepository.findById(id).orElse(null);
+        return usuarioMapper.usuarioModelToUsuarioResponseDTO(usuarioModel);
     }
 
-    public void modificarUsuario(UsuarioModel usuarioModel) {
-        usuarioRepository.save(usuarioModel);
+    public void modificarUsuario(UsuarioModifyDTO modificacion) {
+        if (validarModificacionUsuario(modificacion)){
+            throw new ModificacionInvalidaException("No se puede realizar la modificacion solicitada");
+        };
+        usuarioRepository.save(usuarioMapper.usuarioModifyDTOToModel(modificacion));
+    }
+
+    private boolean validarModificacionUsuario(UsuarioModifyDTO modificacion) {
+        return modificacion.nombre() != null || modificacion.contraseña() != null;
     }
 
     public void borrarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
-    
+
 }

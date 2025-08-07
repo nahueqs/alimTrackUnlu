@@ -62,5 +62,7 @@ public class RecetaService {
         recetaRepository.deleteById(id);
     }
 
-
+    public boolean existsByCreadoPor(Long id) {
+        return false;
+    }
 }

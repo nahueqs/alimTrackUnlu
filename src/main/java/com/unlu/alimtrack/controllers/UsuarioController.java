@@ -6,6 +6,7 @@ import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.services.UsuarioService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,13 +37,14 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public UsuarioDto getUsuarioById(@PathVariable Long id) {
-        return usuarioService.getUsuarioDtoById(id);
+    public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.getUsuarioResponseDTOById(id));
     }
 
     @PutMapping("/{id}")
-    public void modificarUsuario(@RequestBody UsuarioModifyDTO modificacion) {
-        usuarioService.modificarUsuario(modificacion);
+    public ResponseEntity<Void> modificarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioModifyDTO modificacion) {
+        usuarioService.modificarUsuario(id, modificacion);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.request.VersionRecetaCreateDTO;
-import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
@@ -68,14 +67,18 @@ public class VersionRecetaService {
     public VersionRecetaResponseDTO saveVersionReceta(Long idReceta, VersionRecetaCreateDTO versionRecetaCreateDto) {
         // si no tiene receta padre tira exception
         RecetaModel modelRecetaPadre = recetaService.getRecetaModelById(idReceta);
-        if (modelRecetaPadre == null) { throw new RecursoNoEncontradoException("Receta padre no encontrada"); }
+        if (modelRecetaPadre == null) {
+            throw new RecursoNoEncontradoException("Receta padre no encontrada");
+        }
         // obtengo usuario model usando dto.idCreadoPor
-        UsuarioResponseDTO modelUsuarioCreador = usuarioService.getUsuarioModelById(versionRecetaCreateDto.idUsuarioCreador());
-        if (modelUsuarioCreador == null) {throw new RecursoNoEncontradoException("Usuario no encontrado");}
+        UsuarioModel modelUsuarioCreador = usuarioService.getUsuarioModelById(versionRecetaCreateDto.idUsuarioCreador());
+        if (modelUsuarioCreador == null) {
+            throw new RecursoNoEncontradoException("Usuario no encontrado");
+        }
         // mapeo manualmente el dto a un nuevo model
         VersionRecetaModel versionModelFinal = new VersionRecetaModel();
         versionModelFinal.setRecetaPadre(modelRecetaPadre);
-        versionModelFinal.setCreadoPor(usuarioModelMapper.);
+        versionModelFinal.setCreadoPor(modelUsuarioCreador);
         versionModelFinal.setFechaCreacion(versionRecetaCreateDto.fechaCreacion());
         versionRecetaRespository.save(versionModelFinal);
 

@@ -21,5 +21,5 @@ public interface UsuarioModelMapper {
 
     UsuarioResponseDTO usuarioModelToUsuarioResponseDTO(UsuarioModel usuarioModel);
 
-    UsuarioModel usuarioModifyDTOToModel(UsuarioModifyDTO usuarioModifyDTO);
+
 }

@@ -19,10 +19,12 @@ import java.util.stream.Collectors;
 public class RecetaService {
     private final RecetaRepository recetaRepository;
     private final RecetaModelMapper mapper;
+    private final UsuarioService usuarioService;
 
-    public RecetaService(RecetaRepository recetaRepository, RecetaModelMapper mapper) {
+    public RecetaService(RecetaRepository recetaRepository, RecetaModelMapper mapper, UsuarioService usuarioService) {
         this.recetaRepository = recetaRepository;
         this.mapper = mapper;
+        this.usuarioService = usuarioService;
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +64,11 @@ public class RecetaService {
         recetaRepository.deleteById(id);
     }
 
-    public boolean existsByCreadoPor(Long id) {
-        return false;
+    public List<RecetaModel> findAllByCreadoPorId(Long id){
+        if (usuarioService.getUsuarioModelById(id) == null) {
+            throw new RecursoNoEncontradoException("Usuario no existente");
+        }
+        return recetaRepository.findAllByCreadoPorId(id);
+
     }
 }

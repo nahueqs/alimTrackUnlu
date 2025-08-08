@@ -4,11 +4,13 @@ import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
 import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
+import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.exception.RecursoYaExisteException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ public class UsuarioService {
     private final RecetaService recetaService;
     private final VersionRecetaService versionRecetaModelService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper usuarioMapper, PasswordEncoder passwordEncoder, RecetaModelRepository recetaModelRepository, RecetaService recetaModelService, VersionRecetaService versionRecetaModelService) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper usuarioMapper, PasswordEncoder passwordEncoder, @Lazy RecetaService recetaModelService, @Lazy VersionRecetaService versionRecetaModelService) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
@@ -41,13 +43,14 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO saveUsuario(UsuarioCreateDTO usuario) {
-        UsuarioModel usuarioModel = usuarioMapper.usuarioCreateDTOToModel(usuario);
+
         // verifica si ya existe un usuario con ese email
-        if (usuarioRepository.existsByEmail(usuarioModel.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.email())) {
             throw new RecursoYaExisteException("El email ya ha sido usado por un usuario existente");
         }
+        UsuarioModel usuarioModel = usuarioMapper.usuarioCreateDTOToModel(usuario);
         // crea el usuario y devuelve un response
-        String passwordEncriptada = passwordEncoder.encode(usuarioModel.getContraseña());
+        String passwordEncriptada = passwordEncoder.encode(usuario.contraseña());
         usuarioModel.setContraseña(passwordEncriptada);
         usuarioRepository.save(usuarioModel);
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
@@ -90,12 +93,14 @@ public class UsuarioService {
     }
 
     public void borrarUsuario(Long id) {
-        if (recetaService.getRecetaModelById(id) == null) {
-            throw new IllegalStateException("No se puede borrar el usuario, tiene recetas asociadas.");
+        if (recetaService.findAllByCreadoPorId(id) == null) {
+            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
         }
-        if (versionRecetaModelService.getVersionById(id) == null ) {
-            throw new IllegalStateException("No se puede borrar el usuario, tiene recetas asociadas.");
+        if (versionRecetaModelService.findAllByCreadoPorId(id) == null ) {
+            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
         }
+
+        //habria que agregar que no tenga respuestas asociadas
 
         usuarioRepository.deleteById(id);
     }

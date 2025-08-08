@@ -30,4 +30,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
     }
 
+    @ExceptionHandler(OperacionNoPermitida.class)
+    public ResponseEntity<ErrorResponse> handle(OperacionNoPermitida ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(ModificacionInvalidaException.class)
+    public ResponseEntity<ErrorResponse> handle(ModificacionInvalidaException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 }

@@ -84,4 +84,8 @@ public class VersionRecetaService {
 
         return versionRecetaModelMapper.toVersionRecetaResponseDTO(versionModelFinal);
     }
+
+    public  List<VersionRecetaModel> findAllByCreadoPorId(Long id) {
+        return versionRecetaRespository.findAllByCreadaPorId(id);
+    }
 }

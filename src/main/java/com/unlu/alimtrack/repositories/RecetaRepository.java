@@ -10,4 +10,6 @@ import java.util.List;
 public interface RecetaRepository extends JpaRepository<RecetaModel, Long> {
 
     List<RecetaModel> findAllByCreadoPorId(Long id);
+
+    RecetaModel findByCodigoReceta(String codigoReceta);
 }

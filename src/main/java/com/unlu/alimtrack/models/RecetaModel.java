@@ -17,6 +17,9 @@ public class RecetaModel {
     @Column(name = "id_receta", nullable = false)
     private Long id;
 
+    @Column(name = "codigo_receta", unique = true, nullable = false, updatable = false)
+    private String codigoReceta;
+
     @Column(name = "nombre", nullable = false)
     private String nombre;
 

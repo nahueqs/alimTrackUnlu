@@ -25,6 +25,9 @@ public class VersionRecetaModel {
     @Column(name = "descripcion")
     private String descripcion;
 
+    @Column(name = "codigo_version_receta", unique = true, nullable = false, updatable = false)
+    private String codigoVersionReceta;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_receta_padre", nullable = false)
     private RecetaModel recetaPadre;

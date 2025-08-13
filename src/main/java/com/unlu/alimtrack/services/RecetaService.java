@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.RecetaDto;
+import com.unlu.alimtrack.dtos.request.RecetaCreateDTO;
+import com.unlu.alimtrack.dtos.request.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.exception.DatabaseException;
 import com.unlu.alimtrack.exception.InternalServiceException;
@@ -52,9 +53,11 @@ public class RecetaService {
         return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
-    public RecetaResponseDTO updateReceta(RecetaDto receta) {
-        RecetaModel model = recetaRepository.findById(receta.getId()).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + receta.getId()));
-        mapper.recetaDTOToRecetaModel(receta);
+    public RecetaResponseDTO updateReceta(RecetaModifyDTO receta) {
+        RecetaModel model = recetaRepository.findByCodigoReceta((receta.codigoReceta()));
+        if (model == null) { throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + receta.codigoReceta());}
+
+        mapper.updateModelFromCreateDTO(receta, model);
         recetaRepository.save(model);
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
@@ -71,4 +74,11 @@ public class RecetaService {
         return recetaRepository.findAllByCreadoPorId(id);
 
     }
+
+
+    private String generarCodigoUnico() {
+        // RC- + 4 dígitos aleatorios
+        return "RC-" + String.format("%04d", (int) (Math.random() * 10000));
+    }
+
 }

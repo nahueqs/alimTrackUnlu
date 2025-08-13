@@ -1,6 +1,8 @@
 package com.unlu.alimtrack.controllers;
 
 import com.unlu.alimtrack.dtos.RecetaDto;
+import com.unlu.alimtrack.dtos.request.RecetaCreateDTO;
+import com.unlu.alimtrack.dtos.request.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public class RecetaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecetaResponseDTO> updateReceta(@RequestBody RecetaDto receta) {
+    public ResponseEntity<RecetaResponseDTO> updateReceta(@RequestBody RecetaModifyDTO receta) {
         RecetaResponseDTO actualizada = recetaService.updateReceta(receta);
         return ResponseEntity.ok(actualizada);
     }

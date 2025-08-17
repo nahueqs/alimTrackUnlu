@@ -12,6 +12,7 @@ import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,9 +65,9 @@ public class VersionRecetaService {
     }
 
     @Transactional
-    public VersionRecetaResponseDTO saveVersionReceta(Long idReceta, VersionRecetaCreateDTO versionRecetaCreateDto) {
+    public VersionRecetaResponseDTO saveVersionReceta(Long idRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDto) {
         // si no tiene receta padre tira exception
-        RecetaModel modelRecetaPadre = recetaService.getRecetaModelById(idReceta);
+        RecetaModel modelRecetaPadre = recetaService.getRecetaModelById(idRecetaPadre);
         if (modelRecetaPadre == null) {
             throw new RecursoNoEncontradoException("Receta padre no encontrada");
         }
@@ -75,11 +76,15 @@ public class VersionRecetaService {
         if (modelUsuarioCreador == null) {
             throw new RecursoNoEncontradoException("Usuario no encontrado");
         }
-        // mapeo manualmente el dto a un nuevo model
-        VersionRecetaModel versionModelFinal = new VersionRecetaModel();
+
+        // mapeo el dto a un nuevo model
+        VersionRecetaModel versionModelFinal;
+        versionModelFinal = versionRecetaModelMapper.toVersionRecetaModel(versionRecetaCreateDto);
         versionModelFinal.setRecetaPadre(modelRecetaPadre);
-        versionModelFinal.setCreadoPor(modelUsuarioCreador);
-        versionModelFinal.setFechaCreacion(versionRecetaCreateDto.fechaCreacion());
+        if (versionRecetaCreateDto.codigoVersionReceta() == null) {
+            versionModelFinal.setCodigoVersionReceta(generarCodigoUnicoVersionReceta());
+        }
+
         versionRecetaRespository.save(versionModelFinal);
 
         return versionRecetaModelMapper.toVersionRecetaResponseDTO(versionModelFinal);
@@ -87,5 +92,10 @@ public class VersionRecetaService {
 
     public  List<VersionRecetaModel> findAllByCreadoPorId(Long id) {
         return versionRecetaRespository.findAllByCreadaPorId(id);
+    }
+
+    private String generarCodigoUnicoVersionReceta() {
+        // RC- + 4 dígitos aleatorios
+        return "V-" + String.format("%04d", (int) (Math.random() * 10000));
     }
 }

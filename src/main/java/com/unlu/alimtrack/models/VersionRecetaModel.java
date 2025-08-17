@@ -40,4 +40,9 @@ public class VersionRecetaModel {
     @Column(name = "fecha_creacion")
     private Instant fechaCreacion;
 
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = Instant.now();
+    }
+
 }

@@ -1,14 +1,10 @@
 package com.unlu.alimtrack.controllers;
 
-import com.unlu.alimtrack.dtos.UsuarioDto;
 import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
 import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
-import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.services.UsuarioService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +27,8 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> saveUsuario(@RequestBody UsuarioCreateDTO usuario) {
-        UsuarioResponseDTO saved = usuarioService.saveUsuario(usuario);
+    public ResponseEntity<UsuarioResponseDTO> addUsuario(@RequestBody UsuarioCreateDTO usuario) {
+        UsuarioResponseDTO saved = usuarioService.addUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -42,14 +38,15 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> modificarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioModifyDTO modificacion) {
-        usuarioService.modificarUsuario(id, modificacion);
+    public ResponseEntity<Void> modifyUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioModifyDTO modificacion) {
+        usuarioService.modifyUsuario(id, modificacion);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarUsuario(@PathVariable Long id) {
-        usuarioService.borrarUsuario(id);
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+        usuarioService.deleteUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

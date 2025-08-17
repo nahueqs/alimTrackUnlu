@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 
-public record VersionRecetaResponseDTO(@NotNull Long id, String nombre, String descripcion, Instant fechaCreacion,
-                                       String nombreRecetaPadre, String creadaPor) {
+public record VersionRecetaResponseDTO(@NotNull String codigoVersionReceta,String nombreRecetaPadre, String nombre, String descripcion,
+                                        String creadaPor, Instant fechaCreacion) {
 
 }

@@ -3,13 +3,10 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.request.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.request.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
-import com.unlu.alimtrack.exception.DatabaseException;
-import com.unlu.alimtrack.exception.InternalServiceException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,32 +27,32 @@ public class RecetaService {
 
     @Transactional(readOnly = true)
     public List<RecetaResponseDTO> getAllRecetasResponseDTOS() {
-        try {
-            List<RecetaModel> recetas = recetaRepository.findAll();
-            if (recetas.isEmpty()) {
-                throw new RecursoNoEncontradoException("No se encontraron recetas");
-            }
-            return recetas.stream().map(
-                    mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error accediendo a la base de datos");
-        } catch (Exception e) {
-            throw new InternalServiceException("Error inesperado al obtener recetas");
+
+        List<RecetaModel> recetas = recetaRepository.findAll();
+        if (recetas.isEmpty()) {
+            throw new RecursoNoEncontradoException("No se encontraron recetas");
         }
+
+        return recetas.stream().map(
+                mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public RecetaResponseDTO getRecetaResponseDTOById(Long id) {
         RecetaModel recetaModel = recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         return mapper.recetaModeltoRecetaResponseDTO(recetaModel);
     }
 
+    @Transactional(readOnly = true)
     public RecetaModel getRecetaModelById(Long id) {
         return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
     public RecetaResponseDTO updateReceta(RecetaModifyDTO receta) {
         RecetaModel model = recetaRepository.findByCodigoReceta((receta.codigoReceta()));
-        if (model == null) { throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + receta.codigoReceta());}
+        if (model == null) {
+            throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + receta.codigoReceta());
+        }
 
         mapper.updateModelFromCreateDTO(receta, model);
         recetaRepository.save(model);
@@ -67,7 +64,8 @@ public class RecetaService {
         recetaRepository.deleteById(id);
     }
 
-    public List<RecetaModel> findAllByCreadoPorId(Long id){
+    @Transactional(readOnly = true)
+    public List<RecetaModel> findAllByCreadoPorId(Long id) {
         if (usuarioService.getUsuarioModelById(id) == null) {
             throw new RecursoNoEncontradoException("Usuario no existente");
         }
@@ -75,10 +73,19 @@ public class RecetaService {
 
     }
 
-
-    private String generarCodigoUnico() {
+    private String generarCodigoUnicoReceta() {
         // RC- + 4 dígitos aleatorios
         return "RC-" + String.format("%04d", (int) (Math.random() * 10000));
     }
 
+    public RecetaResponseDTO addReceta(RecetaCreateDTO receta) {
+        RecetaModel model = recetaRepository.findByCodigoReceta((receta.codigoReceta()));
+        if (model != null) {
+            throw new RecursoNoEncontradoException("Receta ya existente con codigo: " + receta.codigoReceta());
+        }
+
+        model = mapper.recetaCreateDTOtoModel(receta);
+
+        return mapper.recetaModeltoRecetaResponseDTO(model);
+    }
 }

@@ -13,6 +13,7 @@ import com.unlu.alimtrack.repositories.UsuarioRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class UsuarioService {
         this.versionRecetaModelService = versionRecetaModelService;
     }
 
+    @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> getAllUsuarios() {
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
         if (usuarios.isEmpty()) {
@@ -42,7 +44,7 @@ public class UsuarioService {
                 usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
     }
 
-    public UsuarioResponseDTO saveUsuario(UsuarioCreateDTO usuario) {
+    public UsuarioResponseDTO addUsuario(UsuarioCreateDTO usuario) {
 
         // verifica si ya existe un usuario con ese email
         if (usuarioRepository.existsByEmail(usuario.email())) {
@@ -56,6 +58,7 @@ public class UsuarioService {
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
     }
 
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO getUsuarioResponseDTOById(Long id) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
         if (usuarioModel == null) {
@@ -64,6 +67,7 @@ public class UsuarioService {
         return usuarioMapper.usuarioModelToUsuarioResponseDTO(usuarioModel);
     }
 
+    @Transactional(readOnly = true)
     public UsuarioModel getUsuarioModelById(Long id) {
         UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
         if (usuarioModel == null) {
@@ -72,7 +76,7 @@ public class UsuarioService {
         return usuarioModel;
     }
 
-    public void modificarUsuario(Long id, UsuarioModifyDTO modificacion) {
+    public void modifyUsuario(Long id, UsuarioModifyDTO modificacion) {
         if (!validarModificacionUsuario(modificacion)) {
             throw new ModificacionInvalidaException("No se puede realizar la modificacion solicitada");
         }
@@ -92,7 +96,7 @@ public class UsuarioService {
         return modificacion.nombre() != null || modificacion.contraseña() != null;
     }
 
-    public void borrarUsuario(Long id) {
+    public void deleteUsuario(Long id) {
         if (recetaService.findAllByCreadoPorId(id) == null) {
             throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
         }

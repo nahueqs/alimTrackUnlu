@@ -20,7 +20,7 @@ public class VersionRecetaController {
     }
 
     //devuelve todas las versiones
-    @GetMapping("/v")
+    @GetMapping("/versiones")
     public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersiones() {
         return ResponseEntity.ok(versionRecetaService.getAllVersiones());
     }
@@ -30,15 +30,16 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versionRecetaService.getVersionById(idReceta, idVersion));
     }
 
-    @GetMapping("/{idReceta}/versiones/")
+    @GetMapping("/{idReceta}/versiones")
     public ResponseEntity<List<VersionRecetaResponseDTO>> getVersionesByIdRecetaPadre(@PathVariable Long idReceta) {
         return ResponseEntity.ok(versionRecetaService.getVersionesByIdRecetaPadre(idReceta));
     }
 
-    @PostMapping("/{idReceta}/versiones/")
+    @PostMapping("/{idReceta}/versiones")
     public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(@PathVariable Long idReceta, @RequestBody VersionRecetaCreateDTO dto) {
         return ResponseEntity.ok(versionRecetaService.saveVersionReceta(idReceta, dto));
     }
 
+    // FALTA DELETE
 
 }

@@ -44,9 +44,9 @@ public class RecetaController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Controlador funcionando";
+    @PostMapping("/{id}")
+    public ResponseEntity<RecetaResponseDTO> addReceta(@RequestBody RecetaCreateDTO receta) {
+        return ResponseEntity.ok(recetaService.addReceta(receta));
     }
 
 }

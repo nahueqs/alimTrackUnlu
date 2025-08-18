@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
-import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
+import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
+import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.OperacionNoPermitida;

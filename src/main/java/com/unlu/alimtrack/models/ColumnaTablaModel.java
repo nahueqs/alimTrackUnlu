@@ -1,5 +1,7 @@
 package com.unlu.alimtrack.models;
 
+import com.unlu.alimtrack.enums.TipoDatoCampo;
+import com.unlu.alimtrack.enums.TipoSeccion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +12,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "columnatabla")
+@Table(name = "columna_tabla",
+uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
+
 public class ColumnaTablaModel {
     @Id
     @Column(name = "id_columna", nullable = false)
@@ -24,9 +28,9 @@ public class ColumnaTablaModel {
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Lob
-    @Column(name = "tipo_dato", nullable = false)
-    private String tipoDato;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_dato", nullable = false, length = 20)
+    private TipoDatoCampo tipoDato;
 
     @ColumnDefault("0")
     @Column(name = "orden")

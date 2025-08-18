@@ -10,4 +10,8 @@ public class SeccionService {
     public SeccionService(SeccionRepository seccionRepository) {
         this.seccionRepository = seccionRepository;
     }
+
+
+
+
 }

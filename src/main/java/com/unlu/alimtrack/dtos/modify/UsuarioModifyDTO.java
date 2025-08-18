@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.dtos.request;
+package com.unlu.alimtrack.dtos.modify;
 
 import jakarta.validation.constraints.Size;
 

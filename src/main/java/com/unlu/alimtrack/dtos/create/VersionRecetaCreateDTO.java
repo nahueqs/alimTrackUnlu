@@ -1,8 +1,6 @@
-package com.unlu.alimtrack.dtos.request;
+package com.unlu.alimtrack.dtos.create;
 
 import jakarta.validation.constraints.NotNull;
-
-import java.time.Instant;
 
 // DTO usado para recibir la peticion de crear una nueva version
 

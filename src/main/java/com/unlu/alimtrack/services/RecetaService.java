@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.request.RecetaCreateDTO;
-import com.unlu.alimtrack.dtos.request.RecetaModifyDTO;
+import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
+import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelMapper;

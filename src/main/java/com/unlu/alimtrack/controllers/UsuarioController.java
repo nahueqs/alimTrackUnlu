@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.controllers;
 
-import com.unlu.alimtrack.dtos.request.UsuarioCreateDTO;
-import com.unlu.alimtrack.dtos.request.UsuarioModifyDTO;
+import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
+import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.UsuarioService;
 import jakarta.validation.Valid;

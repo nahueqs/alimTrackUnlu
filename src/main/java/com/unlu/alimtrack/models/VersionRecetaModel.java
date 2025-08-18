@@ -12,7 +12,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Table(name = "versionreceta")
+@Table(name = "version_receta")
 public class VersionRecetaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

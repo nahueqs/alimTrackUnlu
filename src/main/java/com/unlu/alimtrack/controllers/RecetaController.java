@@ -1,11 +1,9 @@
 package com.unlu.alimtrack.controllers;
 
-import com.unlu.alimtrack.dtos.RecetaDto;
-import com.unlu.alimtrack.dtos.request.RecetaCreateDTO;
-import com.unlu.alimtrack.dtos.request.RecetaModifyDTO;
+import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
+import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

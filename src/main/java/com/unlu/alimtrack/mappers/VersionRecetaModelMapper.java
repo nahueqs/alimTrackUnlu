@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.dtos.request.VersionRecetaCreateDTO;
+import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import org.mapstruct.Mapper;

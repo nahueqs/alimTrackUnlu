@@ -10,7 +10,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "filatabla")
+@Table(name = "fila_tabla",
+uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
+
 public class FilaTablaModel {
     @Id
     @Column(name = "id_fila", nullable = false)

@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 public interface SeccionModelMapper {
     SeccionModelMapper mapper = Mappers.getMapper(SeccionModelMapper.class);
 
-    @Mapping(target = "idVersionRecetaPadre.id", source = "idVersionRecetaPadre")
+    @Mapping(target = "versionRecetaPadre.id", source = "idVersionRecetaPadre")
     SeccionModel createDTOToModel(SeccionCreateDTO seccionCreateDTO);
 
     SeccionResponseDTO toResponseDTO(SeccionModel model);

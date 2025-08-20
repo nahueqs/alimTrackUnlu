@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.enums.TipoSeccion;
 import jakarta.persistence.*;
@@ -23,6 +24,7 @@ public class ColumnaTablaModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_tabla", nullable = false)
+    @JsonIgnoreProperties("columnas")
     private TablaModel idTabla;
 
     @Column(name = "nombre", nullable = false, length = 100)

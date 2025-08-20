@@ -2,6 +2,7 @@ package com.unlu.alimtrack.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -10,6 +11,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "receta")
 public class RecetaModel {
     @Id

@@ -2,12 +2,14 @@ package com.unlu.alimtrack.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "usuario")
 public class UsuarioModel {
     @Id

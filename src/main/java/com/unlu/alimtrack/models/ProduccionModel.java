@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -19,9 +20,13 @@ public class ProduccionModel {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "id_version", nullable = false)
-    private VersionRecetaModel idVersion;
+    private VersionRecetaModel versionReceta;
+
+    @Size(max = 100)
+    @Column(name = "codigo_produccion")
+    private String codigoProduccion;
 
     @Column(name = "fecha_inicio")
     private Instant fechaInicio;
@@ -29,15 +34,21 @@ public class ProduccionModel {
     @Column(name = "fecha_fin")
     private Instant fechaFin;
 
-    @Column(name = "lote", length = 100)
+    @Size(max = 100)
+    @Column(name = "lote")
     private String lote;
 
-    @Column(name = "encargado", length = 100)
+    @Size(max = 100)
+    @Column(name = "encargado")
     private String encargado;
 
     @ColumnDefault("'en_proceso'")
-    @Lob
     @Column(name = "estado")
     private String estado;
+
+    @Size(max = 255)
+    @Column(name = "observaciones")
+    private String observaciones;
+
 
 }

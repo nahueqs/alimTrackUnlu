@@ -25,7 +25,7 @@ public class ColumnaTablaModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_tabla", nullable = false)
     @JsonIgnoreProperties("columnas")
-    private TablaModel idTabla;
+    private TablaModel tabla;
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;

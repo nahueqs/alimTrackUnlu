@@ -23,7 +23,7 @@ public class TablaModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_seccion", nullable = false)
     @JsonIgnoreProperties("tablas")
-    private SeccionModel idSeccion;
+    private SeccionModel seccion;
 
     @Column(name = "nombre")
     private String nombre;

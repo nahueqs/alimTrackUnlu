@@ -3,6 +3,7 @@ package com.unlu.alimtrack.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -13,6 +14,7 @@ import java.time.Instant;
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "version_receta")
+@NoArgsConstructor
 public class VersionRecetaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +41,5 @@ public class VersionRecetaModel {
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "fecha_creacion")
     private Instant fechaCreacion;
-
-    @PrePersist
-    protected void onCreate() {
-        this.fechaCreacion = Instant.now();
-    }
 
 }

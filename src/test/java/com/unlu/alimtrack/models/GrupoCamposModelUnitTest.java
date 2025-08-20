@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import com.unlu.alimtrack.enums.TipoSeccion;
-import static com.unlu.alimtrack.enums.TipoSeccion.agrupada;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @DataJpaTest
 @ActiveProfiles("test") // indica que use application-test.properties
-class GrupoCampoModelUnitTest {
+class GrupoCamposModelUnitTest {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -27,15 +26,15 @@ class GrupoCampoModelUnitTest {
 
     @Test
     void testSettersAndGetters() {
-        GrupoCampoModel grupoCampo = new GrupoCampoModel();
+        GrupoCamposModel grupoCampo = new GrupoCamposModel();
         SeccionModel seccion = new SeccionModel();
 
         grupoCampo.setId(1);
-        grupoCampo.setIdSeccion(seccion);
+        grupoCampo.setSeccion(seccion);
         grupoCampo.setSubtitulo("Subtitulo Test");
 
         assertEquals(1, grupoCampo.getId());
-        assertEquals(seccion, grupoCampo.getIdSeccion());
+        assertEquals(seccion, grupoCampo.getSeccion());
         assertEquals("Subtitulo Test", grupoCampo.getSubtitulo());
     }
 
@@ -65,7 +64,7 @@ class GrupoCampoModelUnitTest {
         seccion = new SeccionModel();
         seccion.setTitulo("Sección Test");
         seccion.setTipo(TipoSeccion.simple); // Ajusta según tu enum
-        seccion.setIdVersionRecetaPadre(versionReceta);
+        seccion.setVersionRecetaPadre(versionReceta);
         seccion.setOrden(1);
         seccion = entityManager.persist(seccion);
 
@@ -74,16 +73,16 @@ class GrupoCampoModelUnitTest {
 
     @Test
     public void testUniqueConstraintViolations() {
-        GrupoCampoModel grupo1 = new GrupoCampoModel();
+        GrupoCamposModel grupo1 = new GrupoCamposModel();
         grupo1.setSubtitulo("Grupo Único");
-        grupo1.setIdSeccion(seccion);
+        grupo1.setSeccion(seccion);
 
         entityManager.persist(grupo1);
         entityManager.flush();
 
-        GrupoCampoModel grupo2 = new GrupoCampoModel();
+        GrupoCamposModel grupo2 = new GrupoCamposModel();
         grupo2.setSubtitulo("Grupo Único");
-        grupo2.setIdSeccion(seccion);
+        grupo2.setSeccion(seccion);
 
         assertThrows(ConstraintViolationException.class, () -> {
             entityManager.persist(grupo2);
@@ -93,13 +92,13 @@ class GrupoCampoModelUnitTest {
 
     @Test
     public void testGruposConSubtitulosDiferentes() {
-         GrupoCampoModel grupo1 = new GrupoCampoModel();
+         GrupoCamposModel grupo1 = new GrupoCamposModel();
         grupo1.setSubtitulo("Grupo A");
-        grupo1.setIdSeccion(seccion);
+        grupo1.setSeccion(seccion);
 
-        GrupoCampoModel grupo2 = new GrupoCampoModel();
+        GrupoCamposModel grupo2 = new GrupoCamposModel();
         grupo2.setSubtitulo("Grupo B");
-        grupo2.setIdSeccion(seccion);
+        grupo2.setSeccion(seccion);
 
         entityManager.persist(grupo1);
         entityManager.persist(grupo2);

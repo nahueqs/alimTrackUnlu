@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,8 +34,12 @@ public class VersionRecetaModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_receta_padre", nullable = false)
-   // @JsonIgnoreProperties("versiones")
+    @JsonIgnoreProperties("versiones")
     private RecetaModel recetaPadre;
+
+    @OneToMany(mappedBy = "versionRecetaPadre", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("versionRecetaPadre")
+    private List<SeccionModel> secciones = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creado_por", nullable = false)

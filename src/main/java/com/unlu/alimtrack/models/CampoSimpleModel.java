@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,23 +14,25 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "campo_simple")
 public class CampoSimpleModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_campo", nullable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_seccion", nullable = false)
-    private SeccionModel idSeccion;
+    @JsonIgnoreProperties("camposSimples")
+    private SeccionModel seccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "id_grupo")
-    private GrupoCampoModel idGrupo;
+    @JsonIgnoreProperties("campos")
+    private GrupoCamposModel grupo;
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Lob
     @Column(name = "tipo_dato", nullable = false)
     private String tipoDato;
 

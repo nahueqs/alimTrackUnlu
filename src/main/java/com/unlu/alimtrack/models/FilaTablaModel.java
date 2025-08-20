@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class FilaTablaModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_tabla", nullable = false)
+    @JsonIgnoreProperties("filas")
     private TablaModel idTabla;
 
     @Column(name = "nombre", nullable = false, length = 100)

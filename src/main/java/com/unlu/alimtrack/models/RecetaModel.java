@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,9 +28,9 @@ public class RecetaModel {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-   /* @OneToMany(mappedBy = "recetaPadre", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recetaPadre", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("recetaPadre")
-    private List<VersionReceta> versiones = new ArrayList<>(); */
+    private List<VersionRecetaModel> versiones = new ArrayList<>();
 
     @Column(name = "descripcion")
     private String descripcion;

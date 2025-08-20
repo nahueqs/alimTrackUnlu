@@ -3,6 +3,7 @@ package com.unlu.alimtrack.models;
 import com.unlu.alimtrack.enums.TipoSeccion;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -11,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "seccion",
        uniqueConstraints = {@UniqueConstraint(columnNames = {"id_version_receta_padre", "orden"}),

@@ -25,7 +25,10 @@ public class RecetaModel {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Lob
+   /* @OneToMany(mappedBy = "recetaPadre", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("recetaPadre")
+    private List<VersionReceta> versiones = new ArrayList<>(); */
+
     @Column(name = "descripcion")
     private String descripcion;
 

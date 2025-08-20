@@ -32,6 +32,7 @@ public class VersionRecetaModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_receta_padre", nullable = false)
+   // @JsonIgnoreProperties("versiones")
     private RecetaModel recetaPadre;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

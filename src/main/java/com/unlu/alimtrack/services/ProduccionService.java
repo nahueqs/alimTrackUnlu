@@ -50,10 +50,19 @@ public class ProduccionService {
     public List<ProduccionResponseDTO> getAllProducciones() {
         List<ProduccionModel> producciones =  produccionRepository.findAll();
         if (producciones.isEmpty()) {
-            throw new RecursoNoEncontradoException("No se encontraron recetas");
+            throw new RecursoNoEncontradoException("No se encontraron producciones");
         }
 
         return producciones.stream().map(
                 produccionModelMapper::produccionToProduccionResponseDTO).collect(Collectors.toList());
+    }
+
+    public ProduccionResponseDTO getByCodigoProduccion(String codigo) {
+        ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
+        if (model == null) {
+            throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigo);
+        }
+        return  produccionModelMapper.produccionToProduccionResponseDTO(model);
+
     }
 }

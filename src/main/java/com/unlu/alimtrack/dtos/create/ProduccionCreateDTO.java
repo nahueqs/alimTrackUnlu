@@ -1,7 +1,13 @@
 package com.unlu.alimtrack.dtos.create;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
-public record ProduccionCreateDTO(@NotNull Long idVersionReceta, @NotNull String codigoProduccion, @NotNull Long idUsuarioCreador, String lote,
+
+public record ProduccionCreateDTO(@NotNull Long idVersionReceta, @NotNull String codigoProduccion,
+
+                                  String lote,
                                   String encargado) {
 }
+//mas tarde implementar o no con usuario creador para iniciar la produccion
+/* @NotNull Long idUsuarioCreador, */

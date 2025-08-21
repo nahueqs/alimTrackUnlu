@@ -21,7 +21,9 @@ logs/
 .mvn/
 mvnw
 mvnw.cmd
+src/main/resources/keystore.p12
 !.mvn/wrapper/maven-wrapper.jar
+.bfg-report/
 
 ### STS ###
 .apt_generated

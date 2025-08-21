@@ -15,11 +15,11 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@Table(name = "autosaveproduccion")
+@Table(name = "autosave_produccion")
 public class AutoSaveProduccionModel {
     @Id
     @Column(name = "id_autosave", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

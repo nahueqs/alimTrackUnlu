@@ -3,9 +3,11 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
+import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +50,28 @@ public class RecetaService {
         return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
-    public RecetaResponseDTO updateReceta(RecetaModifyDTO receta) {
-        RecetaModel model = recetaRepository.findByCodigoReceta((receta.codigoReceta()));
-        if (model == null) {
-            throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + receta.codigoReceta());
+    public RecetaResponseDTO updateReceta(Long idReceta, RecetaModifyDTO receta) {
+
+        RecetaModel model = recetaRepository.findById(idReceta).orElseThrow( () -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + idReceta ));
+
+        if (receta.nombre() != null) {
+            if (receta.nombre().isBlank()) {
+                throw new ModificacionInvalidaException("El nombre no puede estar vacío");
+            }
+            if (receta.nombre().length() < 2 || receta.nombre().length() > 100) {
+                throw new ModificacionInvalidaException("Nombre debe tener 2-100 caracteres");
+            }
+            model.setNombre(receta.nombre());
         }
 
-        mapper.updateModelFromCreateDTO(receta, model);
+        if (receta.descripcion() != null) {
+            if (receta.descripcion().length() > 255) {
+                throw new ModificacionInvalidaException("Descripción no puede exceder 255 caracteres");
+            }
+            model.setDescripcion(receta.descripcion());
+        }
+
+        mapper.updateModelFromModifyDTO(receta, model);
         recetaRepository.save(model);
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
@@ -84,7 +101,14 @@ public class RecetaService {
             throw new RecursoNoEncontradoException("Receta ya existente con codigo: " + receta.codigoReceta());
         }
 
+        UsuarioModel usuario = usuarioService.getUsuarioModelById(receta.idUsuarioCreador());
+        if (usuario == null) {
+            throw new RecursoNoEncontradoException("Usuario no existe con id: " +  receta.idUsuarioCreador());
+        }
+
         model = mapper.recetaCreateDTOtoModel(receta);
+
+        recetaRepository.save(model);
 
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }

@@ -2,7 +2,6 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
-import com.unlu.alimtrack.enums.TipoSeccion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +18,7 @@ uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
 public class ColumnaTablaModel {
     @Id
     @Column(name = "id_columna", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

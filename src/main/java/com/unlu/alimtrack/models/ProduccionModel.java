@@ -16,6 +16,7 @@ import java.time.Instant;
 @Table(name = "produccion")
 public class ProduccionModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_produccion", nullable = false)
     private Long id;
 

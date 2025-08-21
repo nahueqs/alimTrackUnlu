@@ -25,6 +25,15 @@ src/main/resources/keystore.p12
 !.mvn/wrapper/maven-wrapper.jar
 .bfg-report/
 
+# Base de datos
+*.db
+*.sqlite
+*.mdf
+*.ldf
+/data/
+/database/*.sqlite
+/database/*.backup
+
 ### STS ###
 .apt_generated
 .classpath

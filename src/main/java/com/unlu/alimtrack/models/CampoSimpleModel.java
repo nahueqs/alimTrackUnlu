@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.unlu.alimtrack.enums.TipoDatoCampo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,8 +34,10 @@ public class CampoSimpleModel {
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "tipo_dato", nullable = false)
-    private String tipoDato;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_dato")
+    private TipoDatoCampo tipoDato;
+
 
     @ColumnDefault("0")
     @Column(name = "orden")

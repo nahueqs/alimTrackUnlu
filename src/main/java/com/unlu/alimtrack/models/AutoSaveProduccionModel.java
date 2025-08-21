@@ -18,13 +18,14 @@ import java.util.Map;
 @Table(name = "autosave_produccion")
 public class AutoSaveProduccionModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_autosave", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_produccion", nullable = false)
-    private ProduccionModel idProduccion;
+    private ProduccionModel produccion;
 
     @Column(name = "datos")
     @JdbcTypeCode(SqlTypes.JSON)

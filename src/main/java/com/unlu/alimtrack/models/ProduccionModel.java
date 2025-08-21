@@ -17,7 +17,7 @@ import java.time.Instant;
 public class ProduccionModel {
     @Id
     @Column(name = "id_produccion", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)

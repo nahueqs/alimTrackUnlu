@@ -23,5 +23,7 @@ public interface RecetaModelMapper {
     @Mapping(target = "creadoPor.id", source = "idUsuarioCreador")
     RecetaModel recetaCreateDTOtoModel(RecetaCreateDTO receta);
 
-    void updateModelFromCreateDTO(RecetaModifyDTO dto, @MappingTarget RecetaModel model);
+    void updateModelFromModifyDTO(RecetaModifyDTO dto, @MappingTarget RecetaModel model);
+
+
 }

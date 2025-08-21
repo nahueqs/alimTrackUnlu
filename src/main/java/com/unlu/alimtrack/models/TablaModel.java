@@ -17,7 +17,7 @@ import java.util.List;
 public class TablaModel {
     @Id
     @Column(name = "id_tabla", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

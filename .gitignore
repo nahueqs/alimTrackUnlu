@@ -3,6 +3,28 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+/env.properties
+/.env.*
+/config/application-*.properties
+/backups/
+*.log
+/target/
+/.idea/
+/.settings/
+*.keystore
+env.properties
+*.jks
+/src/main/resources/application-dev.properties
+/src/main/resources/application-prod.properties
+/src/main/resources/config/ssl-*.properties
+/keystore.p12
+*.p12
+/secrets/
+logs/
+.mvn/
+mvnw
+mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
 .apt_generated
@@ -31,3 +53,34 @@ build/
 
 ### VS Code ###
 .vscode/
+##############################
+## Java
+##############################
+.mtj.tmp/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+##############################
+## Maven
+##############################
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.bak
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+##############################
+## IntelliJ
+##############################
+out/
+.idea/
+.idea_modules/
+

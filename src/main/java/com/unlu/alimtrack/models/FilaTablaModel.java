@@ -17,7 +17,7 @@ uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
 public class FilaTablaModel {
     @Id
     @Column(name = "id_fila", nullable = false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

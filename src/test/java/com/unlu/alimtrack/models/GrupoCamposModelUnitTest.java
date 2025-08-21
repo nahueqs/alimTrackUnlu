@@ -29,7 +29,7 @@ class GrupoCamposModelUnitTest {
         GrupoCamposModel grupoCampo = new GrupoCamposModel();
         SeccionModel seccion = new SeccionModel();
 
-        grupoCampo.setId(1);
+        grupoCampo.setId(1L);
         grupoCampo.setSeccion(seccion);
         grupoCampo.setSubtitulo("Subtitulo Test");
 

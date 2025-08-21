@@ -31,8 +31,8 @@ public class RecetaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecetaResponseDTO> updateReceta(@RequestBody RecetaModifyDTO receta) {
-        RecetaResponseDTO actualizada = recetaService.updateReceta(receta);
+    public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable Long id, @RequestBody RecetaModifyDTO receta) {
+        RecetaResponseDTO actualizada = recetaService.updateReceta(id, receta);
         return ResponseEntity.ok(actualizada);
     }
 

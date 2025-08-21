@@ -6,6 +6,7 @@ import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.services.ProduccionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,11 @@ public class ProduccionController {
     @GetMapping()
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(){
         return ResponseEntity.ok(produccionService.getAllProducciones());
+    }
+
+    @GetMapping("/{codigoProduccion}")
+    public ResponseEntity<ProduccionResponseDTO> getProduccionByCodigoProduccion(@PathVariable String codigoProduccion){
+        return ResponseEntity.ok(produccionService.getByCodigoProduccion(codigoProduccion));
     }
 
 

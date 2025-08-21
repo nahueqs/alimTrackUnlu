@@ -13,4 +13,5 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
     List<ProduccionModel> findByFechaInicioBetween(Date start, Date end);
     List<ProduccionModel> findByVersionRecetaId(Long versionRecetaId);
 
+    ProduccionModel findByCodigoProduccion(String codigo);
 }

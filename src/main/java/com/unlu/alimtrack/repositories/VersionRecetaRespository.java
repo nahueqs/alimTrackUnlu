@@ -19,6 +19,8 @@ public interface VersionRecetaRespository extends JpaRepository<VersionRecetaMod
 
     @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.creadoPor.id = :idCreadaPor")
     List<VersionRecetaModel> findAllByCreadaPorId(Long idCreadaPor);
+
+    VersionRecetaModel findByCodigoVersionReceta(String codigoVersionReceta);
 }
 
 

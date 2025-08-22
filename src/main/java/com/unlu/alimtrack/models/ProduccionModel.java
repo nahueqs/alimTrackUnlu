@@ -43,7 +43,7 @@ public class ProduccionModel {
     @Column(name = "encargado")
     private String encargado;
 
-    @ColumnDefault("'en_proceso'")
+    @ColumnDefault("'en_curso'")
     @Column(name = "estado")
     private String estado;
 

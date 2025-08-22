@@ -5,10 +5,7 @@ import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.services.ProduccionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,8 +24,11 @@ public class ProduccionController {
         return "test";
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(){
+    @GetMapping
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones( @RequestParam(required = false) String codigoVersionReceta){
+        if (codigoVersionReceta != null) {
+            return ResponseEntity.ok(produccionService.getAllProduccionesByCodigoVersionReceta(codigoVersionReceta));
+        }
         return ResponseEntity.ok(produccionService.getAllProducciones());
     }
 
@@ -36,6 +36,21 @@ public class ProduccionController {
     public ResponseEntity<ProduccionResponseDTO> getProduccionByCodigoProduccion(@PathVariable String codigoProduccion){
         return ResponseEntity.ok(produccionService.getByCodigoProduccion(codigoProduccion));
     }
+
+    @GetMapping("/en-curso")
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesEnCurso(){
+        return ResponseEntity.ok(produccionService.getAllProduccionesEnCurso());
+    }
+
+    @GetMapping("/finalizadas")
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesFinalizadas(){
+        return ResponseEntity.ok(produccionService.getAllProduccionesFinalizadas());
+    }
+    
+    /*@GetMapping("/{codigoReceta}")
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesByCodigoReceta(@PathVariable String codigoReceta){
+        return ResponseEntity.ok(produccionService.getAllProduccionesByCodigoReceta(codigoReceta));
+    }*/
 
 
 }

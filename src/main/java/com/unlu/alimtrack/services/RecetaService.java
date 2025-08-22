@@ -112,4 +112,12 @@ public class RecetaService {
 
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
+
+    public RecetaModel getRecetaModelByCodigoReceta(String codigoReceta) {
+        RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
+        if (model == null) {
+            throw new RecursoNoEncontradoException("No existe receta con el codigo " + codigoReceta);
+        }
+        return model;
+    }
 }

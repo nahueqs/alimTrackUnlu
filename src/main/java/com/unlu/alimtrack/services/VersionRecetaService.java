@@ -97,4 +97,12 @@ public class VersionRecetaService {
         // RC- + 4 dígitos aleatorios
         return "V-" + String.format("%04d", (int) (Math.random() * 10000));
     }
+
+    public VersionRecetaModel getVersionByCodigo(String codigoVersionReceta) {
+        VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(codigoVersionReceta);
+        if (model == null) {
+            throw new RecursoNoEncontradoException("No existe ninguna version con el codigo " + codigoVersionReceta);
+        }
+        return model;
+    }
 }

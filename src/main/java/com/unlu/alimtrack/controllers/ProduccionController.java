@@ -7,6 +7,7 @@ import com.unlu.alimtrack.services.ProduccionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,11 +18,6 @@ public class ProduccionController {
 
     public ProduccionController(ProduccionService produccionService) {
         this.produccionService = produccionService;
-    }
-
-    @GetMapping("/test")
-    public String test(){
-        return "test";
     }
 
     @GetMapping
@@ -46,11 +42,5 @@ public class ProduccionController {
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesFinalizadas(){
         return ResponseEntity.ok(produccionService.getAllProduccionesFinalizadas());
     }
-    
-    /*@GetMapping("/{codigoReceta}")
-    public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesByCodigoReceta(@PathVariable String codigoReceta){
-        return ResponseEntity.ok(produccionService.getAllProduccionesByCodigoReceta(codigoReceta));
-    }*/
-
 
 }

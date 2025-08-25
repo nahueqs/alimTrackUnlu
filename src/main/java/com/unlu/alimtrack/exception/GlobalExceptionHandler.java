@@ -14,8 +14,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(FechaFormatException.class)
+    public ResponseEntity<ErrorResponse> handleFechaNoValida(FechaFormatException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(error);
+    }
+
     @ExceptionHandler(RecursoYaExisteException.class)
-    public ResponseEntity<ErrorResponse> handle(RecursoYaExisteException ex) {
+    public ResponseEntity<ErrorResponse> handleRecursoYaExistente(RecursoYaExisteException ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
@@ -31,13 +37,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(OperacionNoPermitida.class)
-    public ResponseEntity<ErrorResponse> handle(OperacionNoPermitida ex) {
+    public ResponseEntity<ErrorResponse> handleRecursoYaExistente(OperacionNoPermitida ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(ModificacionInvalidaException.class)
-    public ResponseEntity<ErrorResponse> handle(ModificacionInvalidaException ex) {
+    public ResponseEntity<ErrorResponse> handleRecursoYaExistente(ModificacionInvalidaException ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }

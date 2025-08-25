@@ -28,7 +28,7 @@ public class RecetaService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecetaResponseDTO> getAllRecetasResponseDTOS() {
+    public List<RecetaResponseDTO> findAllRecetasResponseDTOS() {
 
         List<RecetaModel> recetas = recetaRepository.findAll();
         if (recetas.isEmpty()) {
@@ -40,19 +40,30 @@ public class RecetaService {
     }
 
     @Transactional(readOnly = true)
-    public RecetaResponseDTO getRecetaResponseDTOById(Long id) {
+    protected List<RecetaModel> findAllModelsByCodigoReceta(String codigoReceta) {
+
+        List<RecetaModel> recetas = recetaRepository.findAllByCodigoReceta(codigoReceta);
+        if (recetas.isEmpty()) {
+            throw new RecursoNoEncontradoException("No se encontraron recetas con ese codigo " + codigoReceta);
+        }
+
+        return recetas;
+    }
+
+    @Transactional(readOnly = true)
+    public RecetaResponseDTO findRecetaResponseDTOById(Long id) {
         RecetaModel recetaModel = recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         return mapper.recetaModeltoRecetaResponseDTO(recetaModel);
     }
 
     @Transactional(readOnly = true)
-    public RecetaModel getRecetaModelById(Long id) {
+    protected RecetaModel findRecetaModelById(Long id) {
         return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
     public RecetaResponseDTO updateReceta(Long idReceta, RecetaModifyDTO receta) {
 
-        RecetaModel model = recetaRepository.findById(idReceta).orElseThrow( () -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + idReceta ));
+        RecetaModel model = recetaRepository.findById(idReceta).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + idReceta));
 
         if (receta.nombre() != null) {
             if (receta.nombre().isBlank()) {
@@ -82,7 +93,7 @@ public class RecetaService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecetaModel> findAllByCreadoPorId(Long id) {
+    protected List<RecetaModel> findAllByCreadoPorId(Long id) {
         if (usuarioService.getUsuarioModelById(id) == null) {
             throw new RecursoNoEncontradoException("Usuario no existente");
         }
@@ -103,7 +114,7 @@ public class RecetaService {
 
         UsuarioModel usuario = usuarioService.getUsuarioModelById(receta.idUsuarioCreador());
         if (usuario == null) {
-            throw new RecursoNoEncontradoException("Usuario no existe con id: " +  receta.idUsuarioCreador());
+            throw new RecursoNoEncontradoException("Usuario no existe con id: " + receta.idUsuarioCreador());
         }
 
         model = mapper.recetaCreateDTOtoModel(receta);
@@ -113,11 +124,15 @@ public class RecetaService {
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
 
-    public RecetaModel getRecetaModelByCodigoReceta(String codigoReceta) {
+    protected RecetaModel findRecetaModelByCodigoReceta(String codigoReceta) {
         RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
         if (model == null) {
             throw new RecursoNoEncontradoException("No existe receta con el codigo " + codigoReceta);
         }
         return model;
+    }
+
+    private List<RecetaResponseDTO> convertToResponseDTOList(List<RecetaModel> recetas) {
+        return recetas.stream().map(mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
     }
 }

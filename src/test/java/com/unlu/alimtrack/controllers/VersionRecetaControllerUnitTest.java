@@ -32,15 +32,15 @@ public class VersionRecetaControllerUnitTest {
     @Test
     void testGetAllVersionRecetas() {
         List<VersionRecetaResponseDTO> listaResponseDTOs = List.of(new VersionRecetaResponseDTO("RTEST-001", "Milanesa", "Nombre test", "Descripcion test", "Id creador", Instant.parse("2025-08-17T00:00:00Z")));
-        when(versionRecetaService.getAllVersiones()).thenReturn(listaResponseDTOs);
+        when(versionRecetaService.findAllVersiones()).thenReturn(listaResponseDTOs);
         ResponseEntity<List<VersionRecetaResponseDTO>> resp = versionRecetaController.getAllVersiones();
         assertEquals(1, resp.getBody().size());
-        verify(versionRecetaService).getAllVersiones();
+        verify(versionRecetaService).findAllVersiones();
     }
 
     @Test
     void testGetVersionByIdRecetaNoExiste() {
-        when(versionRecetaService.getVersionById(999L, 1L))
+        when(versionRecetaService.findVersionRecetaByIdRecetaAndIdVersion(999L, 1L))
                 .thenThrow(new RecursoNoEncontradoException("Receta no encontrada"));
 
         Exception exception = assertThrows(RecursoNoEncontradoException.class, () -> {
@@ -48,7 +48,7 @@ public class VersionRecetaControllerUnitTest {
         });
 
         assertEquals("Receta no encontrada", exception.getMessage());
-        verify(versionRecetaService).getVersionById(999L, 1L);
+        verify(versionRecetaService).findVersionRecetaByIdRecetaAndIdVersion(999L, 1L);
     }
 
     @Test
@@ -70,14 +70,14 @@ public class VersionRecetaControllerUnitTest {
     @Test
     void testGetVersionesByIdRecetaPadreSinVersiones() {
         // Simulamos que devuelve lista vacía
-        when(versionRecetaService.getVersionesByIdRecetaPadre(2L))
+        when(versionRecetaService.findAllVersionesByIdRecetaPadre(2L))
                 .thenReturn(List.of());
 
         ResponseEntity<List<VersionRecetaResponseDTO>> resp =
                 versionRecetaController.getVersionesByIdRecetaPadre(2L);
 
         assertEquals(0, resp.getBody().size());
-        verify(versionRecetaService).getVersionesByIdRecetaPadre(2L);
+        verify(versionRecetaService).findAllVersionesByIdRecetaPadre(2L);
     }
 
     @Test
@@ -86,13 +86,13 @@ public class VersionRecetaControllerUnitTest {
                 "VTEST-001", "Receta Padre", "Nombre Version", "Descripcion test", "Creador", Instant.now()
         );
 
-        when(versionRecetaService.getVersionById(1L, 1L)).thenReturn(dto);
+        when(versionRecetaService.findVersionRecetaByIdRecetaAndIdVersion(1L, 1L)).thenReturn(dto);
 
         ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.getVersionById(1L, 1L);
 
         assertEquals("VTEST-001", resp.getBody().codigoVersionReceta());
         assertEquals("Nombre Version", resp.getBody().nombre());
-        verify(versionRecetaService).getVersionById(1L, 1L);
+        verify(versionRecetaService).findVersionRecetaByIdRecetaAndIdVersion(1L, 1L);
     }
 
     @Test
@@ -105,14 +105,14 @@ public class VersionRecetaControllerUnitTest {
         );
 
         List<VersionRecetaResponseDTO> list = List.of(dto1, dto2);
-        when(versionRecetaService.getVersionesByIdRecetaPadre(1L)).thenReturn(list);
+        when(versionRecetaService.findAllVersionesByIdRecetaPadre(1L)).thenReturn(list);
 
         ResponseEntity<List<VersionRecetaResponseDTO>> resp = versionRecetaController.getVersionesByIdRecetaPadre(1L);
 
         assertEquals(2, resp.getBody().size());
         assertEquals("VTEST-001", resp.getBody().get(0).codigoVersionReceta());
         assertEquals("VTEST-002", resp.getBody().get(1).codigoVersionReceta());
-        verify(versionRecetaService).getVersionesByIdRecetaPadre(1L);
+        verify(versionRecetaService).findAllVersionesByIdRecetaPadre(1L);
     }
 
     @Test

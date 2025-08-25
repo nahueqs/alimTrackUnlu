@@ -22,12 +22,12 @@ public class RecetaController {
 
     @GetMapping
     public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
-        return ResponseEntity.ok(recetaService.getAllRecetasResponseDTOS());
+        return ResponseEntity.ok(recetaService.findAllRecetasResponseDTOS());
     }
 
     @GetMapping("/{id}/")
     public ResponseEntity<RecetaResponseDTO> getRecetaById(@PathVariable Long id) {
-        return ResponseEntity.ok(recetaService.getRecetaResponseDTOById(id));
+        return ResponseEntity.ok(recetaService.findRecetaResponseDTOById(id));
     }
 
     @PutMapping("/{id}")

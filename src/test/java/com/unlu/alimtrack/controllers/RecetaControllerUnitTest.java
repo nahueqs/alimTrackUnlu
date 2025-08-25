@@ -30,19 +30,19 @@ class RecetaControllerUnitTest {
     @Test
     void testGetAllRecetas() {
         List<RecetaResponseDTO> list = List.of(new RecetaResponseDTO("RTEST-001", "Milanesa", "Descripcion test", Instant.now(), "Id creador"));
-        when(recetaService.getAllRecetasResponseDTOS()).thenReturn(list);
+        when(recetaService.findAllRecetasResponseDTOS()).thenReturn(list);
         ResponseEntity<List<RecetaResponseDTO>> resp = recetaController.getAllRecetas();
         assertEquals(1, resp.getBody().size());
-        verify(recetaService).getAllRecetasResponseDTOS();
+        verify(recetaService).findAllRecetasResponseDTOS();
     }
 
     @Test
     void testGetRecetaById() {
         RecetaResponseDTO dto = new RecetaResponseDTO("RTEST-001", "Milanesa", "Descripcion test", Instant.now(), "Id creador");
-        when(recetaService.getRecetaResponseDTOById(1L)).thenReturn(dto);
+        when(recetaService.findRecetaResponseDTOById(1L)).thenReturn(dto);
         ResponseEntity<RecetaResponseDTO> resp = recetaController.getRecetaById(1L);
         assertEquals("RTEST-001", resp.getBody().codigoReceta().toString());
-        verify(recetaService).getRecetaResponseDTOById(1L);
+        verify(recetaService).findRecetaResponseDTOById(1L);
     }
 
     @Test

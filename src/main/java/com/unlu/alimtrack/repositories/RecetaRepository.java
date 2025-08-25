@@ -18,4 +18,6 @@ public interface RecetaRepository extends JpaRepository<RecetaModel, Long> {
     @Query("SELECT COUNT(r) > 0 FROM RecetaModel r WHERE r.codigoReceta = :codigoReceta AND r.id != :excludeId")
     boolean existsByCodigoRecetaAndIdNot(@Param("codigoReceta") String codigoReceta,
                                          @Param("excludeId") Long excludeId);
+
+    List<RecetaModel> findAllByCodigoReceta(String codigoReceta);
 }

@@ -19,8 +19,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.unlu.alimtrack.mappers.ProduccionModelMapper.produccionModelMapper;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,7 +30,7 @@ public class ProduccionService {
     private final DateHelper dateHelper;
     private final ProduccionValidator produccionValidator;
 
-    public ProduccionCreateDTO crearProduccion(ProduccionCreateDTO productionDTO) {
+    public ProduccionCreateDTO addProduccion(ProduccionCreateDTO productionDTO) {
         // Validar que la receta exista
         // Verificar disponibilidad de insumos
         // Calcular costos estimados
@@ -40,13 +38,13 @@ public class ProduccionService {
         return null;
     }
 
-    public ProduccionCambioEstadoRequestDTO actualizarEstado(Long productionId, ProduccionCambioEstadoRequestDTO nuevoEstado) {
+    public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId, ProduccionCambioEstadoRequestDTO nuevoEstado) {
         // Validar transiciones de estado válidas
         // Ej: No se puede cancelar una producción completada
         return null;
     }
 
-    public ProduccionResponseDTO getByCodigoProduccion(String codigo) {
+    public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
         ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
         if (model == null) {
             throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigo);
@@ -54,7 +52,7 @@ public class ProduccionService {
         return produccionModelMapper.produccionToProduccionResponseDTO(model);
     }
 
-    public List<ProduccionResponseDTO> getAllProduccionesEnCurso() {
+    public List<ProduccionResponseDTO> findAllProduccionesEnCurso() {
         List<ProduccionModel> producciones = produccionRepository.findAllByEstado(TipoEstadoProduccion.EN_CURSO.getValorBaseDatos());
 
         if (producciones.isEmpty()) {
@@ -64,7 +62,7 @@ public class ProduccionService {
         return producciones.stream().map(produccionModelMapper::produccionToProduccionResponseDTO).collect(Collectors.toList());
     }
 
-    public List<ProduccionResponseDTO> getAllProduccionesFinalizadas() {
+    public List<ProduccionResponseDTO> findAllProduccionesFinalizadas() {
         List<ProduccionModel> producciones = produccionRepository.findAllByEstado(TipoEstadoProduccion.FINALIZADA.getValorBaseDatos());
 
         if (producciones.isEmpty()) {
@@ -74,30 +72,30 @@ public class ProduccionService {
         return producciones.stream().map(produccionModelMapper::produccionToProduccionResponseDTO).collect(Collectors.toList());
     }
 
-    public List<ProduccionResponseDTO> getProduccionesByReceta(String codigoReceta) {
-        log.debug("Buscando producciones para receta: {}", codigoReceta);
+    /*public List<ProduccionResponseDTO> findAllProduccionesByCodigoReceta(String codigoReceta) {
+
+        log.debug("Buscando versiones para receta: {}", codigoReceta);
 
         // obtener todas las versiones de la receta
-        List<VersionRecetaModel> versiones = versionRecetaService.getAllVersionesModelByCodigoVersion(codigoReceta);
+        List<VersionRecetaModel> versiones = versionRecetaService.findAllVersionesByCodigoRecetaPadre(codigoReceta);
 
         if (versiones.isEmpty()) {
             throw new RecursoNoEncontradoException("No se encontraron versiones para la receta: " + codigoReceta);
         }
 
-        // obtener IDs de versiones
-        List<Long> versionIds = versiones.stream()
-                .map(VersionRecetaModel::getId)
-                .collect(Collectors.toList());
+        for (VersionRecetaModel version : versiones) {
+            try{
+                List<ProduccionModel> producciones = findAllProduccionesByCodigoVersionReceta(version.getCodigoVersionReceta());
+            }
+        }
 
-        // buscar producciones de esas versiones
-        List<ProduccionModel> producciones = produccionRepository.findAllByCodigoVersionReceta(codigoVersionReceta);
 
-        return convertToResponseDTOList(producciones);
-    }
-}
+        return null;
+    }*/
 
-    public List<ProduccionResponseDTO> getAllProduccionesByCodigoVersionReceta(String codigoVersionReceta) {
-        VersionRecetaModel version = versionRecetaService.getVersionByCodigo(codigoVersionReceta);
+
+    public List<ProduccionResponseDTO> findAllProduccionesByCodigoVersionReceta(String codigoVersionReceta) {
+        VersionRecetaModel version = versionRecetaService.findVersionByCodigo(codigoVersionReceta);
         if (version == null) {
             throw new RecursoNoEncontradoException("No existe ninguna version con el codigo " + codigoVersionReceta);
         }
@@ -143,7 +141,7 @@ public class ProduccionService {
      */
     public List<ProduccionResponseDTO> findProduccionesByFilters(String codigoVersionReceta, String lote, String encargado, String fechaInicioStr, String fechaFinStr) {
 
-        log.debug("Buscando producciones con filtros: codigoVersionReceta={}, lote={}, encargado={}, fechaInicio={}, fechaFin={}" ,codigoVersionReceta, lote,  encargado, fechaInicioStr, fechaFinStr);
+        log.debug("Buscando producciones con filtros: codigoVersionReceta={}, lote={}, encargado={}, fechaInicio={}, fechaFin={}", codigoVersionReceta, lote, encargado, fechaInicioStr, fechaFinStr);
 
         // valido fechas
         Instant fechaInicio = dateHelper.parseAndValidateFecha(fechaInicioStr);

@@ -38,17 +38,17 @@ public class ProduccionController {
     public ResponseEntity<ProduccionResponseDTO> getProduccionByCodigoProduccion(@PathVariable String codigoProduccion) {
         System.out.println("Usando getProduccionByCodigoProduccion");
 
-        return ResponseEntity.ok(produccionService.getByCodigoProduccion(codigoProduccion));
+        return ResponseEntity.ok(produccionService.findByCodigoProduccion(codigoProduccion));
     }
 
     @GetMapping("/en-curso")
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesEnCurso() {
-        return ResponseEntity.ok(produccionService.getAllProduccionesEnCurso());
+        return ResponseEntity.ok(produccionService.findAllProduccionesEnCurso());
     }
 
     @GetMapping("/finalizadas")
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesFinalizadas() {
-        return ResponseEntity.ok(produccionService.getAllProduccionesFinalizadas());
+        return ResponseEntity.ok(produccionService.findAllProduccionesFinalizadas());
     }
 
 

@@ -37,7 +37,7 @@ public class VersionRecetaService {
     public List<VersionRecetaResponseDTO> getAllVersiones() {
         List<VersionRecetaModel> versiones = versionRecetaRespository.findAll();
         if (versiones.isEmpty()) {
-            throw new RecursoNoEncontradoException("No hay recetas guardadas");
+            throw new RecursoNoEncontradoException("No hay versiones guardadas para ninguna receta");
         }
         return versiones.stream().map(
                 VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
@@ -45,10 +45,41 @@ public class VersionRecetaService {
     }
 
     @Transactional(readOnly = true)
+    public List<VersionRecetaResponseDTO> getAllVersionesByCodigoVersion(String codigoVersionReceta) {
+        List<VersionRecetaModel> versiones = versionRecetaRespository.findAllByCodigoVersionReceta(codigoVersionReceta);
+        if (versiones.isEmpty()) {
+            throw new RecursoNoEncontradoException("No hay versiones con el código "+ codigoVersionReceta);
+        }
+        return versiones.stream().map(
+                VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<VersionRecetaModel> getAllVersionesModelByCodigoVersion(String codigoVersionReceta) {
+        List<VersionRecetaModel> versiones = versionRecetaRespository.findAllByCodigoVersionReceta(codigoVersionReceta);
+        if (versiones.isEmpty()) {
+            throw new RecursoNoEncontradoException("No hay versiones con el código "+ codigoVersionReceta);
+        }
+        return versiones;
+    }
+
+
+
+
+    @Transactional(readOnly = true)
     public VersionRecetaResponseDTO getVersionById(Long idReceta, Long idVersion) {
         VersionRecetaModel model = versionRecetaRespository.findByIdRecetaPadreAndIdVersion(idReceta, idVersion);
         if (model == null) {
             throw new RecursoNoEncontradoException("La versión no existe");
+        }
+        return VersionRecetaModelMapper.mapper.toVersionRecetaResponseDTO(model);
+    }
+
+    @Transactional(readOnly = true)
+    public VersionRecetaResponseDTO getVersionByCodigoVersion(Long idReceta, String CodigoVersion) {
+        VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(CodigoVersion);
+        if (model == null) {
+            throw new RecursoNoEncontradoException("No hay versiones guardadas con ese código");
         }
         return VersionRecetaModelMapper.mapper.toVersionRecetaResponseDTO(model);
     }
@@ -105,4 +136,6 @@ public class VersionRecetaService {
         }
         return model;
     }
+
+
 }

@@ -20,4 +20,6 @@ public interface RecetaRepository extends JpaRepository<RecetaModel, Long> {
                                          @Param("excludeId") Long excludeId);
 
     List<RecetaModel> findAllByCodigoReceta(String codigoReceta);
+
+    void deleteByCodigoReceta(String codigo);
 }

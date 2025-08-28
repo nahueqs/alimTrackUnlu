@@ -5,7 +5,7 @@ import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-// * Validador para parámetros de búsqueda de producciones
+// Validador para parámetros de búsqueda de producciones
 
 @Component
 @RequiredArgsConstructor

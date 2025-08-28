@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,7 +73,7 @@ public class ProduccionService {
         return producciones.stream().map(produccionModelMapper::produccionToProduccionResponseDTO).collect(Collectors.toList());
     }
 
-    /*public List<ProduccionResponseDTO> findAllProduccionesByCodigoReceta(String codigoReceta) {
+    public List<ProduccionResponseDTO> findAllProduccionesByCodigoReceta(String codigoReceta) {
 
         log.debug("Buscando versiones para receta: {}", codigoReceta);
 
@@ -82,16 +83,22 @@ public class ProduccionService {
         if (versiones.isEmpty()) {
             throw new RecursoNoEncontradoException("No se encontraron versiones para la receta: " + codigoReceta);
         }
-
+        List<ProduccionResponseDTO> producciones = new ArrayList<>();
         for (VersionRecetaModel version : versiones) {
-            try{
-                List<ProduccionModel> producciones = findAllProduccionesByCodigoVersionReceta(version.getCodigoVersionReceta());
+            try {
+                producciones = findAllProduccionesByCodigoVersionReceta(version.getCodigoVersionReceta());
+            } catch (Exception e) {
+                log.error("Error obteniendo producciones para versión {}: {}",
+                        version.getCodigoVersionReceta(), e.getMessage());
             }
         }
 
+        if (producciones.isEmpty()) {
+            throw new RecursoNoEncontradoException("No hay producciones para la receta " + codigoReceta);   
+        }
 
-        return null;
-    }*/
+        return producciones;
+    }
 
 
     public List<ProduccionResponseDTO> findAllProduccionesByCodigoVersionReceta(String codigoVersionReceta) {

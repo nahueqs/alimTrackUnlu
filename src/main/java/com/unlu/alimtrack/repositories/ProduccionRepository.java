@@ -47,5 +47,5 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
 
     boolean existsByEncargadoIgnoreCase(String encargado);
 
-    List<ProduccionModel> findAllByCodigoVersionReceta(String codigoVersionReceta);
+    //List<ProduccionModel> findAllByCodigoVersionReceta(String codigoVersionReceta);
 }

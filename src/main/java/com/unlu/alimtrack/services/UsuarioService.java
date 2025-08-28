@@ -2,12 +2,14 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
+import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.exception.RecursoYaExisteException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
+import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import org.springframework.context.annotation.Lazy;
@@ -107,6 +109,11 @@ public class UsuarioService {
         //habria que agregar que no tenga respuestas asociadas
 
         usuarioRepository.deleteById(id);
+    }
+
+    // convierte una lista de models a otra de responseDTO
+    private List<UsuarioResponseDTO> convertToResponseDTOList(List<UsuarioModel> usuarios) {
+        return usuarios.stream().map(usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
     }
 
 }

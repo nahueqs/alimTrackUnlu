@@ -41,6 +41,13 @@ public class ProduccionController {
         return ResponseEntity.ok(produccionService.findByCodigoProduccion(codigoProduccion));
     }
 
+    @GetMapping("/recetas/{codigoReceta}")
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesByCodigoReceta(@PathVariable String codigoReceta) {
+        System.out.println("Usando getAllProduccionesByCodigoReceta");
+
+        return ResponseEntity.ok(produccionService.findAllProduccionesByCodigoReceta(codigoReceta));
+    }
+
     @GetMapping("/en-curso")
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProduccionesEnCurso() {
         return ResponseEntity.ok(produccionService.findAllProduccionesEnCurso());

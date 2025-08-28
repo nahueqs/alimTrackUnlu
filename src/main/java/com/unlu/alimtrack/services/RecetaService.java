@@ -51,7 +51,7 @@ public class RecetaService {
     }
 
     @Transactional(readOnly = true)
-    public RecetaResponseDTO findRecetaResponseDTOById(Long id) {
+    public RecetaResponseDTO findRecetaById(Long id) {
         RecetaModel recetaModel = recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         return mapper.recetaModeltoRecetaResponseDTO(recetaModel);
     }
@@ -92,6 +92,14 @@ public class RecetaService {
         recetaRepository.deleteById(id);
     }
 
+    public void deleteRecetaByCodigoReceta(String codigo) {
+        RecetaModel receta = recetaRepository.findByCodigoReceta(codigo);
+        if (receta == null) {
+            throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + codigo);
+        }
+        recetaRepository.deleteByCodigoReceta(codigo);
+    }
+
     @Transactional(readOnly = true)
     protected List<RecetaModel> findAllByCreadoPorId(Long id) {
         if (usuarioService.getUsuarioModelById(id) == null) {
@@ -124,12 +132,12 @@ public class RecetaService {
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
 
-    protected RecetaModel findRecetaModelByCodigoReceta(String codigoReceta) {
+    public RecetaResponseDTO findRecetaByCodigoReceta(String codigoReceta) {
         RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
         if (model == null) {
             throw new RecursoNoEncontradoException("No existe receta con el codigo " + codigoReceta);
         }
-        return model;
+        return mapper.recetaModeltoRecetaResponseDTO(model);
     }
 
     private List<RecetaResponseDTO> convertToResponseDTOList(List<RecetaModel> recetas) {

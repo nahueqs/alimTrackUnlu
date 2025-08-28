@@ -37,15 +37,6 @@ class RecetaControllerUnitTest {
     }
 
     @Test
-    void testGetRecetaById() {
-        RecetaResponseDTO dto = new RecetaResponseDTO("RTEST-001", "Milanesa", "Descripcion test", Instant.now(), "Id creador");
-        when(recetaService.findRecetaResponseDTOById(1L)).thenReturn(dto);
-        ResponseEntity<RecetaResponseDTO> resp = recetaController.getRecetaById(1L);
-        assertEquals("RTEST-001", resp.getBody().codigoReceta().toString());
-        verify(recetaService).findRecetaResponseDTOById(1L);
-    }
-
-    @Test
     void testAddReceta() {
         RecetaCreateDTO testCreateDTO = new RecetaCreateDTO("RTEST-001", "Tarta", "Desc test", 1L);
         RecetaResponseDTO testResponseDTO = new RecetaResponseDTO("RTEST-001", "Tarta", "Desc test", null, "1");

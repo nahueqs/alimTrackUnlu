@@ -26,6 +26,7 @@ public interface VersionRecetaRespository extends JpaRepository<VersionRecetaMod
 
     List<VersionRecetaModel> findAllByCodigoVersionReceta(String codigoVersionReceta);
 
+    @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.recetaPadre.codigoReceta = :codigoRecetaPadre")
     List<VersionRecetaModel> findAllVersionesByCodigoRecetaPadre(String codigoRecetaPadre);
 
 }

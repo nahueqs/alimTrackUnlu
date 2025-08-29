@@ -9,6 +9,7 @@ import com.unlu.alimtrack.mappers.RecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +17,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RecetaService {
     private final RecetaRepository recetaRepository;
     private final RecetaModelMapper mapper;
     private final UsuarioService usuarioService;
-
-    public RecetaService(RecetaRepository recetaRepository, RecetaModelMapper mapper, UsuarioService usuarioService) {
-        this.recetaRepository = recetaRepository;
-        this.mapper = mapper;
-        this.usuarioService = usuarioService;
-    }
 
     @Transactional(readOnly = true)
     public List<RecetaResponseDTO> findAllRecetasResponseDTOS() {
@@ -34,19 +30,19 @@ public class RecetaService {
         if (recetas.isEmpty()) {
             throw new RecursoNoEncontradoException("No se encontraron recetas");
         }
+        return convertToResponseDTOList(recetas);
+    }
 
-        return recetas.stream().map(
-                mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
+    public RecetaResponseDTO findRecetaByCodigoReceta(String codigoReceta) {
+        return null;
     }
 
     @Transactional(readOnly = true)
     protected List<RecetaModel> findAllModelsByCodigoReceta(String codigoReceta) {
-
         List<RecetaModel> recetas = recetaRepository.findAllByCodigoReceta(codigoReceta);
         if (recetas.isEmpty()) {
             throw new RecursoNoEncontradoException("No se encontraron recetas con ese codigo " + codigoReceta);
         }
-
         return recetas;
     }
 
@@ -61,43 +57,63 @@ public class RecetaService {
         return recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
     }
 
-    public RecetaResponseDTO updateReceta(Long idReceta, RecetaModifyDTO receta) {
+    @Transactional
+    public RecetaResponseDTO updateReceta(String codigoReceta, RecetaModifyDTO recetaDTO) {
+        RecetaModel model = findModeloRecetaByCodigoReceta(codigoReceta);
+        validateModification(recetaDTO);
+        updateModelFromDTO(recetaDTO, model);
+        return saveAndReturnResponse(model);
+    }
 
-        RecetaModel model = recetaRepository.findById(idReceta).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + idReceta));
+    private RecetaModel findModeloRecetaByCodigoReceta(String codigoReceta) {
+        RecetaModel modelo = recetaRepository.findByCodigoReceta(codigoReceta);
+        if (modelo == null) {
+            throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + codigoReceta);
+        }
+        return modelo;
+    }
 
+    private void updateModelFromDTO(RecetaModifyDTO recetaDTO, RecetaModel model) {
+        mapper.updateModelFromModifyDTO(recetaDTO, model);
+    }
+
+    private void validateModification(RecetaModifyDTO receta) {
         if (receta.nombre() != null) {
-            if (receta.nombre().isBlank()) {
-                throw new ModificacionInvalidaException("El nombre no puede estar vacío");
-            }
-            if (receta.nombre().length() < 2 || receta.nombre().length() > 100) {
-                throw new ModificacionInvalidaException("Nombre debe tener 2-100 caracteres");
-            }
-            model.setNombre(receta.nombre());
+            validateNombre(receta.nombre());
         }
-
         if (receta.descripcion() != null) {
-            if (receta.descripcion().length() > 255) {
-                throw new ModificacionInvalidaException("Descripción no puede exceder 255 caracteres");
-            }
-            model.setDescripcion(receta.descripcion());
+            validateDescripcion(receta.descripcion());
         }
+    }
 
-        mapper.updateModelFromModifyDTO(receta, model);
-        recetaRepository.save(model);
-        return mapper.recetaModeltoRecetaResponseDTO(model);
+    private void validateNombre(String nombre) {
+        if (nombre.isBlank()) {
+            throw new ModificacionInvalidaException("El nombre no puede estar vacío");
+        }
+        if (nombre.length() < 2 || nombre.length() > 100) {
+            throw new ModificacionInvalidaException("Nombre debe tener 2-100 caracteres");
+        }
+    }
+
+    private void validateDescripcion(String descripcion) {
+        if (descripcion != null && descripcion.length() > 255) {
+            throw new ModificacionInvalidaException("Descripción no puede exceder 255 caracteres");
+        }
     }
 
     public void deleteRecetaByID(Long id) {
         recetaRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Receta no encontrada con ID: " + id));
         recetaRepository.deleteById(id);
     }
-
+    @Transactional
     public void deleteRecetaByCodigoReceta(String codigo) {
-        RecetaModel receta = recetaRepository.findByCodigoReceta(codigo);
-        if (receta == null) {
-            throw new RecursoNoEncontradoException("Receta no encontrada con ID: " + codigo);
-        }
-        recetaRepository.deleteByCodigoReceta(codigo);
+        RecetaModel receta = findModeloRecetaByCodigoReceta(codigo);
+        recetaRepository.delete(receta);
+    }
+
+    private RecetaResponseDTO saveAndReturnResponse(RecetaModel model) {
+        recetaRepository.save(model);
+        return mapper.recetaModeltoRecetaResponseDTO(model);
     }
 
     @Transactional(readOnly = true)
@@ -129,14 +145,6 @@ public class RecetaService {
 
         recetaRepository.save(model);
 
-        return mapper.recetaModeltoRecetaResponseDTO(model);
-    }
-
-    public RecetaResponseDTO findRecetaByCodigoReceta(String codigoReceta) {
-        RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
-        if (model == null) {
-            throw new RecursoNoEncontradoException("No existe receta con el codigo " + codigoReceta);
-        }
         return mapper.recetaModeltoRecetaResponseDTO(model);
     }
 

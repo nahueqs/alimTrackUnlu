@@ -21,6 +21,7 @@ public class RecetaController {
     }
 
     @GetMapping
+
     public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
         return ResponseEntity.ok(recetaService.findAllRecetasResponseDTOS());
     }
@@ -35,9 +36,9 @@ public class RecetaController {
         return ResponseEntity.ok(recetaService.findRecetaByCodigoReceta(codigoReceta));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable Long id, @RequestBody RecetaModifyDTO receta) {
-        RecetaResponseDTO actualizada = recetaService.updateReceta(id, receta);
+    @PutMapping("/{codigoReceta}")
+    public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable String codigoReceta, @RequestBody RecetaModifyDTO receta) {
+        RecetaResponseDTO actualizada = recetaService.updateReceta(codigoReceta, receta);
         return ResponseEntity.ok(actualizada);
     }
 

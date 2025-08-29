@@ -50,10 +50,10 @@ class RecetaControllerUnitTest {
     void testUpdateReceta() {
         RecetaModifyDTO testModifyDTO = new RecetaModifyDTO("Milanesa Napolitana", "desc");
         RecetaResponseDTO testResponseDTO = new RecetaResponseDTO("COD-001", "Milanesa Napolitana", "desc", Instant.now(),  "Id creador");
-        when(recetaService.updateReceta(1L, testModifyDTO)).thenReturn(testResponseDTO);
-        ResponseEntity<RecetaResponseDTO> resp = recetaController.updateReceta(1L, testModifyDTO);
+        when(recetaService.updateReceta("1", testModifyDTO)).thenReturn(testResponseDTO);
+        ResponseEntity<RecetaResponseDTO> resp = recetaController.updateReceta("1", testModifyDTO);
         assertEquals("Milanesa Napolitana", resp.getBody().nombre());
-        verify(recetaService).updateReceta(1L, testModifyDTO);
+        verify(recetaService).updateReceta("1", testModifyDTO);
     }
 
     @Test

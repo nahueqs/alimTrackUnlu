@@ -25,14 +25,9 @@ public class RecetaController {
     public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
         return ResponseEntity.ok(recetaService.findAllRecetasResponseDTOS());
     }
-/*
-    @GetMapping("/{id}")
-    public ResponseEntity<RecetaResponseDTO> getRecetaById(@PathVariable Long id) {
-        return ResponseEntity.ok(recetaService.findRecetaById(id));
-    }*/
 
     @GetMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> getRecetaByCodigoReceta(@PathVariable String codigoReceta) {
+    public ResponseEntity<RecetaResponseDTO> getReceta(@PathVariable String codigoReceta) {
         return ResponseEntity.ok(recetaService.findRecetaByCodigoReceta(codigoReceta));
     }
 
@@ -42,21 +37,15 @@ public class RecetaController {
         return ResponseEntity.ok(actualizada);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRecetaById(@PathVariable Long id) {
-        recetaService.deleteRecetaByID(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> deleteRecetaodigoReceta(@PathVariable String codigo) {
-        recetaService.deleteRecetaByCodigoReceta(codigo);
+    @DeleteMapping("/{codigoReceta}")
+    public ResponseEntity<Void> deleteReceta(@PathVariable String codigoReceta) {
+        recetaService.deleteRecetaByCodigoReceta(codigoReceta);
         return ResponseEntity.noContent().build();
     }
 
 
-    @PostMapping("/{id}")
-    public ResponseEntity<RecetaResponseDTO> addReceta(@RequestBody RecetaCreateDTO receta) {
+    @PostMapping("/{codigoReceta}")
+    public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta, @RequestBody RecetaCreateDTO receta) {
         return ResponseEntity.ok(recetaService.addReceta(receta));
     }
 

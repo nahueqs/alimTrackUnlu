@@ -56,15 +56,15 @@ public class VersionRecetaControllerUnitTest {
         VersionRecetaCreateDTO createDTO = new VersionRecetaCreateDTO("CVRTEST-001", "Nombre", "Descripcion", 1L);
 
         // Simulamos excepción de usuario inexistente
-        when(versionRecetaService.saveVersionReceta(1L, createDTO))
+        when(versionRecetaService.saveVersionReceta("1", createDTO))
                 .thenThrow(new RecursoNoEncontradoException("Usuario no encontrado"));
 
         Exception exception = assertThrows(RecursoNoEncontradoException.class, () -> {
-            versionRecetaController.saveVersionReceta(1L, createDTO);
+            versionRecetaController.saveVersionReceta("1", createDTO);
         });
 
         assertEquals("Usuario no encontrado", exception.getMessage());
-        verify(versionRecetaService).saveVersionReceta(1L, createDTO);
+        verify(versionRecetaService).saveVersionReceta("1", createDTO);
     }
 
     @Test
@@ -123,13 +123,13 @@ public class VersionRecetaControllerUnitTest {
                 "CVRTEST-001", "Receta Padre", "Nombre Version", "Descripcion test", "Creador", Instant.now()
         );
 
-        when(versionRecetaService.saveVersionReceta(1L, createDTO)).thenReturn(responseDTO);
+        when(versionRecetaService.saveVersionReceta("1", createDTO)).thenReturn(responseDTO);
 
-        ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.saveVersionReceta(1L, createDTO);
+        ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.saveVersionReceta("1", createDTO);
 
         assertEquals("CVRTEST-001", resp.getBody().codigoVersionReceta());
         assertEquals("Nombre Version", resp.getBody().nombre());
-        verify(versionRecetaService).saveVersionReceta(1L, createDTO);
+        verify(versionRecetaService).saveVersionReceta("1", createDTO);
     }
 
 

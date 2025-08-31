@@ -102,9 +102,9 @@ public class VersionRecetaService {
 
 
     @Transactional
-    public VersionRecetaResponseDTO saveVersionReceta(Long idRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDto) {
+    public VersionRecetaResponseDTO saveVersionReceta(String codigoRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDto) {
         // si no tiene receta padre tira exception
-        RecetaModel modelRecetaPadre = recetaService.findRecetaModelById(idRecetaPadre);
+        RecetaModel modelRecetaPadre = recetaService.findRecetaModelByCodigoReceta(codigoRecetaPadre);
         if (modelRecetaPadre == null) {
             throw new RecursoNoEncontradoException("Receta padre no encontrada");
         }

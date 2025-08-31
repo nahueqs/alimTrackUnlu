@@ -34,9 +34,9 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versionRecetaService.findAllVersionesByIdRecetaPadre(idReceta));
     }
 
-    @PostMapping("/{idReceta}/versiones")
-    public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(@PathVariable Long idReceta, @RequestBody VersionRecetaCreateDTO dto) {
-        return ResponseEntity.ok(versionRecetaService.saveVersionReceta(idReceta, dto));
+    @PostMapping("/{codigoRecetaPadre}/versiones")
+    public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(@PathVariable String codigoRecetaPadre, @RequestBody VersionRecetaCreateDTO dto) {
+        return ResponseEntity.ok(versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto));
     }
 
     // FALTA DELETE

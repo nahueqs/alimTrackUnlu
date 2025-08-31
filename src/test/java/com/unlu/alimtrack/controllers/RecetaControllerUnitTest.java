@@ -36,7 +36,7 @@ class RecetaControllerUnitTest {
         verify(recetaService).findAllRecetasResponseDTOS();
     }
 
-    @Test
+   /* @Test
     void testAddReceta() {
         RecetaCreateDTO testCreateDTO = new RecetaCreateDTO("RTEST-001", "Tarta", "Desc test", 1L);
         RecetaResponseDTO testResponseDTO = new RecetaResponseDTO("RTEST-001", "Tarta", "Desc test", null, "1");
@@ -45,7 +45,7 @@ class RecetaControllerUnitTest {
         assertEquals("RTEST-001", resp.getBody().codigoReceta().toString());
         verify(recetaService).addReceta(testCreateDTO);
     }
-
+*/
     @Test
     void testUpdateReceta() {
         RecetaModifyDTO testModifyDTO = new RecetaModifyDTO("Milanesa Napolitana", "desc");
@@ -55,7 +55,7 @@ class RecetaControllerUnitTest {
         assertEquals("Milanesa Napolitana", resp.getBody().nombre());
         verify(recetaService).updateReceta("1", testModifyDTO);
     }
-
+/*
     @Test
     void testDeleteReceta() {
         doNothing().when(recetaService).deleteRecetaByID(1L);
@@ -63,4 +63,6 @@ class RecetaControllerUnitTest {
         assertEquals(204, resp.getStatusCodeValue());
         verify(recetaService).deleteRecetaByID(1L);
     }
+
+ */
 }

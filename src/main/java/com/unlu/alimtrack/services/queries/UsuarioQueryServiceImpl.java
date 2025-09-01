@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.services.queries;
 
-import com.unlu.alimtrack.repositories.RecetaRepository;
-import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import com.unlu.alimtrack.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,22 +10,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UsuarioQueryServiceImpl implements UsuarioQueryService {
 
-    private final RecetaRepository recetaRepository;
-    private final VersionRecetaRespository versionRecetaRespository;
+  private final UsuarioRepository usuarioRepository;
+  private final RecetaQueryService recetaQueryService;
+  private final VersionRecetaQueryService versionRecetaQueryService;
 
-    @Override
-    public boolean usuarioPuedeSerEliminado(String username) {
-        return !usuarioTieneRecetasAsociadas(username) &&
-                !usuarioTieneVersionesRecetasAsociadas(username);
-    }
+  @Override
+  public boolean usuarioPuedeSerEliminado(String username) {
+    return !usuarioTieneRecetasAsociadas(username) &&
+        !usuarioTieneVersionesRecetasAsociadas(username);
+  }
 
-    @Override
-    public boolean usuarioTieneRecetasAsociadas(String username) {
-        return recetaRepository.existsByCreadoPorUsername(username);
-    }
+  @Override
+  public boolean usuarioTieneRecetasAsociadas(String username) {
+    return recetaQueryService.existsByCreadoPorUsername(username);
+  }
 
-    @Override
-    public boolean usuarioTieneVersionesRecetasAsociadas(String username) {
-        return versionRecetaRespository.existsByCreadaPorUsername(username);
-    }
+  @Override
+  public boolean usuarioTieneVersionesRecetasAsociadas(String username) {
+    return versionRecetaQueryService.existsByCreadaPorUsername(username);
+  }
+
+  @Override
+  public boolean existsByUsername(String username) {
+    return usuarioRepository.existsByUsername(username);
+  }
 }

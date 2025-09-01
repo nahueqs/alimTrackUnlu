@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SeccionService {
-    private final SeccionRepository seccionRepository;
 
-    public SeccionService(SeccionRepository seccionRepository) {
-        this.seccionRepository = seccionRepository;
-    }
+  private final SeccionRepository seccionRepository;
+
+  public SeccionService(SeccionRepository seccionRepository) {
+    this.seccionRepository = seccionRepository;
+  }
 
 
 }

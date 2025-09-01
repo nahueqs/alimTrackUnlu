@@ -6,107 +6,114 @@ import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaModelMapper;
 import com.unlu.alimtrack.models.RecetaModel;
-import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
+import com.unlu.alimtrack.services.queries.RecetaQueryService;
+import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.RecetaValidator;
-import com.unlu.alimtrack.services.validators.UsuarioValidator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class RecetaService {
-    private final RecetaRepository recetaRepository;
-    private final RecetaModelMapper mapper;
-    private final UsuarioService usuarioService;
-    private final RecetaValidator recetaValidator;
-    private final UsuarioValidator usuarioValidator;
 
-    @Transactional(readOnly = true)
-    public List<RecetaResponseDTO> findAllRecetas() {
-        List<RecetaModel> recetas = recetaRepository.findAll();
-        recetaValidator.validateModelList(recetas);
-        return convertToResponseDTOList(recetas);
+  private final RecetaRepository recetaRepository;
+  private final RecetaModelMapper recetaMapper;
+  private final RecetaValidator recetaValidator;
+  private final RecetaQueryService recetaQueryService;
+  private final UsuarioQueryService usuarioQueryService;
+
+
+  @Transactional(readOnly = true)
+  public List<RecetaResponseDTO> findAllRecetas() {
+    List<RecetaModel> recetas = recetaRepository.findAll();
+    recetaValidator.validateModelList(recetas);
+    return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
+  }
+
+  private RecetaModel findRecetaModelByCodigoReceta(String codigoReceta) {
+    RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
+    recetaValidator.validateModel(model, codigoReceta);
+    return model;
+  }
+
+  @Transactional(readOnly = true)
+  public RecetaResponseDTO findReceta(String codigoReceta) {
+    recetaValidator.validateCodigoReceta(codigoReceta);
+    RecetaModel model = findRecetaModelByCodigoReceta(codigoReceta);
+    return recetaMapper.recetaModeltoRecetaResponseDTO(model);
+  }
+
+  @Transactional
+  public RecetaResponseDTO updateReceta(String codigoReceta, RecetaModifyDTO recetaDTO) {
+
+    RecetaModel model = findRecetaModelByCodigoReceta(codigoReceta);
+    recetaValidator.validateModification(recetaDTO);
+
+    recetaMapper.updateModelFromModifyDTO(recetaDTO, model);
+
+    saveModel(model);
+
+    return recetaMapper.recetaModeltoRecetaResponseDTO(model);
+  }
+
+  @Transactional
+  public void deleteReceta(String codigo) {
+    RecetaModel receta = findRecetaModelByCodigoReceta(codigo);
+    recetaRepository.delete(receta);
+  }
+
+  private void saveModel(RecetaModel model) {
+    recetaRepository.save(model);
+  }
+
+  @Transactional(readOnly = true)
+  public boolean existsByCodigoReceta(String codigoReceta) {
+    recetaValidator.validateCodigoReceta(codigoReceta);
+    return recetaRepository.existsByCodigoReceta(codigoReceta);
+  }
+
+  @Transactional(readOnly = true)
+  protected List<RecetaModel> findAllByCreadoPorUsername(String username) {
+
+    return null;
+  }
+
+  private void verificarUnicidadCodigoReceta(String codigoReceta) {
+    if (recetaRepository.existsByCodigoReceta(codigoReceta)) {
+      throw new RecursoNoEncontradoException("Receta ya existente con codigo: " + codigoReceta);
     }
+  }
 
-    private RecetaModel findRecetaModelByCodigoReceta(String codigoReceta) {
-        RecetaModel model = recetaRepository.findByCodigoReceta(codigoReceta);
-        recetaValidator.validateModel(model, codigoReceta);
-        return model;
+  private void verificarUsuarioExiste(String username) {
+    if (usuarioQueryService.existsByUsername(username)) {
+      throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
     }
+  }
 
-    @Transactional(readOnly = true)
-    public RecetaResponseDTO findReceta(String codigoReceta) {
-        recetaValidator.validateCodigoReceta(codigoReceta);
-        RecetaModel model = findRecetaModelByCodigoReceta(codigoReceta);
-        return convertToResponseDTO(model);
-    }
+  private void verificarCreacionValida(RecetaCreateDTO recetaCreateDTO) {
+    verificarUnicidadCodigoReceta(recetaCreateDTO.codigoReceta());
+    verificarUsuarioExiste(recetaCreateDTO.usernameCreador());
+  }
 
-    @Transactional
-    public RecetaResponseDTO updateReceta(String codigoReceta, RecetaModifyDTO recetaDTO) {
-        RecetaModel model = findRecetaModelByCodigoReceta(codigoReceta);
-        recetaValidator.validateModification(recetaDTO);
-        updateModelFromDTO(recetaDTO, model);
-        saveModel(model);
-        return convertToResponseDTO(model);
-    }
+  private RecetaModel crearModelByCreateDTO(RecetaCreateDTO recetaCreateDTO) {
+    return recetaMapper.recetaCreateDTOtoModel(recetaCreateDTO);
+  }
 
-    @Transactional
-    public void deleteReceta(String codigo) {
-        RecetaModel receta = findRecetaModelByCodigoReceta(codigo);
-        recetaRepository.delete(receta);
-    }
 
-    private void saveModel(RecetaModel model) {
-        recetaRepository.save(model);
-    }
+  @Transactional
+  public RecetaResponseDTO addReceta(RecetaCreateDTO receta) {
+    // verifico datos de entrada
+    verificarCreacionValida(receta);
+    // traduzco el dto al model
+    RecetaModel model = crearModelByCreateDTO(receta);
+    // guardo el model
+    recetaRepository.save(model);
 
-    @Transactional(readOnly = true)
-    public boolean existsByCodigoReceta(String codigoReceta) {
-        recetaValidator.validateCodigoReceta(codigoReceta);
-        return recetaRepository.existsByCodigoReceta(codigoReceta);
-    }
+    return recetaMapper.recetaModeltoRecetaResponseDTO(model);
+  }
 
-    @Transactional(readOnly = true)
-    protected List<RecetaModel> findAllByCreadoPorUsername(String username) {
-        if (usuarioService.existsByUsername(username)) {
-        }
-        return null;
-    }
-
-    @Transactional
-    public RecetaResponseDTO addReceta(RecetaCreateDTO receta) {
-        RecetaModel model = recetaRepository.findByCodigoReceta((receta.codigoReceta()));
-        if (model != null) {
-            throw new RecursoNoEncontradoException("Receta ya existente con codigo: " + receta.codigoReceta());
-        }
-
-        UsuarioModel usuario = usuarioService.getUsuarioModelById(receta.idUsuarioCreador());
-        if (usuario == null) {
-            throw new RecursoNoEncontradoException("Usuario no existe con id: " + receta.idUsuarioCreador());
-        }
-
-        model = mapper.recetaCreateDTOtoModel(receta);
-
-        recetaRepository.save(model);
-
-        return mapper.recetaModeltoRecetaResponseDTO(model);
-    }
-
-    private void updateModelFromDTO(RecetaModifyDTO recetaDTO, RecetaModel model) {
-        mapper.updateModelFromModifyDTO(recetaDTO, model);
-    }
-
-    private List<RecetaResponseDTO> convertToResponseDTOList(List<RecetaModel> recetas) {
-        return recetas.stream().map(mapper::recetaModeltoRecetaResponseDTO).collect(Collectors.toList());
-    }
-
-    private RecetaResponseDTO convertToResponseDTO(RecetaModel receta) {
-        return mapper.recetaModeltoRecetaResponseDTO(receta);
-    }
 
 }

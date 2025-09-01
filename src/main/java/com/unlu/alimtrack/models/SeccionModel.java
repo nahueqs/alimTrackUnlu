@@ -19,9 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "seccion",
-       uniqueConstraints = {@UniqueConstraint(columnNames = {"id_version_receta_padre", "orden"}),
-                            @UniqueConstraint(columnNames = {"id_version_receta_padre", "titulo"}),
-       }
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"id_version_receta_padre", "orden"}),
+                @UniqueConstraint(columnNames = {"id_version_receta_padre", "titulo"}),
+        }
 )
 public class SeccionModel {
     @Id

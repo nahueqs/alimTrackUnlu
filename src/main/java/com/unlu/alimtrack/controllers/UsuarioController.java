@@ -26,26 +26,26 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
 
+    @GetMapping("/{username}")
+    public ResponseEntity<UsuarioResponseDTO> getUsuarioByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(usuarioService.getUsuarioByUsername(username));
+    }
+
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> addUsuario(@RequestBody UsuarioCreateDTO usuario) {
         UsuarioResponseDTO saved = usuarioService.addUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.getUsuarioResponseDTOById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> modifyUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioModifyDTO modificacion) {
-        usuarioService.modifyUsuario(id, modificacion);
+    @PutMapping("/{username}")
+    public ResponseEntity<Void> modifyUsuario(@PathVariable String username, @Valid @RequestBody UsuarioModifyDTO modificacion) {
+        usuarioService.modifyUsuario(username, modificacion);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
-        usuarioService.deleteUsuario(id);
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteUsuario(@PathVariable String username) {
+        usuarioService.deleteUsuario(username);
         return ResponseEntity.noContent().build();
     }
 

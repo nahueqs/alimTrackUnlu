@@ -26,7 +26,17 @@ public class VersionRecetaController {
 
     @GetMapping("/{idReceta}/versiones/{idVersion}")
     public ResponseEntity<VersionRecetaResponseDTO> getVersionById(@PathVariable Long idReceta, @PathVariable Long idVersion) {
-        return ResponseEntity.ok(versionRecetaService.findVersionRecetaByIdRecetaAndIdVersion(idReceta, idVersion));
+        return ResponseEntity.ok(versionRecetaService.findVersionByIdRecetaAndIdVersion(idReceta, idVersion));
+    }
+
+    @GetMapping("/{codigoReceta}/versiones/{codigoVersion}")
+    public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(@PathVariable String codigoVersion, @PathVariable String codigoReceta) {
+        return ResponseEntity.ok(versionRecetaService.findVersionRecetaByCodigoVersionAndCodigoReceta(codigoVersion, codigoReceta));
+    }
+
+    @GetMapping("/{codigoReceta}/versiones")
+    public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersionesByCodigoReceta(@PathVariable String codigoReceta) {
+        return ResponseEntity.ok(versionRecetaService.findAllVersionesByCodigoReceta(codigoReceta));
     }
 
     @GetMapping("/{idReceta}/versiones")

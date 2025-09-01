@@ -4,49 +4,57 @@ import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/recetas")
 public class RecetaController {
 
-    private final RecetaService recetaService;
+  private final RecetaService recetaService;
 
-    public RecetaController(RecetaService recetaService) {
+  public RecetaController(RecetaService recetaService) {
 
-        this.recetaService = recetaService;
-    }
+    this.recetaService = recetaService;
+  }
 
-    @GetMapping
+  @GetMapping
 
-    public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
-        return ResponseEntity.ok(recetaService.findAllRecetas());
-    }
+  public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
+    return ResponseEntity.ok(recetaService.findAllRecetas());
+  }
 
-    @GetMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> getReceta(@PathVariable String codigoReceta) {
-        return ResponseEntity.ok(recetaService.findReceta(codigoReceta));
-    }
+  @GetMapping("/{codigoReceta}")
+  public ResponseEntity<RecetaResponseDTO> getReceta(@PathVariable String codigoReceta) {
+    return ResponseEntity.ok(recetaService.findReceta(codigoReceta));
+  }
 
-    @PutMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable String codigoReceta, @RequestBody RecetaModifyDTO receta) {
-        RecetaResponseDTO actualizada = recetaService.updateReceta(codigoReceta, receta);
-        return ResponseEntity.ok(actualizada);
-    }
+  @PutMapping("/{codigoReceta}")
+  public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable String codigoReceta,
+      @RequestBody RecetaModifyDTO receta) {
+    RecetaResponseDTO actualizada = recetaService.updateReceta(codigoReceta, receta);
+    return ResponseEntity.ok(actualizada);
+  }
 
-    @PostMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta, @RequestBody RecetaCreateDTO receta) {
-        return ResponseEntity.ok(recetaService.addReceta(receta));
-    }
+  @PostMapping("/{codigoReceta}")
+  public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta,
+      @RequestBody RecetaCreateDTO receta) {
+    return ResponseEntity.ok(recetaService.addReceta(receta));
+  }
 
-    @DeleteMapping("/{codigoReceta}")
-    public ResponseEntity<Void> deleteReceta(@PathVariable String codigoReceta) {
-        recetaService.deleteReceta(codigoReceta);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{codigoReceta}")
+  public ResponseEntity<Void> deleteReceta(@PathVariable String codigoReceta) {
+    recetaService.deleteReceta(codigoReceta);
+    return ResponseEntity.noContent().build();
+  }
 
 
 }

@@ -9,8 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface SeccionModelMapper {
 
-    @Mapping(target = "versionRecetaPadre.id", source = "idVersionRecetaPadre")
-    SeccionModel createDTOToModel(SeccionCreateDTO seccionCreateDTO);
+  @Mapping(target = "versionRecetaPadre.id", source = "codigoVersionRecetaPadre")
+  SeccionModel createDTOToModel(SeccionCreateDTO seccionCreateDTO);
 
-    SeccionResponseDTO toResponseDTO(SeccionModel model);
+  SeccionResponseDTO toResponseDTO(SeccionModel model);
 }

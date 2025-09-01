@@ -3,52 +3,48 @@ package com.unlu.alimtrack.controllers;
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.services.VersionRecetaService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/recetas")
 public class VersionRecetaController {
 
-    final VersionRecetaService versionRecetaService;
+  final VersionRecetaService versionRecetaService;
 
-    public VersionRecetaController(VersionRecetaService versionRecetaService) {
-        this.versionRecetaService = versionRecetaService;
-    }
+  public VersionRecetaController(VersionRecetaService versionRecetaService) {
+    this.versionRecetaService = versionRecetaService;
+  }
 
-    //devuelve todas las versiones
-    @GetMapping("/versiones")
-    public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersiones() {
-        return ResponseEntity.ok(versionRecetaService.findAllVersiones());
-    }
+  //devuelve todas las versiones
+  @GetMapping("/versiones")
+  public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersiones() {
+    return ResponseEntity.ok(versionRecetaService.findAllVersiones());
+  }
 
-    @GetMapping("/{idReceta}/versiones/{idVersion}")
-    public ResponseEntity<VersionRecetaResponseDTO> getVersionById(@PathVariable Long idReceta, @PathVariable Long idVersion) {
-        return ResponseEntity.ok(versionRecetaService.findVersionByIdRecetaAndIdVersion(idReceta, idVersion));
-    }
+  @GetMapping("/versiones/{codigoVersion}")
+  public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(
+      @PathVariable String codigoVersion) {
+    return ResponseEntity.ok(versionRecetaService.findByCodigoVersion(codigoVersion));
+  }
 
-    @GetMapping("/{codigoReceta}/versiones/{codigoVersion}")
-    public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(@PathVariable String codigoVersion, @PathVariable String codigoReceta) {
-        return ResponseEntity.ok(versionRecetaService.findVersionRecetaByCodigoVersionAndCodigoReceta(codigoVersion, codigoReceta));
-    }
+  @GetMapping("/{codigoReceta}/versiones")
+  public ResponseEntity<List<VersionRecetaResponseDTO>> getAllByCodigoReceta(
+      @PathVariable String codigoReceta) {
+    return ResponseEntity.ok(versionRecetaService.findAllByCodigoReceta(codigoReceta));
+  }
 
-    @GetMapping("/{codigoReceta}/versiones")
-    public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersionesByCodigoReceta(@PathVariable String codigoReceta) {
-        return ResponseEntity.ok(versionRecetaService.findAllVersionesByCodigoReceta(codigoReceta));
-    }
+  @PostMapping("/{codigoRecetaPadre}/versiones")
+  public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(
+      @PathVariable String codigoRecetaPadre, @RequestBody VersionRecetaCreateDTO dto) {
+    return ResponseEntity.ok(versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto));
+  }
 
-    @GetMapping("/{idReceta}/versiones")
-    public ResponseEntity<List<VersionRecetaResponseDTO>> getVersionesByIdRecetaPadre(@PathVariable Long idReceta) {
-        return ResponseEntity.ok(versionRecetaService.findAllVersionesByIdRecetaPadre(idReceta));
-    }
-
-    @PostMapping("/{codigoRecetaPadre}/versiones")
-    public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(@PathVariable String codigoRecetaPadre, @RequestBody VersionRecetaCreateDTO dto) {
-        return ResponseEntity.ok(versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto));
-    }
-
-    // FALTA DELETE
 
 }

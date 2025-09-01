@@ -12,126 +12,122 @@ import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.UsuarioValidator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
-    private final UsuarioRepository usuarioRepository;
-    private final UsuarioModelMapper usuarioMapper;
-    private final UsuarioValidator usuarioValidator;
-    private final PasswordEncoder passwordEncoder;
-    private final UsuarioQueryService usuarioQueryService;
 
+  private final UsuarioRepository usuarioRepository;
+  private final UsuarioModelMapper usuarioMapper;
+  private final UsuarioValidator usuarioValidator;
+  private final PasswordEncoder passwordEncoder;
+  private final UsuarioQueryService usuarioQueryService;
 
-    @Transactional(readOnly = true)
-    public List<UsuarioResponseDTO> getAllUsuarios() {
-        List<UsuarioModel> usuarios = usuarioRepository.findAll();
-        usuarioValidator.validateListUsuarios(usuarios);
-        return convertToResponseDTOList(usuarios);
+  @Transactional(readOnly = true)
+  public List<UsuarioResponseDTO> getAllUsuarios() {
+    List<UsuarioModel> usuarios = usuarioRepository.findAll();
+    usuarioValidator.validateListUsuarios(usuarios);
+    return usuarioMapper.convertToResponseDTOList(usuarios);
+  }
+
+  @Transactional(readOnly = true)
+  public UsuarioResponseDTO getUsuarioByUsername(String username) {
+    usuarioValidator.validateUsername(username);
+    UsuarioModel model = getUsuarioModelByUsername(username);
+    return usuarioMapper.convertToResponseDTO(model);
+  }
+
+  private UsuarioModel getUsuarioModelByUsername(String username) {
+    UsuarioModel model = usuarioRepository.findByUsername(username).orElseThrow(
+        () -> new RecursoNoEncontradoException("Usuario no encontrado con username" + username));
+    usuarioValidator.validateUsuario(model);
+    return model;
+  }
+
+  private void validarNuevoUsuario(UsuarioCreateDTO usuario) {
+    if (usuarioRepository.existsByEmail(usuario.email())) {
+      throw new RecursoDuplicadoException("El email ya ha sido usado por un usuario existente");
     }
 
-    @Transactional(readOnly = true)
-    public UsuarioResponseDTO getUsuarioByUsername(String username) {
-        usuarioValidator.validateUsername(username);
-        UsuarioModel model = getUsuarioModelByUsername(username);
-        return convertToResponseDTO(model);
+    if (usuarioRepository.existsByUsername(usuario.username())) {
+      throw new RecursoDuplicadoException("El email ya ha sido usado por un usuario existente");
     }
+  }
 
-    private UsuarioModel getUsuarioModelByUsername(String username) {
-        UsuarioModel model = usuarioRepository.findByUsername(username).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con username" + username));
-        usuarioValidator.validateUsuario(model);
-        return model;
+  private UsuarioModel crearNuevoUsuarioByCreateDTO(UsuarioCreateDTO usuario) {
+    UsuarioModel usuarioModel = usuarioMapper.usuarioCreateDTOToModel(usuario);
+    String passwordEncriptada = passwordEncoder.encode(usuario.contraseña());
+    usuarioModel.setContraseña(passwordEncriptada);
+    return usuarioModel;
+  }
+
+  public UsuarioResponseDTO addUsuario(UsuarioCreateDTO usuarioCreateDTO) {
+    validarNuevoUsuario(usuarioCreateDTO);
+    UsuarioModel usuarioModel = crearNuevoUsuarioByCreateDTO(usuarioCreateDTO);
+    usuarioRepository.save(usuarioModel);
+    return usuarioMapper.convertToResponseDTO(usuarioModel);
+  }
+
+  private void aplicarModificaciones(UsuarioModel usuarioExistente, UsuarioModifyDTO modificacion) {
+    usuarioMapper.updateModelFromModifyDTO(modificacion, usuarioExistente);
+    if (modificacion.contraseña() != null) {
+      String passwordEncriptada = passwordEncoder.encode(modificacion.contraseña());
+      usuarioExistente.setContraseña(passwordEncriptada);
     }
+  }
 
-    @Transactional(readOnly = true)
-    public UsuarioModel getUsuarioModelById(Long id) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        if (usuarioModel == null) {
-            throw new RecursoNoEncontradoException("Usuario no encontrado con id " + id);
-        }
-        return usuarioModel;
+  public void modifyUsuario(String username, UsuarioModifyDTO modificacion) {
+    // verifico validez de datos de entrada
+    usuarioValidator.validarModificacion(modificacion);
+    // traigo el usuario sobre el que se van a hacer las modificaciones
+    UsuarioModel usuarioExistente = getUsuarioModelByUsername(username);
+    // valido que el nuevo email y el nuevo username no sean usados por otros usuarios
+    validateUnicidadDatos(usuarioExistente, modificacion);
+    // aplico las modificaciones al usuarioExistente
+    aplicarModificaciones(usuarioExistente, modificacion);
+
+    usuarioRepository.save(usuarioExistente);
+  }
+
+  private void validateUnicidadDatos(UsuarioModel usuarioExistente, UsuarioModifyDTO modificacion) {
+    validateUnicidadEmail(usuarioExistente, modificacion.email());
+    validateUnicidadUsername(usuarioExistente, modificacion.username());
+  }
+
+  private void validateUnicidadUsername(UsuarioModel usuarioExistente, String username) {
+    if (username != null && !username.equals(usuarioExistente.getUsername())) {
+      if (usuarioRepository.existsByUsername(username)) {
+        throw new ModificacionInvalidaException("El email ya está en uso por otro usuario");
+      }
     }
+  }
 
-    public UsuarioResponseDTO addUsuario(UsuarioCreateDTO usuario) {
-
-        // verifica si ya existe un usuario con ese email
-        if (usuarioRepository.existsByEmail(usuario.email())) {
-            throw new RecursoDuplicadoException("El email ya ha sido usado por un usuario existente");
-        }
-        UsuarioModel usuarioModel = usuarioMapper.usuarioCreateDTOToModel(usuario);
-        // crea el usuario y devuelve un response
-        String passwordEncriptada = passwordEncoder.encode(usuario.contraseña());
-        usuarioModel.setContraseña(passwordEncriptada);
-        usuarioRepository.save(usuarioModel);
-        return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
+  private void validateUnicidadEmail(UsuarioModel usuarioExistente, String email) {
+    if (email != null && !email.equals(usuarioExistente.getEmail())) {
+      if (usuarioRepository.existsByEmail(email)) {
+        throw new ModificacionInvalidaException("El email ya está en uso por otro usuario");
+      }
     }
+  }
 
-    public void modifyUsuario(String username, UsuarioModifyDTO modificacion) {
-        usuarioValidator.validarModificacion(modificacion);
-        UsuarioModel usuarioExistente = getUsuarioModelByUsername(username);
-
-        validateCambioEmail(usuarioExistente, modificacion.nombre());
-        usuarioExistente.setNombre(modificacion.nombre());
-        String passwordEncriptada = passwordEncoder.encode(modificacion.contraseña());
-        usuarioExistente.setContraseña(passwordEncriptada);
-
-        usuarioRepository.save(usuarioExistente);
+  private void validarDeleteUsario(String username) {
+    if (!usuarioQueryService.usuarioPuedeSerEliminado(username)) {
+      throw new OperacionNoPermitida(
+          "No se puede borrar el usuario, tiene recetas o versiones asociadas.");
     }
+  }
 
-    private void validateCambioEmail(UsuarioModel usuarioExistente, String email) {
-        if (email != null && !email.equals(usuarioExistente.getEmail())) {
-            if (usuarioRepository.existsByEmail(email)) {
-                throw new ModificacionInvalidaException("El email ya está en uso por otro usuario");
-            }
-        }
-    }
-
-    private void validateCambioUsername(UsuarioModel usuarioExistente, String username) {
-        if (username != null && !username.equals(usuarioExistente.getUsername())) {
-            if (usuarioRepository.existsByUsername(username)) {
-                throw new ModificacionInvalidaException("El username ya está en uso por otro usuario");
-            }
-        }
-    }
-
-    private void updateModelFromDTO(UsuarioModifyDTO modificacion, UsuarioModel model) {
-        usuarioMapper.updateModelFromModifyDTO(modificacion, model);
-    }
-
-    private void validarDeleteUsario(String username){
-        if (!usuarioQueryService.usuarioPuedeSerEliminado(username)) {
-            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas o versiones asociadas.");
-        }
-    }
-
-    @Transactional
-    public void deleteUsuario(String username) {
-
-        UsuarioModel model = getUsuarioModelByUsername(username);
-
-        validarDeleteUsario(username);
+  @Transactional
+  public void deleteUsuario(String username) {
+    UsuarioModel model = getUsuarioModelByUsername(username);
+    validarDeleteUsario(username);
+    usuarioRepository.deleteByUsername(username);
+  }
 
 
-        // usuarioRepository.deleteById(id);
-    }
-
-    private UsuarioResponseDTO convertToResponseDTO(UsuarioModel model) {
-        return usuarioMapper.usuarioToUsuarioResponseDTO(model);
-    }
-
-    // convierte una lista de models a otra de responseDTO
-    private List<UsuarioResponseDTO> convertToResponseDTOList(List<UsuarioModel> usuarios) {
-        return usuarios.stream().map(usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
-    }
-
-    public boolean existsByUsername(String username) {
-        return false;
-    }
 }

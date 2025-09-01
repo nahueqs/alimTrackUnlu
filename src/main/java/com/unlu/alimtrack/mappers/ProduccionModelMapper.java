@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(uses = ProduccionModel.class, componentModel = "spring")
 public interface ProduccionModelMapper {
 
-    @Mapping(target = "codigoVersion", source = "versionReceta.codigoVersionReceta")
-    ProduccionResponseDTO produccionToProduccionResponseDTO(ProduccionModel produccion);
+  @Mapping(target = "codigoVersion", source = "versionReceta.codigoVersionReceta")
+  ProduccionResponseDTO produccionToProduccionResponseDTO(ProduccionModel produccion);
 
 
 }

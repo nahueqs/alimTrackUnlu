@@ -1,11 +1,26 @@
 package com.unlu.alimtrack.dtos.create;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-public record ProduccionCreateDTO(@NotNull Long idVersionReceta, @NotNull String codigoProduccion,
+public record ProduccionCreateDTO(
 
-                                  String lote,
-                                  String encargado) {
+    @NotNull
+    @Size(min = 1, max = 255)
+    String codigoVersionRecetaPadre,
+
+    @NotNull
+    @Size(min = 1, max = 255)
+    String codigoProduccion,
+
+    @NotNull
+    @Size(min = 1, max = 50)
+    String usernameCreador,
+
+    @Size(min = 1, max = 100)
+    String lote,
+
+    @Size(min = 1, max = 100)
+    String encargado) {
+
 }
-//mas tarde implementar o no con usuario creador para iniciar la produccion
-/* @NotNull Long idUsuarioCreador, */

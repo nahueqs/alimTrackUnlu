@@ -43,6 +43,7 @@ class GrupoCamposModelUnitTest {
         // Configurar datos de prueba
         usuario = new UsuarioModel();
         usuario.setNombre("Test User");
+        usuario.setUsername("Test User");
         usuario.setEmail("test@example.com");
         usuario.setContraseña("password");
         usuario.setEsAdmin(false);

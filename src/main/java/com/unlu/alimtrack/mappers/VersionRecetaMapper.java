@@ -7,10 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
-public interface VersionRecetaModelMapper {
+import java.util.List;
 
-    VersionRecetaModelMapper mapper = Mappers.getMapper(VersionRecetaModelMapper.class);
+@Mapper(componentModel = "spring")
+public interface VersionRecetaMapper {
+
+    VersionRecetaMapper mapper = Mappers.getMapper(VersionRecetaMapper.class);
 
     @Mapping(target = "creadoPor.id", source = "idUsuarioCreador")
     VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
@@ -19,5 +21,6 @@ public interface VersionRecetaModelMapper {
     @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
     VersionRecetaResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
 
+    List<VersionRecetaResponseDTO> toVersionRecetaResponseDTOList(List<VersionRecetaModel> versionRecetaModels);
 
 }

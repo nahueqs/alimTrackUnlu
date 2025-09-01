@@ -10,9 +10,9 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
+import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.UsuarioValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,8 @@ public class UsuarioService {
     private final UsuarioModelMapper usuarioMapper;
     private final UsuarioValidator usuarioValidator;
     private final PasswordEncoder passwordEncoder;
+    private final UsuarioQueryService usuarioQueryService;
+
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> getAllUsuarios() {
@@ -103,19 +105,19 @@ public class UsuarioService {
         usuarioMapper.updateModelFromModifyDTO(modificacion, model);
     }
 
+    private void validarDeleteUsario(String username){
+        if (!usuarioQueryService.usuarioPuedeSerEliminado(username)) {
+            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas o versiones asociadas.");
+        }
+    }
+
     @Transactional
     public void deleteUsuario(String username) {
 
         UsuarioModel model = getUsuarioModelByUsername(username);
 
-        /*if (recetaService.findAllByCreadoPorUsername(username) == null) {
-            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
-        }
-        if (versionRecetaModelService.findAllByCreadoPorUsername(username) == null) {
-            throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
-        }*/
+        validarDeleteUsario(username);
 
-        //habria que agregar que no tenga respuestas asociadas
 
         // usuarioRepository.deleteById(id);
     }

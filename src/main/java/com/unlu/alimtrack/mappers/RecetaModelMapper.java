@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.List;
+
 @Mapper(uses = UsuarioModelMapper.class, componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RecetaModelMapper {
 
@@ -20,5 +22,6 @@ public interface RecetaModelMapper {
 
     void updateModelFromModifyDTO(RecetaModifyDTO dto, @MappingTarget RecetaModel model);
 
+    List<RecetaResponseDTO> recetaModelsToRecetaResponseDTOs(List<RecetaModel> recetas);
 
 }

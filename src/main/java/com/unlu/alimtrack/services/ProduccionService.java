@@ -94,15 +94,14 @@ public class ProduccionService {
         }
 
         if (producciones.isEmpty()) {
-            throw new RecursoNoEncontradoException("No hay producciones para la receta " + codigoReceta);   
+            throw new RecursoNoEncontradoException("No hay producciones para la receta " + codigoReceta);
         }
 
         return producciones;
     }
 
-
     public List<ProduccionResponseDTO> findAllProduccionesByCodigoVersionReceta(String codigoVersionReceta) {
-        VersionRecetaModel version = versionRecetaService.findVersionByCodigo(codigoVersionReceta);
+        VersionRecetaModel version = versionRecetaService.findVersionModelByCodigo(codigoVersionReceta);
         if (version == null) {
             throw new RecursoNoEncontradoException("No existe ninguna version con el codigo " + codigoVersionReceta);
         }
@@ -122,7 +121,7 @@ public class ProduccionService {
     public List<ProduccionResponseDTO> findByVersionRecetaAndFechaRange(String codigoVersionReceta, String fechaInicioStr, String fechaFinStr) {
 
         Instant fechaInicio = dateHelper.parseAndValidateFecha(fechaInicioStr);
-        Instant fechaFin =  dateHelper.parseAndValidateFecha(fechaFinStr);
+        Instant fechaFin = dateHelper.parseAndValidateFecha(fechaFinStr);
 
         System.out.println("Buscando producciones por versión {} y rango {} - {}" + codigoVersionReceta + fechaInicio + fechaFin);
 

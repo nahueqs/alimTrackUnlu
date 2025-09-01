@@ -21,7 +21,6 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
 
     List<ProduccionModel> findAllByVersionReceta(VersionRecetaModel version);
 
-
     @Query("SELECT p FROM ProduccionModel p WHERE " +
             "(:codigoVersionReceta IS NULL OR p.versionReceta.codigoVersionReceta = :codigoVersionReceta) AND " +
             "(:lote IS NULL OR p.lote = :lote) AND " +

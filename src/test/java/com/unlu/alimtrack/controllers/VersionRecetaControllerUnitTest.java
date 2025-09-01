@@ -40,7 +40,7 @@ public class VersionRecetaControllerUnitTest {
 
     @Test
     void testGetVersionByIdRecetaNoExiste() {
-        when(versionRecetaService.findVersionRecetaByIdRecetaAndIdVersion(999L, 1L))
+        when(versionRecetaService.findVersionByIdRecetaAndIdVersion(999L, 1L))
                 .thenThrow(new RecursoNoEncontradoException("Receta no encontrada"));
 
         Exception exception = assertThrows(RecursoNoEncontradoException.class, () -> {
@@ -48,7 +48,7 @@ public class VersionRecetaControllerUnitTest {
         });
 
         assertEquals("Receta no encontrada", exception.getMessage());
-        verify(versionRecetaService).findVersionRecetaByIdRecetaAndIdVersion(999L, 1L);
+        verify(versionRecetaService).findVersionByIdRecetaAndIdVersion(999L, 1L);
     }
 
     @Test
@@ -86,13 +86,13 @@ public class VersionRecetaControllerUnitTest {
                 "VTEST-001", "Receta Padre", "Nombre Version", "Descripcion test", "Creador", Instant.now()
         );
 
-        when(versionRecetaService.findVersionRecetaByIdRecetaAndIdVersion(1L, 1L)).thenReturn(dto);
+        when(versionRecetaService.findVersionByIdRecetaAndIdVersion(1L, 1L)).thenReturn(dto);
 
         ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.getVersionById(1L, 1L);
 
         assertEquals("VTEST-001", resp.getBody().codigoVersionReceta());
         assertEquals("Nombre Version", resp.getBody().nombre());
-        verify(versionRecetaService).findVersionRecetaByIdRecetaAndIdVersion(1L, 1L);
+        verify(versionRecetaService).findVersionByIdRecetaAndIdVersion(1L, 1L);
     }
 
     @Test

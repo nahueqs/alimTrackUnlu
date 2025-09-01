@@ -9,6 +9,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface VersionRecetaModelMapper {
+
     VersionRecetaModelMapper mapper = Mappers.getMapper(VersionRecetaModelMapper.class);
 
     @Mapping(target = "creadoPor.id", source = "idUsuarioCreador")

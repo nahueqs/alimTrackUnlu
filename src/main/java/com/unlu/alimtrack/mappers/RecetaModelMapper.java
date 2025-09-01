@@ -8,14 +8,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = UsuarioModelMapper.class, componentModel = "spring",nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(uses = UsuarioModelMapper.class, componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RecetaModelMapper {
-
-
-
-    RecetaModelMapper mapper = Mappers.getMapper(RecetaModelMapper.class);
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     RecetaResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);

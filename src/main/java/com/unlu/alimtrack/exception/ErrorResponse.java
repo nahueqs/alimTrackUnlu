@@ -1,8 +1,5 @@
 package com.unlu.alimtrack.exception;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 public record ErrorResponse(

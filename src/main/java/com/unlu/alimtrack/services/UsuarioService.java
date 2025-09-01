@@ -10,6 +10,8 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.UsuarioModelMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
+import com.unlu.alimtrack.services.validators.UsuarioValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,28 +21,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioModelMapper usuarioMapper;
+    private final UsuarioValidator usuarioValidator;
     private final PasswordEncoder passwordEncoder;
-    private final RecetaService recetaService;
-    private final VersionRecetaService versionRecetaModelService;
-
-    public UsuarioService(UsuarioRepository usuarioRepository, UsuarioModelMapper usuarioMapper, PasswordEncoder passwordEncoder, @Lazy RecetaService recetaModelService, @Lazy VersionRecetaService versionRecetaModelService) {
-        this.usuarioRepository = usuarioRepository;
-        this.usuarioMapper = usuarioMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.recetaService = recetaModelService;
-        this.versionRecetaModelService = versionRecetaModelService;
-    }
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> getAllUsuarios() {
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
-        if (usuarios.isEmpty()) {
-            throw new RecursoNoEncontradoException("No hay usuarios guardados");
+        usuarioValidator.validateListUsuarios(usuarios);
+        return convertToResponseDTOList(usuarios);
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO getUsuarioByUsername(String username) {
+        usuarioValidator.validateUsername(username);
+        UsuarioModel model = getUsuarioModelByUsername(username);
+        return convertToResponseDTO(model);
+    }
+
+    private UsuarioModel getUsuarioModelByUsername(String username) {
+        UsuarioModel model = usuarioRepository.findByUsername(username).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado con username" + username));
+        usuarioValidator.validateUsuario(model);
+        return model;
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioModel getUsuarioModelById(Long id) {
+        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
+        if (usuarioModel == null) {
+            throw new RecursoNoEncontradoException("Usuario no encontrado con id " + id);
         }
-        return usuarios.stream().map(usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
+        return usuarioModel;
     }
 
     public UsuarioResponseDTO addUsuario(UsuarioCreateDTO usuario) {
@@ -57,62 +71,65 @@ public class UsuarioService {
         return usuarioMapper.usuarioToUsuarioResponseDTO(usuarioModel);
     }
 
-    @Transactional(readOnly = true)
-    public UsuarioResponseDTO getUsuarioResponseDTOById(Long id) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        if (usuarioModel == null) {
-            throw new RecursoNoEncontradoException("Usuario no encontrado con id " + id);
-        }
-        return usuarioMapper.usuarioModelToUsuarioResponseDTO(usuarioModel);
-    }
+    public void modifyUsuario(String username, UsuarioModifyDTO modificacion) {
+        usuarioValidator.validarModificacion(modificacion);
+        UsuarioModel usuarioExistente = getUsuarioModelByUsername(username);
 
-    @Transactional(readOnly = true)
-    public UsuarioModel getUsuarioModelById(Long id) {
-        UsuarioModel usuarioModel = usuarioRepository.findById(id).orElse(null);
-        if (usuarioModel == null) {
-            throw new RecursoNoEncontradoException("Usuario no encontrado con id " + id);
-        }
-        return usuarioModel;
-    }
-
-    public void modifyUsuario(Long id, UsuarioModifyDTO modificacion) {
-        if (!validarModificacionUsuario(modificacion)) {
-            throw new ModificacionInvalidaException("No se puede realizar la modificacion solicitada");
-        }
-        UsuarioModel usuario = usuarioRepository.findById(id).orElse(null);
-        if (usuario == null) {
-            throw new RecursoNoEncontradoException("Usuario no encontrado con id " + id);
-        }
-
-        usuario.setNombre(modificacion.nombre());
+        validateCambioEmail(usuarioExistente, modificacion.nombre());
+        usuarioExistente.setNombre(modificacion.nombre());
         String passwordEncriptada = passwordEncoder.encode(modificacion.contraseña());
-        usuario.setContraseña(passwordEncriptada);
+        usuarioExistente.setContraseña(passwordEncriptada);
 
-        usuarioRepository.save(usuario);
+        usuarioRepository.save(usuarioExistente);
     }
 
-    private boolean validarModificacionUsuario(UsuarioModifyDTO modificacion) {
-        return modificacion.nombre() != null || modificacion.contraseña() != null;
+    private void validateCambioEmail(UsuarioModel usuarioExistente, String email) {
+        if (email != null && !email.equals(usuarioExistente.getEmail())) {
+            if (usuarioRepository.existsByEmail(email)) {
+                throw new ModificacionInvalidaException("El email ya está en uso por otro usuario");
+            }
+        }
     }
 
-    public void deleteUsuario(Long id) {
-        if (recetaService.findAllByCreadoPorId(id) == null) {
+    private void validateCambioUsername(UsuarioModel usuarioExistente, String username) {
+        if (username != null && !username.equals(usuarioExistente.getUsername())) {
+            if (usuarioRepository.existsByUsername(username)) {
+                throw new ModificacionInvalidaException("El username ya está en uso por otro usuario");
+            }
+        }
+    }
+
+    private void updateModelFromDTO(UsuarioModifyDTO modificacion, UsuarioModel model) {
+        usuarioMapper.updateModelFromModifyDTO(modificacion, model);
+    }
+
+    @Transactional
+    public void deleteUsuario(String username) {
+
+        UsuarioModel model = getUsuarioModelByUsername(username);
+
+        /*if (recetaService.findAllByCreadoPorUsername(username) == null) {
             throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
         }
-        if (versionRecetaModelService.findAllByCreadoPorId(id) == null) {
+        if (versionRecetaModelService.findAllByCreadoPorUsername(username) == null) {
             throw new OperacionNoPermitida("No se puede borrar el usuario, tiene recetas asociadas.");
-        }
+        }*/
 
         //habria que agregar que no tenga respuestas asociadas
 
-        usuarioRepository.deleteById(id);
+        // usuarioRepository.deleteById(id);
     }
 
-
+    private UsuarioResponseDTO convertToResponseDTO(UsuarioModel model) {
+        return usuarioMapper.usuarioToUsuarioResponseDTO(model);
+    }
 
     // convierte una lista de models a otra de responseDTO
     private List<UsuarioResponseDTO> convertToResponseDTOList(List<UsuarioModel> usuarios) {
         return usuarios.stream().map(usuarioMapper::usuarioModelToUsuarioResponseDTO).collect(Collectors.toList());
     }
 
+    public boolean existsByUsername(String username) {
+        return false;
+    }
 }

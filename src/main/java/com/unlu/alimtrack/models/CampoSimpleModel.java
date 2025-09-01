@@ -38,7 +38,6 @@ public class CampoSimpleModel {
     @Column(name = "tipo_dato")
     private TipoDatoCampo tipoDato;
 
-
     @ColumnDefault("0")
     @Column(name = "orden")
     private Integer orden;

@@ -1,6 +1,5 @@
 package com.unlu.alimtrack.controllers;
 
-import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
@@ -30,10 +29,10 @@ class RecetaControllerUnitTest {
     @Test
     void testGetAllRecetas() {
         List<RecetaResponseDTO> list = List.of(new RecetaResponseDTO("RTEST-001", "Milanesa", "Descripcion test", Instant.now(), "Id creador"));
-        when(recetaService.findAllRecetasResponseDTOS()).thenReturn(list);
+        when(recetaService.findAllRecetas()).thenReturn(list);
         ResponseEntity<List<RecetaResponseDTO>> resp = recetaController.getAllRecetas();
         assertEquals(1, resp.getBody().size());
-        verify(recetaService).findAllRecetasResponseDTOS();
+        verify(recetaService).findAllRecetas();
     }
 
    /* @Test

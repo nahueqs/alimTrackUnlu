@@ -5,6 +5,8 @@ import com.unlu.alimtrack.models.VersionRecetaModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class VersionRecetaValidator {
@@ -12,6 +14,12 @@ public class VersionRecetaValidator {
     public void validarVersionReceta(VersionRecetaModel model, String codigoVersionReceta) {
         if (model == null) {
             throw new RecursoNoEncontradoException("No existe ninguna version con el codigo " + codigoVersionReceta);
+        }
+    }
+
+    public void validarVersionRecetaList(List<VersionRecetaModel> list) {
+        if (list == null) {
+            throw new RecursoNoEncontradoException("No existen versiones para la receta");
         }
     }
 

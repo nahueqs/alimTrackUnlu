@@ -3,7 +3,7 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.VersionRecetaModelMapper;
+import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
@@ -21,7 +21,7 @@ public class VersionRecetaService {
 
     private final VersionRecetaRespository versionRecetaRespository;
     private final RecetaService recetaService;
-    private final VersionRecetaModelMapper versionRecetaModelMapper;
+    private final VersionRecetaMapper versionRecetaMapper;
     @Lazy
     private final UsuarioService usuarioService;
 
@@ -32,18 +32,8 @@ public class VersionRecetaService {
             throw new RecursoNoEncontradoException("No hay versiones guardadas para ninguna receta");
         }
         return versiones.stream().map(
-                VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
+                VersionRecetaMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
 
-    }
-
-    @Transactional(readOnly = true)
-    public List<VersionRecetaResponseDTO> findAllVersionesByCodigoVersion(String codigoVersionReceta) {
-        List<VersionRecetaModel> versiones = versionRecetaRespository.findAllByCodigoVersionReceta(codigoVersionReceta);
-        if (versiones.isEmpty()) {
-            throw new RecursoNoEncontradoException("No hay versiones con el código " + codigoVersionReceta);
-        }
-        return versiones.stream().map(
-                VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +42,7 @@ public class VersionRecetaService {
         if (model == null) {
             throw new RecursoNoEncontradoException("La versión no existe");
         }
-        return VersionRecetaModelMapper.mapper.toVersionRecetaResponseDTO(model);
+        return VersionRecetaMapper.mapper.toVersionRecetaResponseDTO(model);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +51,7 @@ public class VersionRecetaService {
         if (model == null) {
             throw new RecursoNoEncontradoException("No hay versiones guardadas con ese código");
         }
-        return VersionRecetaModelMapper.mapper.toVersionRecetaResponseDTO(model);
+        return VersionRecetaMapper.mapper.toVersionRecetaResponseDTO(model);
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +61,7 @@ public class VersionRecetaService {
             throw new RecursoNoEncontradoException("No hay recetas guardadas");
         }
         return versiones.stream().map(
-                VersionRecetaModelMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
+                VersionRecetaMapper.mapper::toVersionRecetaResponseDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -97,7 +87,7 @@ public class VersionRecetaService {
 
         // mapeo el dto a un nuevo model
         VersionRecetaModel versionModelFinal;
-        versionModelFinal = versionRecetaModelMapper.toVersionRecetaModel(versionRecetaCreateDto);
+        versionModelFinal = versionRecetaMapper.toVersionRecetaModel(versionRecetaCreateDto);
         //versionModelFinal.setRecetaPadre(modelRecetaPadre);
         if (versionRecetaCreateDto.codigoVersionReceta() == null) {
             versionModelFinal.setCodigoVersionReceta(generarCodigoUnicoVersionReceta());
@@ -105,7 +95,7 @@ public class VersionRecetaService {
 
         versionRecetaRespository.save(versionModelFinal);
 
-        return versionRecetaModelMapper.toVersionRecetaResponseDTO(versionModelFinal);
+        return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
     }
 
     protected List<VersionRecetaModel> findAllByCreadoPorId(Long id) {
@@ -126,7 +116,7 @@ public class VersionRecetaService {
     }
 
     private VersionRecetaResponseDTO converToResponseDTO(VersionRecetaModel model) {
-        return versionRecetaModelMapper.toVersionRecetaResponseDTO(model);
+        return versionRecetaMapper.toVersionRecetaResponseDTO(model);
     }
 
     public VersionRecetaResponseDTO findVersionRecetaByCodigoVersionAndCodigoReceta(String codigoVersion, String codigoReceta) {

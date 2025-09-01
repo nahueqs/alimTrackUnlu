@@ -24,17 +24,13 @@ public interface VersionRecetaRespository extends JpaRepository<VersionRecetaMod
 
     boolean existsByCodigoVersionReceta(String codigoVersion);
 
-    List<VersionRecetaModel> findAllByCodigoVersionReceta(String codigoVersionReceta);
-
     @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.recetaPadre.codigoReceta = :codigoRecetaPadre")
     List<VersionRecetaModel> findAllVersionesByCodigoRecetaPadre(String codigoRecetaPadre);
-
 
     @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.creadoPor.username = :username")
     boolean existsByCreadaPorUsername(String username);
 
-
-
+    List<VersionRecetaModel> findAllByCreadoPorUsername(String username);
 }
 
 

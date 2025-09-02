@@ -7,7 +7,7 @@ import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoDuplicadoException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.UsuarioModelMapper;
+import com.unlu.alimtrack.mappers.UsuarioMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioService {
 
   private final UsuarioRepository usuarioRepository;
-  private final UsuarioModelMapper usuarioMapper;
+  private final UsuarioMapper usuarioMapper;
   private final UsuarioValidator usuarioValidator;
   private final PasswordEncoder passwordEncoder;
   private final UsuarioQueryService usuarioQueryService;

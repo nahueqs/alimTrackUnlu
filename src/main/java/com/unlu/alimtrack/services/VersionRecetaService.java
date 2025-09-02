@@ -109,8 +109,8 @@ public class VersionRecetaService {
     verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
 
     // mapeo el dto a un nuevo model
-    VersionRecetaModel versionModelFinal;
-    versionModelFinal = versionRecetaMapper.toVersionRecetaModel(versionRecetaCreateDTO);
+    VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
+        versionRecetaCreateDTO);
 
     versionRecetaRespository.save(versionModelFinal);
 

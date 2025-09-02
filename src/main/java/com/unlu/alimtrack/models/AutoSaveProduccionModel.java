@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +41,6 @@ public class AutoSaveProduccionModel {
 
   @ColumnDefault("CURRENT_TIMESTAMP")
   @Column(name = "timestamp")
-  private Instant timestamp;
+  private LocalDateTime timestamp;
 
 }

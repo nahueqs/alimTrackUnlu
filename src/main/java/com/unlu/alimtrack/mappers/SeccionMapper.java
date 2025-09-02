@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface SeccionModelMapper {
+public interface SeccionMapper {
 
   @Mapping(target = "versionRecetaPadre.id", source = "codigoVersionRecetaPadre")
   SeccionModel createDTOToModel(SeccionCreateDTO seccionCreateDTO);

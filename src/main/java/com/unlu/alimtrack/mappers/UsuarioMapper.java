@@ -10,7 +10,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface UsuarioModelMapper {
+public interface UsuarioMapper {
 
   UsuarioModel usuarioCreateDTOToModel(UsuarioCreateDTO usuarioCreateDTO);
 

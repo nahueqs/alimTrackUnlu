@@ -1,26 +1,34 @@
 package com.unlu.alimtrack.dtos.create;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "DTO para la creacion de una nueva produccion")
 public record ProduccionCreateDTO(
 
+    @Schema(description = "Código de versión de receta padre de la produccion", example = "REC-V1-2024")
+    @Size(max = 50, message = "El código de versión no puede exceder 50 caracteres")
     @NotNull
-    @Size(min = 1, max = 255)
-    String codigoVersionRecetaPadre,
+    String codigoVersionReceta,
 
-    @NotNull
-    @Size(min = 1, max = 255)
+    @Schema(description = "Código de la produccion a crear", example = "PROD-1928")
+    @NotNull @Size(min = 1, max = 255)
     String codigoProduccion,
 
-    @NotNull
-    @Size(min = 1, max = 50)
+    @NotNull @Size(min = 1, max = 50)
     String usernameCreador,
 
-    @Size(min = 1, max = 100)
-    String lote,
+    @Schema(description = "Número de lote", example = "LOTE-2024-001")
+    @Pattern(regexp = "^[A-Z0-9-]{0,20}$", message = "Formato de lote inválido. Solo mayúsculas, números y guiones")
+    @Size(min = 1, max = 100) String lote,
 
     @Size(min = 1, max = 100)
-    String encargado) {
+    String encargado,
+
+    @Size(min = 1, max = 255)
+    String observaciones
+) {
 
 }

@@ -10,7 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -38,10 +38,10 @@ public class ProduccionModel {
   private String codigoProduccion;
 
   @Column(name = "fecha_inicio")
-  private Instant fechaInicio;
+  private LocalDateTime fechaInicio;
 
   @Column(name = "fecha_fin")
-  private Instant fechaFin;
+  private LocalDateTime fechaFin;
 
   @Size(max = 100)
   @Column(name = "lote")

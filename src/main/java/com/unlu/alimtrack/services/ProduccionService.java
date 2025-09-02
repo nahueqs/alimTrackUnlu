@@ -2,19 +2,17 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.modify.ProduccionCambioEstadoRequestDTO;
+import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
-import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.ProduccionModelMapper;
+import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
-import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.services.helpers.DateHelper;
 import com.unlu.alimtrack.services.validators.ProduccionValidator;
-import java.time.Instant;
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,11 +22,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProduccionService {
 
-  private final RecetaService recetaService;
-  private final VersionRecetaService versionRecetaService;
   private final ProduccionRepository produccionRepository;
-  private final ProduccionModelMapper produccionMapper;
-  private final DateHelper dateHelper;
+  private final ProduccionMapper produccionMapper;
   private final ProduccionValidator produccionValidator;
 
   public ProduccionCreateDTO addProduccion(ProduccionCreateDTO productionDTO) {
@@ -46,139 +41,56 @@ public class ProduccionService {
     return null;
   }
 
+  private void verificarProduccionBuscadaByCodigo(ProduccionModel produccion, String codigoProduccion) {
+    if (produccion == null) {
+      throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigoProduccion);
+    }
+  }
+
+
   public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
     ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
-    if (model == null) {
-      throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigo);
-    }
+    verificarProduccionBuscadaByCodigo(model, codigo);
     return produccionMapper.produccionToProduccionResponseDTO(model);
   }
 
-  public List<ProduccionResponseDTO> findAllProduccionesEnCurso() {
-    List<ProduccionModel> producciones = produccionRepository.findAllByEstado(
-        TipoEstadoProduccion.EN_CURSO.getValorBaseDatos());
+  public List<ProduccionResponseDTO> findAllByFilters(@Valid ProduccionFilterRequestDTO filtros) {
 
-    if (producciones.isEmpty()) {
-      throw new RecursoNoEncontradoException("No se encontraron producciones en curso");
-    }
+    // asigno fechas
+    LocalDateTime fechaInicio = convertToStartOfDay(filtros.fechaInicio());
+    LocalDateTime fechaFin = convertToEndOfDay(filtros.fechaFin());
 
-    return producciones.stream().map(produccionMapper::produccionToProduccionResponseDTO)
-        .collect(Collectors.toList());
+    List<ProduccionModel> producciones = hacerConsultaAvanzada(
+        filtros.codigoVersionReceta(),
+        filtros.lote(),
+        filtros.encargado(),
+        fechaInicio,
+        fechaFin,
+        filtros.estado()
+    );
+
+    return produccionMapper.toProduccionResponseDTOList(producciones);
   }
 
-  public List<ProduccionResponseDTO> findAllProduccionesFinalizadas() {
-    List<ProduccionModel> producciones = produccionRepository.findAllByEstado(
-        TipoEstadoProduccion.FINALIZADA.getValorBaseDatos());
-
-    if (producciones.isEmpty()) {
-      throw new RecursoNoEncontradoException("No se encontraron producciones finalizadas");
-    }
-
-    return producciones.stream().map(produccionMapper::produccionToProduccionResponseDTO)
-        .collect(Collectors.toList());
+  private LocalDateTime convertToStartOfDay(LocalDate date) {
+    return date != null ? date.atStartOfDay() : null;
   }
 
-  public List<ProduccionResponseDTO> findAllProduccionesByCodigoReceta(String codigoReceta) {
-
-    log.debug("Buscando versiones para receta: {}", codigoReceta);
-
-    // obtener todas las versiones de la receta
-    List<VersionRecetaModel> versiones = versionRecetaService.findAllVersionesByCodigoRecetaPadre(
-        codigoReceta);
-
-    if (versiones.isEmpty()) {
-      throw new RecursoNoEncontradoException(
-          "No se encontraron versiones para la receta: " + codigoReceta);
-    }
-    List<ProduccionResponseDTO> producciones = new ArrayList<>();
-    for (VersionRecetaModel version : versiones) {
-      try {
-        producciones = findAllProduccionesByCodigoVersionReceta(version.getCodigoVersionReceta());
-      } catch (Exception e) {
-        log.error("Error obteniendo producciones para versión {}: {}",
-            version.getCodigoVersionReceta(), e.getMessage());
-      }
-    }
-
-    if (producciones.isEmpty()) {
-      throw new RecursoNoEncontradoException("No hay producciones para la receta " + codigoReceta);
-    }
-
-    return producciones;
+  private LocalDateTime convertToEndOfDay(LocalDate date) {
+    return date != null ? date.atTime(23, 59, 59) : null;
   }
 
-  public List<ProduccionResponseDTO> findAllProduccionesByCodigoVersionReceta(
-      String codigoVersionReceta) {
-    VersionRecetaModel version = versionRecetaService.findVersionModelByCodigo(codigoVersionReceta);
-    if (version == null) {
-      throw new RecursoNoEncontradoException(
-          "No existe ninguna version con el codigo " + codigoVersionReceta);
-    }
-    List<ProduccionModel> producciones = produccionRepository.findAllByVersionReceta(version);
-    if (producciones.isEmpty()) {
-      throw new RecursoNoEncontradoException(
-          "No se encontraron producciones para el codigo de version receta " + codigoVersionReceta);
-    }
-    return convertToResponseDTOList(producciones);
+  private List<ProduccionModel> hacerConsultaAvanzada(
+      String codigoVersionReceta,
+      String lote,
+      String encargado,
+      LocalDateTime fechaInicio,
+      LocalDateTime fechaFin,
+      String estado) {
+
+    return produccionRepository.findByAdvancedFilters(
+        codigoVersionReceta, lote, encargado, estado, fechaInicio, fechaFin
+    );
   }
 
-  /* * Busca producciones por versión de receta y rango de fechas
-   * @param codigoVersionReceta Código de versión de receta
-   * @param fechaInicioStr Fecha de inicio mínima
-   * @param fechaFinStr Fecha de inicio máxima
-   * @return Lista de producciones que cumplen ambos criterios
-   */
-  public List<ProduccionResponseDTO> findByVersionRecetaAndFechaRange(String codigoVersionReceta,
-      String fechaInicioStr, String fechaFinStr) {
-
-    Instant fechaInicio = dateHelper.parseAndValidateFecha(fechaInicioStr);
-    Instant fechaFin = dateHelper.parseAndValidateFecha(fechaFinStr);
-
-    System.out.println(
-        "Buscando producciones por versión {} y rango {} - {}" + codigoVersionReceta + fechaInicio
-            + fechaFin);
-
-    return convertToResponseDTOList(
-        produccionRepository.findByVersionRecetaAndFechaRange(codigoVersionReceta, fechaInicio,
-            fechaFin));
-  }
-
-  // convierte una lista de models a otra de responseDTO
-  private List<ProduccionResponseDTO> convertToResponseDTOList(List<ProduccionModel> producciones) {
-    return producciones.stream().map(produccionMapper::produccionToProduccionResponseDTO)
-        .collect(Collectors.toList());
-  }
-
-  /*
-   * Obtiene todas las producciones con filtros opcionales
-   * Método principal para búsquedas flexibles
-   *
-   * @param codigoVersionReceta Filtro por código de versión (opcional)
-   * @param lote Filtro por número de lote (opcional)
-   * @param encargado Filtro por encargado (opcional)
-   * @param fechaInicioStr Filtro por fecha inicio mínima (opcional)
-   * @param fechaFinStr Filtro por fecha inicio máxima (opcional)
-   * @return Lista de producciones filtradas como DTOs
-   * @throws IllegalArgumentException Si el formato de fecha es inválido
-   */
-  public List<ProduccionResponseDTO> findProduccionesByFilters(String codigoVersionReceta,
-      String lote, String encargado, String fechaInicioStr, String fechaFinStr) {
-
-    log.debug(
-        "Buscando producciones con filtros: codigoVersionReceta={}, lote={}, encargado={}, fechaInicio={}, fechaFin={}",
-        codigoVersionReceta, lote, encargado, fechaInicioStr, fechaFinStr);
-
-    // valido fechas
-    Instant fechaInicio = dateHelper.parseAndValidateFecha(fechaInicioStr);
-    Instant fechaFin = dateHelper.parseAndValidateFecha(fechaFinStr);
-    dateHelper.validateRangoFechas(fechaInicio, fechaFin, "fechaInicio", "fechaFin");
-
-    //valido las referencias sino tira exception RecursoNoEncontrado
-    produccionValidator.validateReferencias(codigoVersionReceta, lote, encargado);
-
-    List<ProduccionModel> producciones = produccionRepository.findByAdvancedFilters(
-        codigoVersionReceta, lote, encargado, fechaInicio, fechaFin);
-
-    return convertToResponseDTOList(producciones);
-  }
 }

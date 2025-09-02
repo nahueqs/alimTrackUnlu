@@ -2,7 +2,7 @@ package com.unlu.alimtrack.services.queries;
 
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.RecetaModelMapper;
+import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecetaQueryServiceImpl implements RecetaQueryService {
 
   private final RecetaRepository recetaRepository;
-  private final RecetaModelMapper recetaModelMapper;
+  private final RecetaMapper recetaMapper;
 
   @Override
   public boolean existsByCreadoPorUsername(String username) {
@@ -34,6 +34,6 @@ public class RecetaQueryServiceImpl implements RecetaQueryService {
         () -> new RecursoNoEncontradoException(
             "No existen el receta creadas por el usuario " + username)
     );
-    return recetaModelMapper.recetaModelsToRecetaResponseDTOs(recetas);
+    return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
   }
 }

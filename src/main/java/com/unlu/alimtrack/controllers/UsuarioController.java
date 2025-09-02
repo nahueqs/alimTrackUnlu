@@ -6,6 +6,7 @@ import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.UsuarioService;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,14 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
   final UsuarioService usuarioService;
-
-  public UsuarioController(UsuarioService usuarioService) {
-    this.usuarioService = usuarioService;
-  }
 
   @GetMapping()
   public ResponseEntity<List<UsuarioResponseDTO>> getAllUsuarios() {

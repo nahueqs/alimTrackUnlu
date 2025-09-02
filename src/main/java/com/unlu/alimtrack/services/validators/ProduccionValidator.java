@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.services.validators;
 
+import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
@@ -18,17 +19,18 @@ public class ProduccionValidator {
   /**
    * Valida la existencia de referencias
    */
-  public void validateReferencias(String codigoVersionReceta, String lote, String encargado) {
-    if (codigoVersionReceta != null) {
-      validateVersionReceta(codigoVersionReceta);
+  public void validarReferencias(ProduccionFilterRequestDTO filtros) {
+    if (filtros.codigoVersionReceta() != null) {
+      validateVersionReceta(filtros.codigoVersionReceta());
     }
-    if (lote != null) {
-      validateLote(lote);
+    if (filtros.lote() != null) {
+      validateLote(filtros.lote());
     }
-    if (encargado != null) {
-      validateEncargado(encargado);
+    if (filtros.encargado() != null) {
+      validateEncargado(filtros.encargado());
     }
   }
+
 
   private void validateVersionReceta(String codigoVersion) {
     if (!versionRecetaRespository.existsByCodigoVersionReceta(codigoVersion)) {

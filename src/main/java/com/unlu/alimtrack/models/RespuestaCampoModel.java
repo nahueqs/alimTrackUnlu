@@ -8,7 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -41,6 +41,6 @@ public class RespuestaCampoModel {
 
   @ColumnDefault("CURRENT_TIMESTAMP")
   @Column(name = "timestamp")
-  private Instant timestamp;
+  private LocalDateTime timestamp;
 
 }

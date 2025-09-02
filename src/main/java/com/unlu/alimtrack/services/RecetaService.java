@@ -4,7 +4,7 @@ import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.RecetaModelMapper;
+import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import com.unlu.alimtrack.services.queries.RecetaQueryService;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecetaService {
 
   private final RecetaRepository recetaRepository;
-  private final RecetaModelMapper recetaMapper;
+  private final RecetaMapper recetaMapper;
   private final RecetaValidator recetaValidator;
   private final RecetaQueryService recetaQueryService;
   private final UsuarioQueryService usuarioQueryService;

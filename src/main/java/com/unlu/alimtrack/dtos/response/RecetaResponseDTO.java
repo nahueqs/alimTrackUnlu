@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.dtos.response;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public record RecetaResponseDTO(@NotNull String codigoReceta, String nombre, String descripcion,
-                                Instant fechaCreacion, String creadaPor) {
+                                LocalDateTime fechaCreacion, String creadaPor) {
 
 }

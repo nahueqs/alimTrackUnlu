@@ -1,8 +1,7 @@
 package com.unlu.alimtrack.repositories;
 
 import com.unlu.alimtrack.models.ProduccionModel;
-import com.unlu.alimtrack.models.VersionRecetaModel;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,41 +9,23 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProduccionRepository extends JpaRepository<ProduccionModel, Long> {
 
-  Boolean existsByCodigoProduccion(String codigoProduccion);
-
-  List<ProduccionModel> findAllByEstado(String estado);
-
-  // List<ProduccionModel> findByRecetaId(Long recetaId);
-
   ProduccionModel findByCodigoProduccion(String codigoProduccion);
 
-  List<ProduccionModel> findAllByVersionReceta(VersionRecetaModel version);
-
-  @Query("SELECT p FROM ProduccionModel p WHERE " +
-      "(:codigoVersionReceta IS NULL OR p.versionReceta.codigoVersionReceta = :codigoVersionReceta) AND "
-      +
-      "(:lote IS NULL OR p.lote = :lote) AND " +
-      "(:encargado IS NULL OR LOWER(p.encargado) = LOWER(:encargado)) AND " +
-      "(:fechaInicio IS NULL OR p.fechaInicio >= :fechaInicio) AND " +
-      "(:fechaFin IS NULL OR p.fechaInicio <= :fechaFin)")
-  List<ProduccionModel> findByAdvancedFilters(
-      @Param("codigoVersionReceta") String codigoVersionReceta,
-      @Param("lote") String lote,
-      @Param("encargado") String encargado,
-      @Param("fechaInicio") Instant fechaInicio,
-      @Param("fechaFin") Instant fechaFin);
-
-  @Query("SELECT p FROM ProduccionModel p WHERE " +
-      "p.versionReceta.codigoVersionReceta = :codigoVersionReceta AND " +
-      "p.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
-  List<ProduccionModel> findByVersionRecetaAndFechaRange(
-      @Param("codigoVersionReceta") String codigoVersionReceta,
-      @Param("fechaInicio") Instant fechaInicio,
-      @Param("fechaFin") Instant fechaFin);
+  @Query("SELECT p FROM ProduccionModel p WHERE "
+      + "(:codigoVersionReceta IS NULL OR p.versionReceta.codigoVersionReceta = :codigoVersionReceta) AND "
+      + "(:lote IS NULL OR p.lote = :lote) AND "
+      + "(:encargado IS NULL OR LOWER(p.encargado) = LOWER(:encargado)) AND "
+      + "(:fechaInicio IS NULL OR p.fechaInicio >= :fechaInicio) AND "
+      + "(:fechaFin IS NULL OR p.fechaInicio <= :fechaFin) AND "
+      + "(:estado IS NULL OR p.estado = :estado)"
+  )
+  List<ProduccionModel> findByAdvancedFilters(@Param("codigoVersionReceta") String codigoVersionReceta,
+      @Param("lote") String lote, @Param("encargado") String encargado, @Param("estado") String estado,
+      @Param("fechaInicio") LocalDateTime fechaInicio,
+      @Param("fechaFin") LocalDateTime fechaFin);
 
   boolean existsByLote(String lote);
 
   boolean existsByEncargadoIgnoreCase(String encargado);
 
-  //List<ProduccionModel> findAllByCodigoVersionReceta(String codigoVersionReceta);
 }

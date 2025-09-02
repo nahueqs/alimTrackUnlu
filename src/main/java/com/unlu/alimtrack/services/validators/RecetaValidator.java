@@ -30,7 +30,7 @@ public class RecetaValidator {
     }
   }
 
-  public void validateModification(RecetaModifyDTO receta) {
+  public void validateDatosModification(RecetaModifyDTO receta) {
     if (receta.nombre() != null) {
       validateNombre(receta.nombre());
     }

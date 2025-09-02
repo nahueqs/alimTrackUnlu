@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
+import com.unlu.alimtrack.dtos.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
@@ -8,6 +9,7 @@ import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
+import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class VersionRecetaService {
   private final RecetaService recetaService;
   private final VersionRecetaMapper versionRecetaMapper;
   private final UsuarioQueryService usuarioQueryService;
+  private final VersionRecetaValidator versionRecetaValidator;
 
   @Transactional(readOnly = true)
   public List<VersionRecetaResponseDTO> findAllVersiones() {
@@ -43,17 +46,10 @@ public class VersionRecetaService {
     }
   }
 
-  private void verificarVersionObtenidaByCodigoVersion(VersionRecetaModel version,
-      String codigoVersion) {
-    if (version == null) {
-      throw new RecursoNoEncontradoException("No existe version con el codigo " + codigoVersion);
-    }
-  }
-
   @Transactional(readOnly = true)
   public VersionRecetaResponseDTO findByCodigoVersion(String codigoVersion) {
     VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(codigoVersion);
-    verificarVersionObtenidaByCodigoVersion(model, codigoVersion);
+    verificarVersionModelNotNull(model, codigoVersion);
     return VersionRecetaMapper.mapper.toVersionRecetaResponseDTO(model);
   }
 
@@ -117,13 +113,30 @@ public class VersionRecetaService {
     return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
   }
 
-  protected VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
-    VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(
-        codigoVersionReceta);
+  private void verificarVersionModelNotNull(VersionRecetaModel model, String codigoVersion) {
     if (model == null) {
       throw new RecursoNoEncontradoException(
-          "No existe ninguna version con el codigo " + codigoVersionReceta);
+          "No existe ninguna version con el codigo " + codigoVersion);
     }
+  }
+
+  private VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
+    VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(
+        codigoVersionReceta);
+    verificarVersionModelNotNull(model, codigoVersionReceta);
     return model;
   }
+
+  public VersionRecetaResponseDTO updateVersionReceta(String codigoReceta, VersionRecetaModifyDTO modificacion) {
+    VersionRecetaModel model = findVersionModelByCodigo(codigoReceta);
+    versionRecetaValidator.validateModification(modificacion);
+    versionRecetaMapper.updateModelFromModifyDTO(modificacion, model);
+    saveVersionModel(model);
+    return versionRecetaMapper.toVersionRecetaResponseDTO(model);
+  }
+
+  private void saveVersionModel(VersionRecetaModel model) {
+    versionRecetaRespository.save(model);
+  }
+
 }

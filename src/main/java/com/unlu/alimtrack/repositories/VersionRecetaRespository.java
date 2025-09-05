@@ -31,6 +31,8 @@ public interface VersionRecetaRespository extends JpaRepository<VersionRecetaMod
   boolean existsByCreadaPorUsername(String username);
 
   List<VersionRecetaModel> findAllByCreadoPorUsername(String username);
+
+  boolean existsByRecetaPadre_CodigoReceta(String recetaPadreCodigoReceta);
 }
 
 

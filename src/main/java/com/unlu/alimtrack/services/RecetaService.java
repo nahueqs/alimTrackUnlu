@@ -7,6 +7,7 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
+import com.unlu.alimtrack.services.queries.RecetaQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.RecetaValidator;
 import java.util.List;
@@ -22,6 +23,7 @@ public class RecetaService {
   private final RecetaMapper recetaMapper;
   private final RecetaValidator recetaValidator;
   private final UsuarioQueryService usuarioQueryService;
+  private final RecetaQueryService recetaQueryService;
 
 
   @Transactional(readOnly = true)
@@ -58,6 +60,7 @@ public class RecetaService {
   @Transactional
   public void deleteReceta(String codigo) {
     RecetaModel receta = findRecetaModelByCodigoReceta(codigo);
+    recetaQueryService.validateDelete(codigo);
     recetaRepository.delete(receta);
   }
 
@@ -106,7 +109,6 @@ public class RecetaService {
     RecetaModel model = crearModelByCreateDTO(receta);
     // guardo el model
     recetaRepository.save(model);
-
     return recetaMapper.recetaModeltoRecetaResponseDTO(model);
   }
 

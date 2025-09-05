@@ -9,4 +9,6 @@ public interface VersionRecetaQueryService {
 
   List<VersionRecetaResponseDTO> findAllByCreadoPorUsername(String username);
 
+  boolean existsByRecetaPadre(String codigoRecetaPadre);
+
 }

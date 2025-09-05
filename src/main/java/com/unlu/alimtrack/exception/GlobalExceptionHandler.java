@@ -21,6 +21,18 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
   }
 
+  @ExceptionHandler(BorradoFallidoException.class)
+  public ResponseEntity<ErrorResponse> handleNotFound(BorradoFallidoException ex,
+      HttpServletRequest request) {
+
+    ErrorResponse error = new ErrorResponse(
+        HttpStatus.CONFLICT.value(),
+        ex.getMessage(),
+        request.getRequestURL().toString()
+    );
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+  }
+
   @ExceptionHandler(RecursoNoEncontradoException.class)
   public ResponseEntity<ErrorResponse> handleNotFound(RecursoNoEncontradoException ex,
       HttpServletRequest request) {

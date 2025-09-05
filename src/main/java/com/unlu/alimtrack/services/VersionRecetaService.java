@@ -128,8 +128,10 @@ public class VersionRecetaService {
   }
 
   public VersionRecetaResponseDTO updateVersionReceta(String codigoReceta, VersionRecetaModifyDTO modificacion) {
-    VersionRecetaModel model = findVersionModelByCodigo(codigoReceta);
     versionRecetaValidator.validateModification(modificacion);
+
+    VersionRecetaModel model = findVersionModelByCodigo(codigoReceta);
+
     versionRecetaMapper.updateModelFromModifyDTO(modificacion, model);
     saveVersionModel(model);
     return versionRecetaMapper.toVersionRecetaResponseDTO(model);
@@ -139,4 +141,9 @@ public class VersionRecetaService {
     versionRecetaRespository.save(model);
   }
 
+  public void deleteVersionReceta(String codigoVersion) {
+    VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);
+
+    versionRecetaRespository.delete(receta);
+  }
 }

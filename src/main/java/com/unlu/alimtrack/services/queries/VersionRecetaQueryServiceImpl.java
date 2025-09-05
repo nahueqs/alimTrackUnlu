@@ -32,5 +32,10 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
     return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
   }
 
+  @Override
+  public boolean existsByRecetaPadre(String codigoRecetaPadre) {
+    return versionRecetaRespository.existsByRecetaPadre_CodigoReceta(codigoRecetaPadre);
+  }
+
 
 }

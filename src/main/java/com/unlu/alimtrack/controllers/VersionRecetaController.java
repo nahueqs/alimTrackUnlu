@@ -7,6 +7,7 @@ import com.unlu.alimtrack.services.VersionRecetaService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,12 @@ public class VersionRecetaController {
       @RequestBody VersionRecetaModifyDTO receta) {
     VersionRecetaResponseDTO actualizada = versionRecetaService.updateVersionReceta(codigoVersion, receta);
     return ResponseEntity.ok(actualizada);
+  }
+
+  @DeleteMapping("/versiones/{codigoVersion}")
+  public ResponseEntity<Void> deleteVersionReceta(@PathVariable String codigoVersion) {
+    versionRecetaService.deleteVersionReceta(codigoVersion);
+    return ResponseEntity.noContent().build();
   }
 
 

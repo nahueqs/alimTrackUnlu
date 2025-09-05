@@ -3,8 +3,8 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.exception.BorradoFallidoException;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
-import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoDuplicadoException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.UsuarioMapper;
@@ -117,7 +117,7 @@ public class UsuarioService {
 
   private void validarDeleteUsario(String username) {
     if (!usuarioQueryService.usuarioPuedeSerEliminado(username)) {
-      throw new OperacionNoPermitida(
+      throw new BorradoFallidoException(
           "No se puede borrar el usuario, tiene recetas o versiones asociadas.");
     }
   }

@@ -11,4 +11,5 @@ public interface RecetaQueryService {
 
   List<RecetaResponseDTO> findAllByCreadoPorUsername(String username);
 
+  void validateDelete(String codigoReceta);
 }

@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.services.queries;
 
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
-import com.unlu.alimtrack.exception.BorradoFallidoException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
@@ -20,6 +19,7 @@ public class RecetaQueryServiceImpl implements RecetaQueryService {
   private final RecetaMapper recetaMapper;
   private final VersionRecetaQueryService versionRecetaQueryService;
 
+  @Override
   public boolean recetaTieneVersiones(String codigoReceta) {
     return versionRecetaQueryService.existsByRecetaPadre(codigoReceta);
 
@@ -42,12 +42,5 @@ public class RecetaQueryServiceImpl implements RecetaQueryService {
             "No existen el receta creadas por el usuario " + username)
     );
     return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
-  }
-
-  @Override
-  public void validateDelete(String codigoReceta) {
-    if (recetaTieneVersiones(codigoReceta)) {
-      throw new BorradoFallidoException("La receta no puede ser eliminada ya que tiene versiones hijas existentes.");
-    }
   }
 }

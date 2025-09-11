@@ -11,4 +11,10 @@ public interface VersionRecetaQueryService {
 
   boolean existsByRecetaPadre(String codigoRecetaPadre);
 
+  boolean existsByCodigoVersion(String codigoVersion);
+
+  boolean versionTieneProducciones(String codigoVersion);
 }
+
+
+

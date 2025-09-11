@@ -18,6 +18,7 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
   private final VersionRecetaRespository versionRecetaRespository;
   private final VersionRecetaMapper versionRecetaMapper;
   private final VersionRecetaValidator versionRecetaValidator;
+  private final ProduccionQueryService produccionQueryService;
 
   @Override
   public boolean existsByCreadaPorUsername(String username) {
@@ -35,6 +36,16 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
   @Override
   public boolean existsByRecetaPadre(String codigoRecetaPadre) {
     return versionRecetaRespository.existsByRecetaPadre_CodigoReceta(codigoRecetaPadre);
+  }
+
+  @Override
+  public boolean existsByCodigoVersion(String codigoVersion) {
+    return versionRecetaRespository.existsByCodigoVersionReceta(codigoVersion);
+  }
+
+  @Override
+  public boolean versionTieneProducciones(String codigoVersion) {
+    return produccionQueryService.existsByVersionRecetaPadre(codigoVersion);
   }
 
 

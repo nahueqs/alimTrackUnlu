@@ -4,10 +4,15 @@ import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
+import com.unlu.alimtrack.exception.ModificacionInvalidaException;
+import com.unlu.alimtrack.exception.OperacionNoPermitida;
+import com.unlu.alimtrack.exception.RecursoDuplicadoException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
+import com.unlu.alimtrack.services.queries.UsuarioQueryService;
+import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.ProduccionValidator;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -25,14 +30,9 @@ public class ProduccionService {
   private final ProduccionRepository produccionRepository;
   private final ProduccionMapper produccionMapper;
   private final ProduccionValidator produccionValidator;
+  private final VersionRecetaQueryService versionRecetaQueryService;
+  private final UsuarioQueryService usuarioQueryService;
 
-  public ProduccionCreateDTO addProduccion(ProduccionCreateDTO productionDTO) {
-    // Validar que la receta exista
-    // Verificar disponibilidad de insumos
-    // Calcular costos estimados
-    // Crear la producción
-    return null;
-  }
 
   public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
       ProduccionCambioEstadoRequestDTO nuevoEstado) {
@@ -46,7 +46,6 @@ public class ProduccionService {
       throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigoProduccion);
     }
   }
-
 
   public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
     ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
@@ -92,5 +91,63 @@ public class ProduccionService {
         codigoVersionReceta, lote, encargado, estado, fechaInicio, fechaFin
     );
   }
+
+  private void verificarCreacionProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+    verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
+    verificarCodigoProduccionNoExiste(codigoProduccion);
+    verificarVersionExiste(createDTO.codigoVersionReceta());
+    verificarUsuarioExisteYEstaActivo(createDTO.usernameCreador());
+
+  }
+
+  private void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+    if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
+      throw new ModificacionInvalidaException("El codigo de la url no coincide con el cuerpo de la petición.");
+    }
+  }
+
+  private void verificarCodigoProduccionNoExiste(String codigoProduccion) {
+    if (codigoProduccion.equals(produccionRepository.existsByCodigoProduccion(codigoProduccion))) {
+      throw new RecursoDuplicadoException("El codigo de la producción que desea agregar ya ha sido usado.");
+    }
+  }
+
+  private void verificarVersionExiste(String codigoVersion) {
+    if (!versionRecetaQueryService.existsByCodigoVersion(codigoVersion)) {
+      throw new ModificacionInvalidaException(
+          "La producción que desea agregar no corresponde a una version existente.");
+    }
+  }
+
+  private void verificarUsuarioExisteYEstaActivo(String username) {
+    if (!usuarioQueryService.existsByUsername(username)) {
+      throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
+    }
+    if (!usuarioQueryService.estaActivoByUsername(username)) {
+      throw new OperacionNoPermitida(
+          "El usuario que intenta guardar la producción se encuentra inactivo. username: " + username);
+    }
+
+  }
+
+  public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+//    VersionRecetaCreateDTO versionRecetaCreateDTO) {
+//      // verifico la que el cuerpo coincida con la url de la peticion
+//      // verifico que no exista una produccion con el mismo codigo
+//      // verifico que exista el usuario creador
+    // verifico que la version padre exista
+
+//      verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
+//
+//      // mapeo el dto a un nuevo model
+//      VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
+//          versionRecetaCreateDTO);
+//
+//      versionRecetaRespository.save(versionModelFinal);
+//
+//      return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
+    return null;
+  }
+
 
 }

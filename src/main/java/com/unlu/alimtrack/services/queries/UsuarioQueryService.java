@@ -9,4 +9,6 @@ public interface UsuarioQueryService {
   boolean usuarioTieneVersionesRecetasAsociadas(String username);
 
   boolean existsByUsername(String username);
+
+  boolean estaActivoByUsername(String username);
 }

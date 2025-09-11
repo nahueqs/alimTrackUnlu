@@ -34,4 +34,9 @@ public class UsuarioQueryServiceImpl implements UsuarioQueryService {
   public boolean existsByUsername(String username) {
     return usuarioRepository.existsByUsername(username);
   }
+
+  @Override
+  public boolean estaActivoByUsername(String username) {
+    return usuarioRepository.findByUsername(username).get().getEstaActivo();
+  }
 }

@@ -3,6 +3,7 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
+import com.unlu.alimtrack.exception.BorradoFallidoException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
@@ -60,8 +61,19 @@ public class RecetaService {
   @Transactional
   public void deleteReceta(String codigo) {
     RecetaModel receta = findRecetaModelByCodigoReceta(codigo);
-    recetaQueryService.validateDelete(codigo);
+    validateDelete(codigo);
     recetaRepository.delete(receta);
+  }
+
+
+  private void validateDelete(String codigoReceta) {
+    validarNoTengaVersionesHijas(codigoReceta);
+  }
+
+  private void validarNoTengaVersionesHijas(String codigoReceta) {
+    if (recetaQueryService.recetaTieneVersiones(codigoReceta)) {
+      throw new BorradoFallidoException("La receta no puede ser eliminada ya que tiene versiones hijas existentes.");
+    }
   }
 
   private void saveRecetaModel(RecetaModel model) {
@@ -87,7 +99,7 @@ public class RecetaService {
   }
 
   private void verificarUsuarioExiste(String username) {
-    if (usuarioQueryService.existsByUsername(username)) {
+    if (!usuarioQueryService.existsByUsername(username)) {
       throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
     }
   }

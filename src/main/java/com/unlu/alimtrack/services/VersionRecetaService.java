@@ -3,11 +3,13 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
+import com.unlu.alimtrack.exception.BorradoFallidoException;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import com.unlu.alimtrack.services.queries.ProduccionQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import java.util.List;
@@ -24,6 +26,7 @@ public class VersionRecetaService {
   private final VersionRecetaMapper versionRecetaMapper;
   private final UsuarioQueryService usuarioQueryService;
   private final VersionRecetaValidator versionRecetaValidator;
+  private final ProduccionQueryService produccionQueryService;
 
   @Transactional(readOnly = true)
   public List<VersionRecetaResponseDTO> findAllVersiones() {
@@ -63,16 +66,17 @@ public class VersionRecetaService {
 
   private void verificarCreacionVersionReceta(String codigoRecetaPadre,
       VersionRecetaCreateDTO versionRecetaCreateDTO) {
-    verificarIntegridadDatos(codigoRecetaPadre, versionRecetaCreateDTO);
+    verificarIntegridadDatosCreacion(codigoRecetaPadre, versionRecetaCreateDTO);
     verificarVersionRepetida(versionRecetaCreateDTO.codigoVersionReceta());
     verificarRecetaExistente(versionRecetaCreateDTO.codigoRecetaPadre());
     verificarUsuarioExiste(versionRecetaCreateDTO.usernameCreador());
   }
 
-  private void verificarIntegridadDatos(String codigoRecetaPadre,
+  private void verificarIntegridadDatosCreacion(String codigoRecetaPadre,
       VersionRecetaCreateDTO versionRecetaCreateDTO) {
     if (!codigoRecetaPadre.equals(versionRecetaCreateDTO.codigoRecetaPadre())) {
-      throw new ModificacionInvalidaException("La receta padre es inconsistente");
+      throw new ModificacionInvalidaException(
+          "El código de la url no coincide con el código de receta en el cuerpo de la petición.");
     }
   }
 
@@ -103,13 +107,10 @@ public class VersionRecetaService {
     // verifico que exista la receta padre
     // verifico que exista el usuario creador
     verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
-
     // mapeo el dto a un nuevo model
     VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
         versionRecetaCreateDTO);
-
     versionRecetaRespository.save(versionModelFinal);
-
     return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
   }
 
@@ -129,9 +130,7 @@ public class VersionRecetaService {
 
   public VersionRecetaResponseDTO updateVersionReceta(String codigoReceta, VersionRecetaModifyDTO modificacion) {
     versionRecetaValidator.validateModification(modificacion);
-
     VersionRecetaModel model = findVersionModelByCodigo(codigoReceta);
-
     versionRecetaMapper.updateModelFromModifyDTO(modificacion, model);
     saveVersionModel(model);
     return versionRecetaMapper.toVersionRecetaResponseDTO(model);
@@ -141,9 +140,21 @@ public class VersionRecetaService {
     versionRecetaRespository.save(model);
   }
 
+  private void validateDelete(String codigoVersion) {
+    validateNoTieneProduccionesHijas(codigoVersion);
+  }
+
+  private void validateNoTieneProduccionesHijas(String codigoVersion) {
+    if (produccionQueryService.existsByVersionRecetaPadre(codigoVersion)) {
+      throw new BorradoFallidoException(
+          "La version tiene producciones hijas existentes. codigo version: " + codigoVersion);
+    }
+  }
+
   public void deleteVersionReceta(String codigoVersion) {
     VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);
-
+    validateDelete(codigoVersion);
     versionRecetaRespository.delete(receta);
   }
+
 }

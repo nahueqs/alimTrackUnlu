@@ -23,4 +23,6 @@ public interface RecetaRepository extends JpaRepository<RecetaModel, Long> {
 
   @Query(value = "SELECT r FROM RecetaModel r WHERE r.creadoPor.username = :username")
   Optional<List<RecetaModel>> findAllByCreadoPorUsername(String username);
+
+  boolean existsByCodigoReceta(String codigoReceta);
 }

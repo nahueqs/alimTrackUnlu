@@ -13,4 +13,5 @@ public interface RecetaQueryService {
 
   List<RecetaResponseDTO> findAllByCreadoPorUsername(String username);
 
+  boolean existsByCodigoVersion(String codigoVersion);
 }

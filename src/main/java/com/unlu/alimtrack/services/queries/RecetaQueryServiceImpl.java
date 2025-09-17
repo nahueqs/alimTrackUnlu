@@ -43,4 +43,9 @@ public class RecetaQueryServiceImpl implements RecetaQueryService {
     );
     return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
   }
+
+  @Override
+  public boolean existsByCodigoVersion(String codigoVersion) {
+    return recetaRepository.existsByCodigoVersion(codigoVersion);
+  }
 }

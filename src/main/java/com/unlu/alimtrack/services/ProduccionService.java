@@ -11,8 +11,8 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
+import com.unlu.alimtrack.services.queries.RecetaQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
-import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.ProduccionValidator;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -30,9 +30,8 @@ public class ProduccionService {
   private final ProduccionRepository produccionRepository;
   private final ProduccionMapper produccionMapper;
   private final ProduccionValidator produccionValidator;
-  private final VersionRecetaQueryService versionRecetaQueryService;
   private final UsuarioQueryService usuarioQueryService;
-
+  RecetaQueryService versionRecetaQueryService;
 
   public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
       ProduccionCambioEstadoRequestDTO nuevoEstado) {

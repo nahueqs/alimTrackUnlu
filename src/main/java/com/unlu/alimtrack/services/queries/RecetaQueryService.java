@@ -12,6 +12,4 @@ public interface RecetaQueryService {
   boolean recetaPerteneceAUsuario(String codigoReceta, String username);
 
   List<RecetaResponseDTO> findAllByCreadoPorUsername(String username);
-
-  boolean existsByCodigoVersion(String codigoVersion);
 }

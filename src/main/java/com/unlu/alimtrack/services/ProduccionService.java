@@ -11,12 +11,10 @@ import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.services.queries.RecetaQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.ProduccionValidator;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -50,14 +48,14 @@ public class ProduccionService {
   public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
     ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
     verificarProduccionBuscadaByCodigo(model, codigo);
-    return produccionMapper.produccionToProduccionResponseDTO(model);
+    return produccionMapper.modelToResponseDTO(model);
   }
 
   public List<ProduccionResponseDTO> findAllByFilters(@Valid ProduccionFilterRequestDTO filtros) {
 
     // asigno fechas
-    LocalDateTime fechaInicio = convertToStartOfDay(filtros.fechaInicio());
-    LocalDateTime fechaFin = convertToEndOfDay(filtros.fechaFin());
+    LocalDateTime fechaInicio = produccionValidator.convertToStartOfDay(filtros.fechaInicio());
+    LocalDateTime fechaFin = produccionValidator.convertToEndOfDay(filtros.fechaFin());
 
     List<ProduccionModel> producciones = hacerConsultaAvanzada(
         filtros.codigoVersionReceta(),
@@ -68,15 +66,7 @@ public class ProduccionService {
         filtros.estado()
     );
 
-    return produccionMapper.toProduccionResponseDTOList(producciones);
-  }
-
-  private LocalDateTime convertToStartOfDay(LocalDate date) {
-    return date != null ? date.atStartOfDay() : null;
-  }
-
-  private LocalDateTime convertToEndOfDay(LocalDate date) {
-    return date != null ? date.atTime(23, 59, 59) : null;
+    return produccionMapper.modelListToResponseDTOList(producciones);
   }
 
   private List<ProduccionModel> hacerConsultaAvanzada(
@@ -131,22 +121,15 @@ public class ProduccionService {
   }
 
   public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
-//    VersionRecetaCreateDTO versionRecetaCreateDTO) {
-//      // verifico la que el cuerpo coincida con la url de la peticion
-//      // verifico que no exista una produccion con el mismo codigo
-//      // verifico que exista el usuario creador
-    // verifico que la version padre exista
 
-//      verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
-//
-//      // mapeo el dto a un nuevo model
-//      VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
-//          versionRecetaCreateDTO);
-//
-//      versionRecetaRespository.save(versionModelFinal);
-//
-//      return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
-    return null;
+    // verifico la que el cuerpo del dto coincida con la url de la peticion
+    // verifico que no exista una produccion con el mismo codigo
+    // verifico que exista el usuario creador
+    // verifico que la version padre exista
+    verificarCreacionProduccion(codigoProduccion,  createDTO);
+    ProduccionModel modelFinal = produccionMapper.createDTOtoModel(createDTO);
+    produccionRepository.save(modelFinal);
+    return produccionMapper.modelToResponseDTO(modelFinal);
   }
 
 

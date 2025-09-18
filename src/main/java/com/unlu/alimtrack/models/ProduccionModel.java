@@ -1,7 +1,10 @@
 package com.unlu.alimtrack.models;
 
+import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,12 +29,17 @@ public class ProduccionModel {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_produccion", nullable = false)
-  private Long id;
+  private Long id_produccion;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @OnDelete(action = OnDeleteAction.RESTRICT)
   @JoinColumn(name = "id_version", nullable = false)
   private VersionRecetaModel versionReceta;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @OnDelete(action = OnDeleteAction.RESTRICT)
+  @JoinColumn(name = "usuario_creador", nullable = false)
+  private UsuarioModel usuarioCreador;
 
   @Size(max = 100)
   @Column(name = "codigo_produccion")
@@ -51,9 +59,10 @@ public class ProduccionModel {
   @Column(name = "encargado")
   private String encargado;
 
-  @ColumnDefault("'en_curso'")
-  @Column(name = "estado")
-  private String estado;
+  @Enumerated(EnumType.STRING)
+  @ColumnDefault("'EN_PROCESO'")
+  @Column(name = "estado", length = 20)
+  private TipoEstadoProduccion estado;
 
   @Size(max = 255)
   @Column(name = "observaciones")

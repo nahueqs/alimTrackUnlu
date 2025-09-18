@@ -4,6 +4,8 @@ import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -48,5 +50,13 @@ public class ProduccionValidator {
     if (!produccionRepository.existsByEncargadoIgnoreCase(encargado)) {
       throw new RecursoNoEncontradoException(encargado);
     }
+  }
+
+  public LocalDateTime convertToStartOfDay(LocalDate date) {
+    return date != null ? date.atStartOfDay() : null;
+  }
+
+  public LocalDateTime convertToEndOfDay(LocalDate date) {
+    return date != null ? date.atTime(23, 59, 59) : null;
   }
 }

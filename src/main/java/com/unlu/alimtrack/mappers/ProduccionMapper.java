@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
+import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.models.ProduccionModel;
 import java.util.List;
@@ -10,9 +11,10 @@ import org.mapstruct.Mapping;
 public interface ProduccionMapper {
 
   @Mapping(target = "codigoVersion", source = "versionReceta.codigoVersionReceta")
-  ProduccionResponseDTO produccionToProduccionResponseDTO(ProduccionModel produccion);
+  ProduccionResponseDTO modelToResponseDTO(ProduccionModel model);
 
-  List<ProduccionResponseDTO> toProduccionResponseDTOList(List<ProduccionModel> produccion);
+  List<ProduccionResponseDTO> modelListToResponseDTOList(List<ProduccionModel> modelList);
 
+  ProduccionModel createDTOtoModel(ProduccionCreateDTO createDTO);
 }
 

@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.enums;
 
-public enum TipoSeccion {
+public enum TipoCampo {
   simple,
-  agrupada,
-  tabla
+  agrupada
 }

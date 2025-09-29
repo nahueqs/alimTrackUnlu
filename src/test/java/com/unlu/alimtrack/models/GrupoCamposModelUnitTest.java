@@ -1,20 +1,22 @@
 package com.unlu.alimtrack.models;
 
+import com.unlu.alimtrack.enums.TipoRolUsuario;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.unlu.alimtrack.enums.TipoSeccion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @DataJpaTest
-@ActiveProfiles("test") // indica que use application-test.properties
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GrupoCamposModelUnitTest {
 
     @Autowired
@@ -40,14 +42,21 @@ class GrupoCamposModelUnitTest {
 
     @BeforeEach
     public void setUp() {
+        // Clear any existing data
+        entityManager.clear();
+        
+        // Create a unique username and email for each test run
+        String uniqueId = String.valueOf(System.currentTimeMillis());
+        
         // Configurar datos de prueba
         usuario = new UsuarioModel();
-        usuario.setNombre("Test User");
-        usuario.setUsername("Test User");
-        usuario.setEmail("test@example.com");
-        usuario.setContraseña("password");
-        usuario.setEsAdmin(false);
+        usuario.setNombre("Test User " + uniqueId);
+        usuario.setUsername("testuser_" + uniqueId);
+        usuario.setEmail("test_" + uniqueId + "@example.com");
+        usuario.setPassword("password123");
+        usuario.setRol(TipoRolUsuario.USUARIO);
         usuario = entityManager.persist(usuario);
+        entityManager.flush();
 
         receta = new RecetaModel();
         receta.setNombre("Receta Test");
@@ -64,7 +73,6 @@ class GrupoCamposModelUnitTest {
 
         seccion = new SeccionModel();
         seccion.setTitulo("Sección Test");
-        seccion.setTipo(TipoSeccion.simple); // Ajusta según tu enum
         seccion.setVersionRecetaPadre(versionReceta);
         seccion.setOrden(1);
         seccion = entityManager.persist(seccion);

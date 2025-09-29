@@ -60,9 +60,9 @@ public class ProduccionModel {
   private String encargado;
 
   @Enumerated(EnumType.STRING)
-  @ColumnDefault("'EN_PROCESO'")
-  @Column(name = "estado", length = 20)
-  private TipoEstadoProduccion estado;
+  @Column(name = "estado", length = 20, nullable = false)
+  @ColumnDefault("'EN_CURSO'")
+  private TipoEstadoProduccion estado = TipoEstadoProduccion.EN_CURSO;
 
   @Size(max = 255)
   @Column(name = "observaciones")

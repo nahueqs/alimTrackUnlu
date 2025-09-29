@@ -121,7 +121,7 @@ public class VersionRecetaService {
     }
   }
 
-  private VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
+  public VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
     VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(
         codigoVersionReceta);
     verificarVersionModelNotNull(model, codigoVersionReceta);

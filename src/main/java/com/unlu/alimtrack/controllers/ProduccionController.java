@@ -4,6 +4,8 @@ import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.services.ProduccionService;
+import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,16 @@ public class ProduccionController {
 
   @PostMapping("/{codigoProduccion}")
   public ResponseEntity<ProduccionResponseDTO> saveProduccion(@PathVariable String codigoProduccion,
-      @RequestBody ProduccionCreateDTO createDTO) {
-    return ResponseEntity.ok(produccionService.saveProduccion(codigoProduccion, createDTO));
+     @Valid @RequestBody ProduccionCreateDTO createDTO) {
+    ProduccionResponseDTO created = produccionService.saveProduccion(codigoProduccion, createDTO);
+    return ResponseEntity.created(URI.create("/producciones/" + created.codigoProduccion())).body(created);
   }
+
+//  @GetMapping("/{idProduccion}/estructura")
+//  public ResponseEntity<EstructuraProduccionDTO> getEstructuraCompleta(
+//      @PathVariable Long idProduccion) {
+//    EstructuraProduccionDTO estructura = produccionService.getEstructuraCompleta(idProduccion);
+//    return ResponseEntity.ok(estructura);
+
+
 }

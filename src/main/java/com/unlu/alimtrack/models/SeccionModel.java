@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.unlu.alimtrack.enums.TipoSeccion;
+import com.unlu.alimtrack.enums.TipoCampo;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +40,7 @@ public class SeccionModel {
   @Id
   @Column(name = "id_seccion", nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long idSeccion;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
@@ -52,10 +52,6 @@ public class SeccionModel {
   @Length(min = 1, max = 255)
   private String titulo;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "tipo", nullable = false)
-  private TipoSeccion tipo;
-
   @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
   @JsonIgnoreProperties("seccion")
   private List<GrupoCamposModel> gruposCampos = new ArrayList<>();
@@ -63,6 +59,10 @@ public class SeccionModel {
   @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
   @JsonIgnoreProperties("seccion")
   private List<TablaModel> tablas = new ArrayList<>();
+
+  @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
+  @JsonIgnoreProperties("seccion")
+  private List<CampoSimpleModel> camposSimples = new ArrayList<>();
 
   @ColumnDefault("0")
   @Column(name = "orden")

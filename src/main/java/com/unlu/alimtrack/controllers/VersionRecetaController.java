@@ -4,6 +4,8 @@ import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.services.VersionRecetaService;
+import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +45,10 @@ public class VersionRecetaController {
 
   @PostMapping("/{codigoRecetaPadre}/versiones")
   public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(
-      @PathVariable String codigoRecetaPadre, @RequestBody VersionRecetaCreateDTO dto) {
-    return ResponseEntity.ok(versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto));
+      @PathVariable String codigoRecetaPadre, @Valid @RequestBody VersionRecetaCreateDTO dto) {
+    VersionRecetaResponseDTO created = versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto);
+    return ResponseEntity.created(URI.create("/recipes/" + codigoRecetaPadre + "/versions/" + created.codigoVersionReceta()))
+        .body(created);
   }
 
   @PutMapping("/versiones/{codigoVersion}")

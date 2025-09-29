@@ -4,6 +4,8 @@ import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
+import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +38,16 @@ public class RecetaController {
 
   @PutMapping("/{codigoReceta}")
   public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable String codigoReceta,
-      @RequestBody RecetaModifyDTO receta) {
-    RecetaResponseDTO actualizada = recetaService.updateReceta(codigoReceta, receta);
-    return ResponseEntity.ok(actualizada);
+     @Valid @RequestBody RecetaModifyDTO receta) {
+    return ResponseEntity.ok(recetaService.updateReceta(codigoReceta, receta));
   }
 
   @PostMapping("/{codigoReceta}")
   public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta,
-      @RequestBody RecetaCreateDTO receta) {
-    return ResponseEntity.ok(recetaService.addReceta(receta));
+     @Valid @RequestBody RecetaCreateDTO receta) {
+    RecetaResponseDTO created = recetaService.addReceta(receta);
+    return ResponseEntity.created(URI.create("/recipes/" + created.codigoReceta()))
+        .body(created);
   }
 
   @DeleteMapping("/{codigoReceta}")

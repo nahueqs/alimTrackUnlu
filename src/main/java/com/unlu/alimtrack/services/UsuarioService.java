@@ -42,7 +42,7 @@ public class UsuarioService {
     return usuarioMapper.convertToResponseDTO(model);
   }
 
-  private UsuarioModel getUsuarioModelByUsername(String username) {
+  public UsuarioModel getUsuarioModelByUsername(String username) {
     UsuarioModel model = usuarioRepository.findByUsername(username).orElseThrow(
         () -> new RecursoNoEncontradoException("Usuario no encontrado con username" + username));
     usuarioValidator.validateUsuario(model);
@@ -62,7 +62,7 @@ public class UsuarioService {
   private UsuarioModel crearNuevoUsuarioByCreateDTO(UsuarioCreateDTO usuario) {
     UsuarioModel usuarioModel = usuarioMapper.usuarioCreateDTOToModel(usuario);
     String passwordEncriptada = passwordEncoder.encode(usuario.contraseña());
-    usuarioModel.setContraseña(passwordEncriptada);
+    usuarioModel.setPassword(passwordEncriptada);
     return usuarioModel;
   }
 
@@ -77,7 +77,7 @@ public class UsuarioService {
     usuarioMapper.updateModelFromModifyDTO(modificacion, usuarioExistente);
     if (modificacion.contraseña() != null) {
       String passwordEncriptada = passwordEncoder.encode(modificacion.contraseña());
-      usuarioExistente.setContraseña(passwordEncriptada);
+      usuarioExistente.setPassword(passwordEncriptada);
     }
   }
 

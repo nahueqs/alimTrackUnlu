@@ -70,7 +70,7 @@ public class VersionRecetaControllerUnitTest {
 
     ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.saveVersionReceta("codPadre", createDTO);
 
-    assertEquals(HttpStatus.OK, resp.getStatusCode());
+    assertEquals(HttpStatus.CREATED, resp.getStatusCode());
     assertEquals("codVersion", resp.getBody().codigoVersionReceta());
     assertEquals("nombre", resp.getBody().nombre());
     verify(versionRecetaService).saveVersionReceta("codPadre", createDTO);

@@ -144,5 +144,9 @@ public class RecetaControllerTest {
 
     @Test
     public void testDeleteReceta() {
+      String codigoReceta = "RTEST-001";
+      ResponseEntity<Void> respuesta = recetaController.deleteReceta(codigoReceta);
+      assertEquals(HttpStatus.NO_CONTENT, respuesta.getStatusCode());
+      verify(recetaService).deleteReceta(codigoReceta);
     }
 }

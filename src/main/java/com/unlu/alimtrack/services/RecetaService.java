@@ -104,7 +104,14 @@ public class RecetaService {
     }
   }
 
-  private void verificarCreacionValida(RecetaCreateDTO recetaCreateDTO) {
+  private void verificarConsistenciaCodigoReceta(String codigoReceta, String codigoRecetaDTO) {
+    if (!codigoReceta.equals(codigoRecetaDTO)) {
+      throw new IllegalArgumentException("El codigo de la receta (" + codigoReceta + ") no coincide con el del dto");
+    }
+  }
+
+  private void verificarCreacionValida(String codigoReceta, RecetaCreateDTO recetaCreateDTO) {
+    verificarConsistenciaCodigoReceta(codigoReceta, recetaCreateDTO.codigoReceta());
     verificarUnicidadCodigoReceta(recetaCreateDTO.codigoReceta());
     verificarUsuarioExiste(recetaCreateDTO.usernameCreador());
   }
@@ -114,9 +121,9 @@ public class RecetaService {
   }
 
   @Transactional
-  public RecetaResponseDTO addReceta(RecetaCreateDTO receta) {
+  public RecetaResponseDTO addReceta(String codigoReceta, RecetaCreateDTO receta) {
     // verifico datos de entrada
-    verificarCreacionValida(receta);
+    verificarCreacionValida(codigoReceta, receta);
     // traduzco el dto al model
     RecetaModel model = crearModelByCreateDTO(receta);
     // guardo el model

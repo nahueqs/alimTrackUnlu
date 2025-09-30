@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.unlu.alimtrack.controllers.v1.VersionRecetaController;
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
@@ -114,7 +113,7 @@ public class VersionRecetaControllerTest {
     );
 
     // Expectations
-    when(versionRecetaService.saveVersionReceta(anyString(), createDTO))
+    when(versionRecetaService.saveVersionReceta(codigoReceta, createDTO))
         .thenReturn(version1);
 
     // Act
@@ -123,9 +122,9 @@ public class VersionRecetaControllerTest {
 
     // Assert
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
-    assertEquals("/recetas/" + codigoReceta + "/versiones",
+    assertEquals("/api/v1/recetas/" + codigoReceta + "/versiones/" + version1.codigoVersionReceta(),
         response.getHeaders().getLocation().getPath());
-    verify(versionRecetaService).saveVersionReceta(anyString(), createDTO);
+    verify(versionRecetaService).saveVersionReceta(codigoReceta, createDTO);
     verifyNoMoreInteractions(versionRecetaService);
   }
 

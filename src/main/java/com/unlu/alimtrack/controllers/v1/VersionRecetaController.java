@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/recetas")
+@RequestMapping("/api/v1")
 public class VersionRecetaController {
 
   final VersionRecetaService versionRecetaService;
@@ -31,35 +31,35 @@ public class VersionRecetaController {
     return ResponseEntity.ok(versionRecetaService.findAllVersiones());
   }
 
-  @GetMapping("/versiones/{codigoVersion}")
+  @GetMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
   public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(
       @PathVariable String codigoVersion) {
     return ResponseEntity.ok(versionRecetaService.findByCodigoVersion(codigoVersion));
   }
 
-  @GetMapping("/{codigoReceta}/versiones")
+  @GetMapping("/recetas/{codigoReceta}/versiones")
   public ResponseEntity<List<VersionRecetaResponseDTO>> getAllByCodigoReceta(
       @PathVariable String codigoReceta) {
     return ResponseEntity.ok(versionRecetaService.findAllByCodigoReceta(codigoReceta));
   }
 
-  @PostMapping("/{codigoRecetaPadre}/versiones")
+  @PostMapping("/recetas/{codigoReceta}/versiones")
   public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(
-      @PathVariable String codigoRecetaPadre, @Valid @RequestBody VersionRecetaCreateDTO dto) {
-    VersionRecetaResponseDTO created = versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto);
+      @PathVariable String codigoReceta, @Valid @RequestBody VersionRecetaCreateDTO dto) {
+    VersionRecetaResponseDTO created = versionRecetaService.saveVersionReceta(codigoReceta, dto);
     return ResponseEntity.created(
-            URI.create("/recipes/" + codigoRecetaPadre + "/versions/" + created.codigoVersionReceta()))
+            URI.create("/api/v1/recetas/" + codigoReceta + "/versiones/" + created.codigoVersionReceta()))
         .body(created);
   }
 
-  @PutMapping("/versiones/{codigoVersion}")
+  @PutMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
   public ResponseEntity<VersionRecetaResponseDTO> updateVersionReceta(@PathVariable String codigoVersion,
       @RequestBody VersionRecetaModifyDTO receta) {
     VersionRecetaResponseDTO actualizada = versionRecetaService.updateVersionReceta(codigoVersion, receta);
     return ResponseEntity.ok(actualizada);
   }
 
-  @DeleteMapping("/versiones/{codigoVersion}")
+  @DeleteMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
   public ResponseEntity<Void> deleteVersionReceta(@PathVariable String codigoVersion) {
     versionRecetaService.deleteVersionReceta(codigoVersion);
     return ResponseEntity.noContent().build();

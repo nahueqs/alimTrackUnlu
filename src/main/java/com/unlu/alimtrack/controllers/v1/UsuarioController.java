@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;

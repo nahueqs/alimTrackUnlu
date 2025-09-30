@@ -8,7 +8,7 @@ import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.queries.ProduccionQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class VersionRecetaService {
 
-  private final VersionRecetaRespository versionRecetaRespository;
+  private final VersionRecetaRepository versionRecetaRepository;
   private final RecetaService recetaService;
   private final VersionRecetaMapper versionRecetaMapper;
   private final UsuarioQueryService usuarioQueryService;
@@ -30,7 +30,7 @@ public class VersionRecetaService {
 
   @Transactional(readOnly = true)
   public List<VersionRecetaResponseDTO> findAllVersiones() {
-    List<VersionRecetaModel> versiones = versionRecetaRespository.findAll();
+    List<VersionRecetaModel> versiones = versionRecetaRepository.findAll();
     verificarListaVersionesObtenida(versiones);
     return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
   }
@@ -51,14 +51,14 @@ public class VersionRecetaService {
 
   @Transactional(readOnly = true)
   public VersionRecetaResponseDTO findByCodigoVersion(String codigoVersion) {
-    VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(codigoVersion);
+    VersionRecetaModel model = versionRecetaRepository.findByCodigoVersionReceta(codigoVersion);
     verificarVersionModelNotNull(model, codigoVersion);
     return VersionRecetaMapper.mapper.toVersionRecetaResponseDTO(model);
   }
 
   @Transactional(readOnly = true)
   public List<VersionRecetaResponseDTO> findAllByCodigoReceta(String codigoRecetaPadre) {
-    List<VersionRecetaModel> versiones = versionRecetaRespository.findAllVersionesByCodigoRecetaPadre(
+    List<VersionRecetaModel> versiones = versionRecetaRepository.findAllVersionesByCodigoRecetaPadre(
         codigoRecetaPadre);
     verificarListaVersionesObtenidaByCodigoReceta(versiones, codigoRecetaPadre);
     return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
@@ -94,7 +94,7 @@ public class VersionRecetaService {
   }
 
   private void verificarVersionRepetida(String codigoVersion) {
-    if (versionRecetaRespository.existsByCodigoVersionReceta(codigoVersion)) {
+    if (versionRecetaRepository.existsByCodigoVersionReceta(codigoVersion)) {
       throw new RecursoNoEncontradoException(
           "Ya existe una version receta con el codigo " + codigoVersion);
     }
@@ -110,7 +110,7 @@ public class VersionRecetaService {
     // mapeo el dto a un nuevo model
     VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
         versionRecetaCreateDTO);
-    versionRecetaRespository.save(versionModelFinal);
+    versionRecetaRepository.save(versionModelFinal);
     return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
   }
 
@@ -122,7 +122,7 @@ public class VersionRecetaService {
   }
 
   public VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
-    VersionRecetaModel model = versionRecetaRespository.findByCodigoVersionReceta(
+    VersionRecetaModel model = versionRecetaRepository.findByCodigoVersionReceta(
         codigoVersionReceta);
     verificarVersionModelNotNull(model, codigoVersionReceta);
     return model;
@@ -137,7 +137,7 @@ public class VersionRecetaService {
   }
 
   private void saveVersionModel(VersionRecetaModel model) {
-    versionRecetaRespository.save(model);
+    versionRecetaRepository.save(model);
   }
 
   private void validateDelete(String codigoVersion) {
@@ -154,7 +154,7 @@ public class VersionRecetaService {
   public void deleteVersionReceta(String codigoVersion) {
     VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);
     validateDelete(codigoVersion);
-    versionRecetaRespository.delete(receta);
+    versionRecetaRepository.delete(receta);
   }
 
 }

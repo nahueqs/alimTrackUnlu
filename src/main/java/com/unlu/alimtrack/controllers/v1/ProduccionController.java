@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
@@ -46,7 +46,7 @@ public class ProduccionController {
 
   @PostMapping("/{codigoProduccion}")
   public ResponseEntity<ProduccionResponseDTO> saveProduccion(@PathVariable String codigoProduccion,
-     @Valid @RequestBody ProduccionCreateDTO createDTO) {
+      @Valid @RequestBody ProduccionCreateDTO createDTO) {
     ProduccionResponseDTO created = produccionService.saveProduccion(codigoProduccion, createDTO);
     return ResponseEntity.created(URI.create("/producciones/" + created.codigoProduccion())).body(created);
   }

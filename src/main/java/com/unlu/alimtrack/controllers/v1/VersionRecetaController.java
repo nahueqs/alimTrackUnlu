@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.dtos.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.VersionRecetaModifyDTO;
@@ -47,7 +47,8 @@ public class VersionRecetaController {
   public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(
       @PathVariable String codigoRecetaPadre, @Valid @RequestBody VersionRecetaCreateDTO dto) {
     VersionRecetaResponseDTO created = versionRecetaService.saveVersionReceta(codigoRecetaPadre, dto);
-    return ResponseEntity.created(URI.create("/recipes/" + codigoRecetaPadre + "/versions/" + created.codigoVersionReceta()))
+    return ResponseEntity.created(
+            URI.create("/recipes/" + codigoRecetaPadre + "/versions/" + created.codigoVersionReceta()))
         .body(created);
   }
 

@@ -3,7 +3,7 @@ package com.unlu.alimtrack.services.validators;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProduccionValidator {
 
-  private final VersionRecetaRespository versionRecetaRespository;
+  private final VersionRecetaRepository versionRecetaRepository;
   private final ProduccionRepository produccionRepository;
 
   /**
@@ -35,7 +35,7 @@ public class ProduccionValidator {
 
 
   private void validateVersionReceta(String codigoVersion) {
-    if (!versionRecetaRespository.existsByCodigoVersionReceta(codigoVersion)) {
+    if (!versionRecetaRepository.existsByCodigoVersionReceta(codigoVersion)) {
       throw new RecursoNoEncontradoException(codigoVersion);
     }
   }

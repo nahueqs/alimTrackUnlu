@@ -3,7 +3,7 @@ package com.unlu.alimtrack.services.queries;
 import com.unlu.alimtrack.dtos.response.VersionRecetaResponseDTO;
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import com.unlu.alimtrack.repositories.VersionRecetaRespository;
+import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService {
 
-  private final VersionRecetaRespository versionRecetaRespository;
+  private final VersionRecetaRepository versionRecetaRepository;
   private final VersionRecetaMapper versionRecetaMapper;
   private final VersionRecetaValidator versionRecetaValidator;
   private final ProduccionQueryService produccionQueryService;
 
   @Override
   public boolean existsByCreadaPorUsername(String username) {
-    return versionRecetaRespository.existsByCreadaPorUsername(username);
+    return versionRecetaRepository.existsByCreadaPorUsername(username);
   }
 
   @Override
   public List<VersionRecetaResponseDTO> findAllByCreadoPorUsername(String username) {
-    List<VersionRecetaModel> versiones = versionRecetaRespository.findAllByCreadoPorUsername(
+    List<VersionRecetaModel> versiones = versionRecetaRepository.findAllByCreadoPorUsername(
         username);
     versionRecetaValidator.validarVersionRecetaList(versiones);
     return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
@@ -35,12 +35,12 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
 
   @Override
   public boolean existsByRecetaPadre(String codigoRecetaPadre) {
-    return versionRecetaRespository.existsByRecetaPadre_CodigoReceta(codigoRecetaPadre);
+    return versionRecetaRepository.existsByRecetaPadre_CodigoReceta(codigoRecetaPadre);
   }
 
   @Override
   public boolean existsByCodigoVersion(String codigoVersion) {
-    return versionRecetaRespository.existsByCodigoVersionReceta(codigoVersion);
+    return versionRecetaRepository.existsByCodigoVersionReceta(codigoVersion);
   }
 
   @Override

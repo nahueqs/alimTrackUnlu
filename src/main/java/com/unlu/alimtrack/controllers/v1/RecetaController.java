@@ -20,13 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/recetas")
+@RequestMapping("/api/v1/recetas")
 public class RecetaController {
 
   private final RecetaService recetaService;
 
   @GetMapping
-
   public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
     return ResponseEntity.ok(recetaService.findAllRecetas());
   }
@@ -42,11 +41,11 @@ public class RecetaController {
     return ResponseEntity.ok(recetaService.updateReceta(codigoReceta, receta));
   }
 
-  @PostMapping("/{codigoReceta}")
+  @PostMapping()
   public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta,
       @Valid @RequestBody RecetaCreateDTO receta) {
-    RecetaResponseDTO created = recetaService.addReceta(receta);
-    return ResponseEntity.created(URI.create("/recipes/" + created.codigoReceta()))
+    RecetaResponseDTO created = recetaService.addReceta(codigoReceta, receta);
+    return ResponseEntity.created(URI.create("/api/v1/recetas/" + created.codigoReceta()))
         .body(created);
   }
 

@@ -1,10 +1,9 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.unlu.alimtrack.controllers.v1.RecetaController;
 import com.unlu.alimtrack.dtos.create.RecetaCreateDTO;
 import com.unlu.alimtrack.dtos.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.dtos.response.RecetaResponseDTO;
@@ -123,19 +122,19 @@ public class RecetaControllerTest {
         "Usuario Test"
     );
 
-    when(recetaService.addReceta(nuevaReceta)).thenReturn(respuestaEsperada);
+    when(recetaService.addReceta("RTEST-002", nuevaReceta)).thenReturn(respuestaEsperada);
 
     ResponseEntity<RecetaResponseDTO> respuesta = recetaController.addReceta("RTEST-002", nuevaReceta);
 
     assertEquals(HttpStatus.CREATED, respuesta.getStatusCode());
-    assertEquals("/recipes/" + "RTEST-002",
+    assertEquals("/api/v1/recetas/" + "RTEST-002",
         respuesta.getHeaders().getFirst("Location"));
     assertEquals("RTEST-002", respuesta.getBody().codigoReceta());
     assertEquals("Nombre receta", respuesta.getBody().nombre());
     assertEquals("Descripción de la nueva receta", respuesta.getBody().descripcion());
     assertEquals(fechaFija, respuesta.getBody().fechaCreacion());
     assertEquals("Usuario Test", respuesta.getBody().creadaPor());
-    verify(recetaService).addReceta(nuevaReceta);
+    verify(recetaService).addReceta("RTEST-002", nuevaReceta);
   }
 
   @Test

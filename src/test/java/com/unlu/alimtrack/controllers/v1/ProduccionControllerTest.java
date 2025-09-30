@@ -1,6 +1,5 @@
-package com.unlu.alimtrack.controllers;
+package com.unlu.alimtrack.controllers.v1;
 
-import com.unlu.alimtrack.controllers.v1.ProduccionController;
 import com.unlu.alimtrack.services.ProduccionService;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

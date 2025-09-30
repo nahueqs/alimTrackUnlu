@@ -5,9 +5,9 @@ import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
 import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.UsuarioService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/usuarios")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
 
   final UsuarioService usuarioService;
@@ -38,8 +38,9 @@ public class UsuarioController {
   @PostMapping
   public ResponseEntity<UsuarioResponseDTO> addUsuario(@RequestBody UsuarioCreateDTO usuario) {
     UsuarioResponseDTO saved = usuarioService.addUsuario(usuario);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    return ResponseEntity.created(URI.create("/api/v1/usuarios/" + saved.username())).body(saved);
   }
+
 
   @PutMapping("/{username}")
   public ResponseEntity<Void> modifyUsuario(@PathVariable String username,

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/producciones")
+@RequestMapping("/api/v1/producciones")
 public class ProduccionController {
 
   private final ProduccionService produccionService;
@@ -48,7 +48,7 @@ public class ProduccionController {
   public ResponseEntity<ProduccionResponseDTO> saveProduccion(@PathVariable String codigoProduccion,
       @Valid @RequestBody ProduccionCreateDTO createDTO) {
     ProduccionResponseDTO created = produccionService.saveProduccion(codigoProduccion, createDTO);
-    return ResponseEntity.created(URI.create("/producciones/" + created.codigoProduccion())).body(created);
+    return ResponseEntity.created(URI.create("/api/v1/producciones/" + created.codigoProduccion())).body(created);
   }
 
 //  @GetMapping("/{idProduccion}/estructura")

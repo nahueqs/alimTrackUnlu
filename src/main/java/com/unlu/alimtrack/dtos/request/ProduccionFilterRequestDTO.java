@@ -43,7 +43,7 @@ public record ProduccionFilterRequestDTO(
     @Schema(description = "Estado de producción para filtrar",
         allowableValues = {"EN_CURSO", "FINALIZADA"},
         example = "EN_CURSO")
-    @Pattern(regexp = "^(EN_CURSO|FINALIZADA)?$", message = "Estado debe ser: EN_CURSO, FINALIZADA")
+    @Pattern(regexp = "(?i)^(EN_CURSO|FINALIZADA)?$", message = "Estado debe ser: EN_CURSO, FINALIZADA")
     String estado) {
 
   public ProduccionFilterRequestDTO {

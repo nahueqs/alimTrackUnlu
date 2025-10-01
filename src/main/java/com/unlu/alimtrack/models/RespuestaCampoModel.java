@@ -36,7 +36,7 @@ public class RespuestaCampoModel {
   private CampoSimpleModel idCampo;
 
   @Lob
-  @Column(name = "valor")
+  @Column(name = "valor", columnDefinition = "LONGTEXT")
   private String valor;
 
   @ColumnDefault("CURRENT_TIMESTAMP")

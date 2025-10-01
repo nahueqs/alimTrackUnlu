@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.repositories;
 
+import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.models.ProduccionModel;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +21,7 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
       + "(:estado IS NULL OR p.estado = :estado)"
   )
   List<ProduccionModel> findByAdvancedFilters(@Param("codigoVersionReceta") String codigoVersionReceta,
-      @Param("lote") String lote, @Param("encargado") String encargado, @Param("estado") String estado,
+      @Param("lote") String lote, @Param("encargado") String encargado, @Param("estado") TipoEstadoProduccion estado,
       @Param("fechaInicio") LocalDateTime fechaInicio,
       @Param("fechaFin") LocalDateTime fechaFin);
 

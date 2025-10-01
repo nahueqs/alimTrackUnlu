@@ -4,6 +4,7 @@ import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.dtos.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
+import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoDuplicadoException;
@@ -63,7 +64,7 @@ public class ProduccionService {
         filtros.encargado(),
         fechaInicio,
         fechaFin,
-        filtros.estado()
+        TipoEstadoProduccion.fromString(filtros.estado())
     );
 
     return produccionMapper.modelListToResponseDTOList(producciones);
@@ -75,7 +76,7 @@ public class ProduccionService {
       String encargado,
       LocalDateTime fechaInicio,
       LocalDateTime fechaFin,
-      String estado) {
+      TipoEstadoProduccion estado) {
 
     return produccionRepository.findByAdvancedFilters(
         codigoVersionReceta, lote, encargado, estado, fechaInicio, fechaFin
@@ -126,7 +127,7 @@ public class ProduccionService {
     // verifico que no exista una produccion con el mismo codigo
     // verifico que exista el usuario creador
     // verifico que la version padre exista
-    verificarCreacionProduccion(codigoProduccion,  createDTO);
+    verificarCreacionProduccion(codigoProduccion, createDTO);
     ProduccionModel modelFinal = produccionMapper.createDTOtoModel(createDTO);
     produccionRepository.save(modelFinal);
     return produccionMapper.modelToResponseDTO(modelFinal);

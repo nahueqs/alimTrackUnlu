@@ -3,17 +3,16 @@ package com.unlu.alimtrack.models;
 import com.unlu.alimtrack.enums.TipoRolUsuario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import com.unlu.alimtrack.enums.TipoRolUsuario;
 
 @Getter
 @Setter
@@ -42,7 +41,7 @@ public class UsuarioModel {
   private TipoRolUsuario rol;
 
   @ColumnDefault("1")
-  @Column(name = "esta_activo")
+  @Column(name = "esta_activo", columnDefinition = "TINYINT(1) DEFAULT 1")
   private Boolean estaActivo = true;
 
   @Column(name = "password", nullable = false, length = 60)

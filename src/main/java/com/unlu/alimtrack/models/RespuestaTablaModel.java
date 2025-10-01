@@ -41,7 +41,7 @@ public class RespuestaTablaModel {
   private ColumnaTablaModel idColumna;
 
   @Lob
-  @Column(name = "valor")
+  @Column(name = "valor", columnDefinition = "LONGTEXT")
   private String valor;
 
   @ColumnDefault("CURRENT_TIMESTAMP")

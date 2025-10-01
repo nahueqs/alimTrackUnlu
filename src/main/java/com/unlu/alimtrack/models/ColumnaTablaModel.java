@@ -28,7 +28,7 @@ public class ColumnaTablaModel {
 
   @Id
   @Column(name = "id_columna", nullable = false)
-  private Long id;
+  private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @OnDelete(action = OnDeleteAction.CASCADE)

@@ -40,8 +40,7 @@ public class UsuarioModel {
   @Column(name = "rol", nullable = false)
   private TipoRolUsuario rol;
 
-  @ColumnDefault("1")
-  @Column(name = "esta_activo", columnDefinition = "TINYINT(1) DEFAULT 1")
+  @Column(name = "esta_activo", columnDefinition = "boolean default true")
   private Boolean estaActivo = true;
 
   @Column(name = "password", nullable = false, length = 60)

@@ -30,6 +30,7 @@ public class VersionRecetaControllerTest {
   private final LocalDateTime fechaFija = LocalDateTime.of(2025, 9, 30, 0, 0);
   private final String codigoReceta = "REC001";
   private final String codigoPrimeraVersion = "VER001";
+
   @Mock
   private VersionRecetaService versionRecetaService;
   @InjectMocks

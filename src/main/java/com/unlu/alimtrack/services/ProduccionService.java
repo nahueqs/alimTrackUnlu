@@ -5,9 +5,9 @@ import com.unlu.alimtrack.dtos.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-import com.unlu.alimtrack.exception.ModificacionInvalidaException;
 import com.unlu.alimtrack.exception.OperacionNoPermitida;
 import com.unlu.alimtrack.exception.RecursoDuplicadoException;
+import com.unlu.alimtrack.exception.RecursoIdentifierConflictException;
 import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
@@ -53,33 +53,24 @@ public class ProduccionService {
   }
 
   public List<ProduccionResponseDTO> findAllByFilters(@Valid ProduccionFilterRequestDTO filtros) {
-
-    // asigno fechas
-    LocalDateTime fechaInicio = produccionValidator.convertToStartOfDay(filtros.fechaInicio());
-    LocalDateTime fechaFin = produccionValidator.convertToEndOfDay(filtros.fechaFin());
-
-    List<ProduccionModel> producciones = hacerConsultaAvanzada(
-        filtros.codigoVersionReceta(),
-        filtros.lote(),
-        filtros.encargado(),
-        fechaInicio,
-        fechaFin,
-        TipoEstadoProduccion.fromString(filtros.estado())
-    );
-
+    List<ProduccionModel> producciones = buscarProduccionesPorFiltros(filtros);
     return produccionMapper.modelListToResponseDTOList(producciones);
   }
 
-  private List<ProduccionModel> hacerConsultaAvanzada(
-      String codigoVersionReceta,
-      String lote,
-      String encargado,
-      LocalDateTime fechaInicio,
-      LocalDateTime fechaFin,
-      TipoEstadoProduccion estado) {
+  private List<ProduccionModel> buscarProduccionesPorFiltros(ProduccionFilterRequestDTO filtros) {
+    LocalDateTime fechaInicio = produccionValidator.convertToStartOfDay(filtros.fechaInicio());
+    LocalDateTime fechaFin = produccionValidator.convertToEndOfDay(filtros.fechaFin());
+    TipoEstadoProduccion estado = filtros.estado() != null
+        ? TipoEstadoProduccion.fromString(filtros.estado())
+        : null;
 
     return produccionRepository.findByAdvancedFilters(
-        codigoVersionReceta, lote, encargado, estado, fechaInicio, fechaFin
+        filtros.codigoVersionReceta(),
+        filtros.lote(),
+        filtros.encargado(),
+        estado,
+        fechaInicio,
+        fechaFin
     );
   }
 
@@ -93,7 +84,9 @@ public class ProduccionService {
 
   private void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
     if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
-      throw new ModificacionInvalidaException("El codigo de la url no coincide con el cuerpo de la petición.");
+      throw new RecursoIdentifierConflictException(
+          "El codigo de la url no coincide con el cuerpo de la petición. Codigo de produccion: " + codigoProduccion
+              + " Codigo que desea crear: " + createDTO.codigoProduccion());
     }
   }
 
@@ -105,7 +98,7 @@ public class ProduccionService {
 
   private void verificarVersionExiste(String codigoVersion) {
     if (!versionRecetaQueryService.existsByCodigoVersion(codigoVersion)) {
-      throw new ModificacionInvalidaException(
+      throw new RecursoNoEncontradoException(
           "La producción que desea agregar no corresponde a una version existente.");
     }
   }
@@ -124,7 +117,7 @@ public class ProduccionService {
   public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
 
     // verifico la que el cuerpo del dto coincida con la url de la peticion
-    // verifico que no exista una produccion con el mismo codigo
+    // verifico que no exista una produccion con el mismo codigoverificarIntegridadDatosCreacion(codigoProduccion, createDTO);
     // verifico que exista el usuario creador
     // verifico que la version padre exista
     verificarCreacionProduccion(codigoProduccion, createDTO);

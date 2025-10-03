@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 @ExtendWith(MockitoExtension.class)
 public class VersionRecetaControllerUnitTest {
 
+
   @Mock
   private VersionRecetaService versionRecetaService;
 

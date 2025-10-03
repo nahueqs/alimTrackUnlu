@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.repositories;
 
+import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.models.ProduccionModel;
 import java.time.LocalDateTime;

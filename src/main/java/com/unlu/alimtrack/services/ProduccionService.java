@@ -16,116 +16,117 @@ import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.ProduccionValidator;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProduccionService {
 
-  private final ProduccionRepository produccionRepository;
-  private final ProduccionMapper produccionMapper;
-  private final ProduccionValidator produccionValidator;
-  private final UsuarioQueryService usuarioQueryService;
-  private final VersionRecetaQueryService versionRecetaQueryService;
+    private final ProduccionRepository produccionRepository;
+    private final ProduccionMapper produccionMapper;
+    private final ProduccionValidator produccionValidator;
+    private final UsuarioQueryService usuarioQueryService;
+    private final VersionRecetaQueryService versionRecetaQueryService;
 
-  public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
-      ProduccionCambioEstadoRequestDTO nuevoEstado) {
-    // Validar transiciones de estado válidas
-    // Ej: No se puede cancelar una producción completada
-    return null;
-  }
-
-  private void verificarProduccionBuscadaByCodigo(ProduccionModel produccion, String codigoProduccion) {
-    if (produccion == null) {
-      throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigoProduccion);
-    }
-  }
-
-  public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
-    ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
-    verificarProduccionBuscadaByCodigo(model, codigo);
-    return produccionMapper.modelToResponseDTO(model);
-  }
-
-  public List<ProduccionResponseDTO> findAllByFilters(@Valid ProduccionFilterRequestDTO filtros) {
-    List<ProduccionModel> producciones = buscarProduccionesPorFiltros(filtros);
-    return produccionMapper.modelListToResponseDTOList(producciones);
-  }
-
-  private List<ProduccionModel> buscarProduccionesPorFiltros(ProduccionFilterRequestDTO filtros) {
-    LocalDateTime fechaInicio = produccionValidator.convertToStartOfDay(filtros.fechaInicio());
-    LocalDateTime fechaFin = produccionValidator.convertToEndOfDay(filtros.fechaFin());
-    TipoEstadoProduccion estado = filtros.estado() != null
-        ? TipoEstadoProduccion.fromString(filtros.estado())
-        : null;
-
-    return produccionRepository.findByAdvancedFilters(
-        filtros.codigoVersionReceta(),
-        filtros.lote(),
-        filtros.encargado(),
-        estado,
-        fechaInicio,
-        fechaFin
-    );
-  }
-
-  private void verificarCreacionProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
-    verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
-    verificarCodigoProduccionNoExiste(codigoProduccion);
-    verificarVersionExiste(createDTO.codigoVersionReceta());
-    verificarUsuarioExisteYEstaActivo(createDTO.usernameCreador());
-
-  }
-
-  private void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
-    if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
-      throw new RecursoIdentifierConflictException(
-          "El codigo de la url no coincide con el cuerpo de la petición. Codigo de produccion: " + codigoProduccion
-              + " Codigo que desea crear: " + createDTO.codigoProduccion());
-    }
-  }
-
-  private void verificarCodigoProduccionNoExiste(String codigoProduccion) {
-    if (codigoProduccion.equals(produccionRepository.existsByCodigoProduccion(codigoProduccion))) {
-      throw new RecursoDuplicadoException("El codigo de la producción que desea agregar ya ha sido usado.");
-    }
-  }
-
-  private void verificarVersionExiste(String codigoVersion) {
-    if (!versionRecetaQueryService.existsByCodigoVersion(codigoVersion)) {
-      throw new RecursoNoEncontradoException(
-          "La producción que desea agregar no corresponde a una version existente.");
-    }
-  }
-
-  private void verificarUsuarioExisteYEstaActivo(String username) {
-    if (!usuarioQueryService.existsByUsername(username)) {
-      throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
-    }
-    if (!usuarioQueryService.estaActivoByUsername(username)) {
-      throw new OperacionNoPermitida(
-          "El usuario que intenta guardar la producción se encuentra inactivo. username: " + username);
+    public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
+                                                         ProduccionCambioEstadoRequestDTO nuevoEstado) {
+        // Validar transiciones de estado válidas
+        // Ej: No se puede cancelar una producción completada
+        return null;
     }
 
-  }
+    private void verificarProduccionBuscadaByCodigo(ProduccionModel produccion, String codigoProduccion) {
+        if (produccion == null) {
+            throw new RecursoNoEncontradoException("No se encontró la produccion codigo " + codigoProduccion);
+        }
+    }
 
-  public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+    public ProduccionResponseDTO findByCodigoProduccion(String codigo) {
+        ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo);
+        verificarProduccionBuscadaByCodigo(model, codigo);
+        return produccionMapper.modelToResponseDTO(model);
+    }
 
-    // verifico la que el cuerpo del dto coincida con la url de la peticion
-    // verifico que no exista una produccion con el mismo codigoverificarIntegridadDatosCreacion(codigoProduccion, createDTO);
-    // verifico que exista el usuario creador
-    // verifico que la version padre exista
-    verificarCreacionProduccion(codigoProduccion, createDTO);
-    ProduccionModel modelFinal = produccionMapper.createDTOtoModel(createDTO);
-    produccionRepository.save(modelFinal);
-    return produccionMapper.modelToResponseDTO(modelFinal);
+    public List<ProduccionResponseDTO> findAllByFilters(@Valid ProduccionFilterRequestDTO filtros) {
+        List<ProduccionModel> producciones = buscarProduccionesPorFiltros(filtros);
+        return produccionMapper.modelListToResponseDTOList(producciones);
+    }
 
-  }
+    private List<ProduccionModel> buscarProduccionesPorFiltros(ProduccionFilterRequestDTO filtros) {
+        LocalDateTime fechaInicio = produccionValidator.convertToStartOfDay(filtros.fechaInicio());
+        LocalDateTime fechaFin = produccionValidator.convertToEndOfDay(filtros.fechaFin());
+
+        TipoEstadoProduccion estado = filtros.estado() != null
+                ? TipoEstadoProduccion.valueOf(filtros.estado().toUpperCase())
+                : null;
+
+        return produccionRepository.findByAdvancedFilters(
+                filtros.codigoVersionReceta(),
+                filtros.lote(),
+                filtros.encargado(),
+                estado,
+                fechaInicio,
+                fechaFin
+        );
+    }
+
+    private void verificarCreacionProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+        verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
+        verificarCodigoProduccionNoExiste(codigoProduccion);
+        verificarVersionExiste(createDTO.codigoVersionReceta());
+        verificarUsuarioExisteYEstaActivo(createDTO.usernameCreador());
+
+    }
+
+    private void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+        if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
+            throw new RecursoIdentifierConflictException(
+                    "El codigo de la url no coincide con el cuerpo de la petición. Codigo de produccion: " + codigoProduccion
+                            + " Codigo que desea crear: " + createDTO.codigoProduccion());
+        }
+    }
+
+    private void verificarCodigoProduccionNoExiste(String codigoProduccion) {
+        if (codigoProduccion.equals(produccionRepository.existsByCodigoProduccion(codigoProduccion))) {
+            throw new RecursoDuplicadoException("El codigo de la producción que desea agregar ya ha sido usado.");
+        }
+    }
+
+    private void verificarVersionExiste(String codigoVersion) {
+        if (!versionRecetaQueryService.existsByCodigoVersion(codigoVersion)) {
+            throw new RecursoNoEncontradoException(
+                    "La producción que desea agregar no corresponde a una version existente.");
+        }
+    }
+
+    private void verificarUsuarioExisteYEstaActivo(String username) {
+        if (!usuarioQueryService.existsByUsername(username)) {
+            throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
+        }
+        if (!usuarioQueryService.estaActivoByUsername(username)) {
+            throw new OperacionNoPermitida(
+                    "El usuario que intenta guardar la producción se encuentra inactivo. username: " + username);
+        }
+
+    }
+
+    public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+
+        // verifico la que el cuerpo del dto coincida con la url de la peticion
+        // verifico que no exista una produccion con el mismo codigo verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
+        // verifico que exista el usuario creador
+        // verifico que la version padre exista
+        verificarCreacionProduccion(codigoProduccion, createDTO);
+        ProduccionModel modelFinal = produccionMapper.createDTOtoModel(createDTO);
+        produccionRepository.save(modelFinal);
+        return produccionMapper.modelToResponseDTO(modelFinal);
+    }
 
 
 }

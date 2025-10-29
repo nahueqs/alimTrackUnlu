@@ -1,19 +1,23 @@
 package com.unlu.alimtrack.enums;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum TipoEstadoProduccion {
-  EN_CURSO,
-  FINALIZADA;
+    @JsonProperty("EN_PROCESO")
+    EN_PROCESO,
+    @JsonProperty("FINALIZADA")
+    FINALIZADA;
 
 //  public String getValorBaseDatos() {
 //    return name().toUpperCase();
 //  }
 
-  public static TipoEstadoProduccion fromString(String valor) {
-    if (valor == null) {
-      return null;
+    public static TipoEstadoProduccion fromString(String valor) {
+        if (valor == null) {
+            return null;
+        }
+        return TipoEstadoProduccion.valueOf(valor.toUpperCase());
     }
-    return TipoEstadoProduccion.valueOf(valor.toUpperCase());
-  }
 
 
 }

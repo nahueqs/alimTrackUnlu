@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -52,7 +51,6 @@ public class ProduccionModel {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", length = 20, nullable = false)
-    @ColumnDefault("EN_PROCESO")
     private TipoEstadoProduccion estado = TipoEstadoProduccion.EN_PROCESO;
 
     @Size(max = 255)

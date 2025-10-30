@@ -15,9 +15,9 @@ public record RegisterRequestDTO(
         @Email
         String email,
 
-        @Size(min = 6, max = 61, message = "La contraseña debe tener al menos 6 caracteres")
+        @Size(min = 6, max = 61, message = "La password debe tener al menos 6 caracteres")
         @NotNull
-        String contraseña,
+        String password,
 
         @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
         @NotNull

@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.config;
 
 
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,20 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> usuarioRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario con el username " + username));
+        return
+                username -> {
+                    final UsuarioModel usuario = usuarioRepository.findByEmail(username)
+                            .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario con el username " + username));
+                    return UsuarioModel.builder()
+                            .username(usuario.getEmail())
+                            .estaActivo(usuario.getEstaActivo())
+                            .rol(usuario.getRol())
+                            .id(usuario.getId())
+                            .nombre(usuario.getNombre())
+                            .password(usuario.getPassword())
+                            .build();
+                }
+                ;
     }
 
 }

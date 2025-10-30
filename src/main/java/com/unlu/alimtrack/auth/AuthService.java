@@ -5,6 +5,9 @@ import com.unlu.alimtrack.jwt.JwtService;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +18,23 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     public AuthResponse login(LoginRequestDTO request) {
-        return null;
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password())
+        );
 
+        UserDetails user = usuarioRepository.findByEmail(request.email()).orElseThrow(
+                () -> new RuntimeException("Usuario no encontrado con email " + request.email())
+        );
+
+        String token = jwtService.getToken(user);
+        return AuthResponse.builder()
+                .token(token)
+                .build();
     }
 
     public AuthResponse register(RegisterRequestDTO request) {

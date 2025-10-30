@@ -50,6 +50,7 @@ public class ApplicationConfig {
                 username -> {
                     final UsuarioModel usuario = usuarioRepository.findByEmail(username)
                             .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario con el username " + username));
+
                     return UsuarioModel.builder()
                             .username(usuario.getEmail())
                             .estaActivo(usuario.getEstaActivo())

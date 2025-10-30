@@ -7,7 +7,6 @@ import com.unlu.alimtrack.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class AuthService {
                         request.password())
         );
 
-        UserDetails user = usuarioRepository.findByEmail(request.email()).orElseThrow(
+        UsuarioModel user = usuarioRepository.findByEmail(request.email()).orElseThrow(
                 () -> new RuntimeException("Usuario no encontrado con email " + request.email())
         );
 

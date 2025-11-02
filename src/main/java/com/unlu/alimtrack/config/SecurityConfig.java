@@ -35,17 +35,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers(
-                                        "/",
-                                        "/index.html",
-                                        "/static/**",
-                                        "/assets/**",
-                                        "/*.js",
-                                        "/*.css",
-                                        "/*.ico",
-                                        "/favicon.ico",
-                                        "/manifest.json"
-                                ).permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest().authenticated()
                 )

@@ -18,7 +18,7 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
             + "(:lote IS NULL OR p.lote = :lote) AND "
             + "(:encargado IS NULL OR LOWER(p.encargado) = LOWER(:encargado)) AND "
             + "(:fechaInicio IS NULL OR p.fechaInicio >= :fechaInicio) AND "
-            + "(:fechaFin IS NULL OR p.fechaInicio <= :fechaFin) AND "
+            + "(:fechaFin IS NULL OR p.fechaFin <= :fechaFin) AND "
             + "(:estado IS NULL OR p.estado = :estado)    "
     )
     List<ProduccionModel> findByAdvancedFilters(@Param("codigoVersionReceta") String codigoVersionReceta,

@@ -95,7 +95,8 @@ public class ProduccionServiceTest {
                 encargado,
                 lote,
                 "EN_PROCESO",
-                fechaInicio
+                fechaInicio,
+                fechaFin
         );
 
         produccionCreateDTO = new ProduccionCreateDTO(

@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.auth;
 
 import com.unlu.alimtrack.enums.TipoRolUsuario;
+import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
 import com.unlu.alimtrack.jwt.JwtService;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;
@@ -20,15 +21,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse login(LoginRequestDTO request) {
+
+        UsuarioModel user = usuarioRepository.findByEmail(request.email()).orElseThrow(
+                () -> new RecursoNoEncontradoException("No existe un usuario con ese email")
+        );
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
                         request.password())
         );
 
-        UsuarioModel user = usuarioRepository.findByEmail(request.email()).orElseThrow(
-                () -> new RuntimeException("Usuario no encontrado con email " + request.email())
-        );
 
         String token = jwtService.getToken(user);
         return AuthResponse.builder()

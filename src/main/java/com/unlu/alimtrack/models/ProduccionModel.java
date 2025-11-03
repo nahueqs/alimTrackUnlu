@@ -28,7 +28,7 @@ public class ProduccionModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "usuario_creador", nullable = false)
+    @JoinColumn(name = "creado_por", nullable = false)
     private UsuarioModel usuarioCreador;
 
     @Size(max = 100)

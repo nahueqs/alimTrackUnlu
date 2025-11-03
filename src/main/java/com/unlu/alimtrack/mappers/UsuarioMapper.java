@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
-import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
+import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.models.UsuarioModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

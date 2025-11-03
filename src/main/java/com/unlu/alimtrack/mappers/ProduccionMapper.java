@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
+import com.unlu.alimtrack.DTOS.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;

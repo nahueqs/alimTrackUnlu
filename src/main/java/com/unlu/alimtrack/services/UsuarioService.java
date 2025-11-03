@@ -1,12 +1,12 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
-import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
-import com.unlu.alimtrack.exception.BorradoFallidoException;
-import com.unlu.alimtrack.exception.ModificacionInvalidaException;
-import com.unlu.alimtrack.exception.RecursoDuplicadoException;
-import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
+import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
+import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.exceptions.BorradoFallidoException;
+import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
+import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
+import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.UsuarioMapper;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;

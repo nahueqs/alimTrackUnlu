@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.services.validators;
 
-import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.exception.ModificacionInvalidaException;
-import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
+import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
+import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
+import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.models.UsuarioModel;
 import jakarta.validation.ValidationException;
 import lombok.NoArgsConstructor;

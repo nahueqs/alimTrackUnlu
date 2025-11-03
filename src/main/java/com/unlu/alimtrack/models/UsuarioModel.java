@@ -37,7 +37,7 @@ public class UsuarioModel implements UserDetails {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'USUARIO'")
+    @ColumnDefault("OPERADOR")
     @Column(name = "rol", nullable = false)
     private TipoRolUsuario rol;
 

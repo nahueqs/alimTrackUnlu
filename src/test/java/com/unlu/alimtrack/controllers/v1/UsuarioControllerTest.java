@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.controllers.v1;
 
-import com.unlu.alimtrack.dtos.create.UsuarioCreateDTO;
-import com.unlu.alimtrack.dtos.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
+import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.auth;
 
 import com.unlu.alimtrack.enums.TipoRolUsuario;
-import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
+import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.jwt.JwtService;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.UsuarioRepository;

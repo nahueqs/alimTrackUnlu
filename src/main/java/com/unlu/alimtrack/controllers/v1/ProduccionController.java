@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.controllers.v1;
 
-import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
+import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
+import com.unlu.alimtrack.DTOS.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.services.ProduccionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.auth;
 
-import com.unlu.alimtrack.dtos.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

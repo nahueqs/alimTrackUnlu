@@ -1,13 +1,13 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.dtos.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.dtos.modify.ProduccionCambioEstadoRequestDTO;
-import com.unlu.alimtrack.dtos.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.dtos.response.ProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
+import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
+import com.unlu.alimtrack.DTOS.response.ProduccionResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-import com.unlu.alimtrack.exception.OperacionNoPermitida;
-import com.unlu.alimtrack.exception.RecursoIdentifierConflictException;
-import com.unlu.alimtrack.exception.RecursoNoEncontradoException;
+import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
+import com.unlu.alimtrack.exceptions.RecursoIdentifierConflictException;
+import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
@@ -81,6 +81,7 @@ public class ProduccionServiceTest {
         fechaFin = LocalDateTime.of(2025, 12, 31, 23, 59);
         fechaInicioDate = LocalDate.of(2025, 1, 1);
         fechaFinDate = LocalDate.of(2025, 12, 31);
+        String observaciones = "Observaciones de prueba";
 
         produccionModel = new ProduccionModel();
         produccionModel.setCodigoProduccion(codigoProduccion);
@@ -88,6 +89,8 @@ public class ProduccionServiceTest {
         produccionModel.setEncargado(encargado);
         produccionModel.setEstado(TipoEstadoProduccion.EN_PROCESO);
         produccionModel.setFechaInicio(fechaInicio);
+        produccionModel.setFechaFin(fechaFin);
+        produccionModel.setObservaciones("Observaciones de prueba");
 
         produccionResponseDTO = new ProduccionResponseDTO(
                 codigoProduccion,
@@ -96,7 +99,8 @@ public class ProduccionServiceTest {
                 lote,
                 "EN_PROCESO",
                 fechaInicio,
-                fechaFin
+                fechaFin,
+                observaciones
         );
 
         produccionCreateDTO = new ProduccionCreateDTO(

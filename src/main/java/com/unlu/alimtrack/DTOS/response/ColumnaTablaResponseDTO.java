@@ -1,8 +1,10 @@
 package com.unlu.alimtrack.DTOS.response;
 
+import com.unlu.alimtrack.enums.TipoDatoCampo;
 import jakarta.validation.constraints.NotNull;
 
-public record FilaTablaResponseDTO(
+public record ColumnaTablaResponseDTO(
+
         @NotNull
         String id,
         @NotNull
@@ -10,6 +12,8 @@ public record FilaTablaResponseDTO(
         @NotNull
         String nombre,
         @NotNull
-        Integer orden
+        Integer orden,
+        @NotNull
+        TipoDatoCampo tipoDato
 ) {
 }

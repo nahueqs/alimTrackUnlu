@@ -97,7 +97,7 @@ public class VersionRecetaControllerUnitTest {
         assertEquals(HttpStatus.CREATED, resp.getStatusCode());
         assertEquals("codVersion", resp.getBody().codigoVersionReceta());
         assertEquals("nombre", resp.getBody().nombreRecetaPadre());
-        assertEquals("Nombre version", resp.getBody().nombreVersion());
+        assertEquals("Nombre version", resp.getBody().nombre());
         assertEquals("descripcion", resp.getBody().descripcion());
         assertEquals("usernameCreador", resp.getBody().creadaPor());
         assertEquals(LocalDateTime.now(), resp.getBody().fechaCreacion());

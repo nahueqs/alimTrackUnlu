@@ -154,7 +154,7 @@ public class VersionRecetaControllerTest {
                 versionRecetaController.updateVersionReceta(codigoPrimeraVersion, modifyDTO);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Nombre primera versión actualizada", response.getBody().nombreVersion());
+        assertEquals("Nombre primera versión actualizada", response.getBody().nombre());
         assertEquals("Descripción primera versión actualizada", response.getBody().descripcion());
         verify(versionRecetaService).updateVersionReceta(anyString(), any(VersionRecetaModifyDTO.class));
         verifyNoMoreInteractions(versionRecetaService);

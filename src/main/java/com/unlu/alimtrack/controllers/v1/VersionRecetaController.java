@@ -22,7 +22,7 @@ public class VersionRecetaController {
     final VersionRecetaService versionRecetaService;
 
     //devuelve todas las versiones
-    @GetMapping("/versiones")
+    @GetMapping("/recetas/versiones")
     public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersiones() {
         log.debug("Obteniendo todas las versiones de recetas");
         List<VersionRecetaResponseDTO> versiones = versionRecetaService.findAllVersiones();
@@ -30,7 +30,7 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versiones);
     }
 
-    @GetMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
+    @GetMapping("/recetas/versiones/{codigoVersion}")
     public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(
             @PathVariable String codigoVersion) {
         log.debug("Buscando versión de receta con código: {}", codigoVersion);

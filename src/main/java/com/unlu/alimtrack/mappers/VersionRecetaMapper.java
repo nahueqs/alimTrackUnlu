@@ -22,6 +22,7 @@ public interface VersionRecetaMapper {
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
+    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
     VersionRecetaResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
 
     List<VersionRecetaResponseDTO> toVersionRecetaResponseDTOList(

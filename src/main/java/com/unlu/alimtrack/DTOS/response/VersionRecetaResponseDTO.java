@@ -7,15 +7,21 @@ import java.time.LocalDateTime;
 public record VersionRecetaResponseDTO(
         @NotNull
         String codigoVersionReceta,
+
         @NotNull
         String codigoRecetaPadre,
+
         @NotNull
         String nombreRecetaPadre,
+
         @NotNull
-        String nombreVersion,
+        String nombre,
+
         String descripcion,
+
         @NotNull
         String creadaPor,
+
         @NotNull
         LocalDateTime fechaCreacion
 ) {

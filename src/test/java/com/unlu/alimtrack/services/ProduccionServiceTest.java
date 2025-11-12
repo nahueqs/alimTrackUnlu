@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
@@ -10,8 +9,6 @@ import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.services.queries.ProduccionQueryServiceImpl;
-import com.unlu.alimtrack.services.queries.UsuarioQueryService;
-import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.ProduccionQueryServiceValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,12 +38,6 @@ public class ProduccionServiceTest {
     @Mock
     private ProduccionQueryServiceValidator produccionQueryServiceValidator;
 
-    @Mock
-    private UsuarioQueryService usuarioQueryService;
-
-    @Mock
-    private VersionRecetaQueryService versionRecetaQueryService;
-
     @InjectMocks
     private ProduccionQueryServiceImpl produccionManagementService;
 
@@ -63,9 +52,7 @@ public class ProduccionServiceTest {
     private LocalDate fechaFinDate;
     private ProduccionModel produccionModel;
     private ProduccionResponseDTO produccionResponseDTO;
-    private ProduccionCreateDTO produccionCreateDTO;
     private ProduccionFilterRequestDTO produccionFilterRequestDTO;
-    private ProduccionCambioEstadoRequestDTO produccionCambioEstadoRequestDTO;
     private List<ProduccionModel> produccionModelList;
     private List<ProduccionResponseDTO> produccionResponseDTOList;
 
@@ -98,21 +85,18 @@ public class ProduccionServiceTest {
                 "testuser",
                 lote,
                 "EN_PROCESO",
-
                 fechaInicio,
                 fechaFin,
                 observaciones
         );
 
-        produccionCreateDTO = new ProduccionCreateDTO(
+        ProduccionCreateDTO produccionCreateDTO = new ProduccionCreateDTO(
                 codigoVersionReceta,
                 codigoProduccion,
                 username,
                 lote,
                 encargado,
-
                 "Observaciones de prueba"
-
         );
 
         produccionFilterRequestDTO = new ProduccionFilterRequestDTO(

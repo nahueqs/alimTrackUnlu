@@ -12,11 +12,11 @@ import java.util.Optional;
 @Repository
 public interface AutoSaveRepository extends JpaRepository<AutoSaveProduccionModel, Long> {
 
-    Optional<AutoSaveProduccionModel> findByProduccionIdProduccion(Long idProduccion);
+    Optional<AutoSaveProduccionModel> findByProduccionProduccion(Long idProduccion);
 
-    boolean existsByProduccionIdProduccion(Long idProduccion);
+    boolean existsByProduccionProduccion(Long idProduccion);
 
     @Modifying
     @Query("DELETE FROM AutoSaveProduccionModel a WHERE a.produccion.produccion = :idProduccion")
-    void deleteByProduccionIdProduccion(@Param("idProduccion") Long idProduccion);
+    void deleteByProduccionProduccion(@Param("idProduccion") Long idProduccion);
 }

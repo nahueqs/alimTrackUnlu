@@ -18,6 +18,9 @@ public interface VersionRecetaMetadataMapper {
     VersionRecetaMetadataMapper mapper = Mappers.getMapper(VersionRecetaMetadataMapper.class);
 
     @Mapping(target = "creadoPor.username", source = "usernameCreador")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "fechaCreacion", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "recetaPadre.codigoReceta", source = "codigoRecetaPadre")
     VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")

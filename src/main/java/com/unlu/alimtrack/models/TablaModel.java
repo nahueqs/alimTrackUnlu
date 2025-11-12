@@ -49,4 +49,13 @@ public class TablaModel {
     private List<FilaTablaModel> filas = new ArrayList<>();
 
 
+    public void addColumna(ColumnaTablaModel columna) {
+        columnas.add(columna);
+        columna.setTabla(this);
+    }
+
+    public void addFila(FilaTablaModel fila) {
+        filas.add(fila);
+        fila.setTabla(this);
+    }
 }

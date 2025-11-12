@@ -4,7 +4,7 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.EstadoActualProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
@@ -43,6 +43,7 @@ public class ProduccionManagementService {
     private final InputValidator inputValidator;
     private final RespuestaCampoRepository respuestaCampoRepository;
     private final AutoSaveService autoSaveService;
+    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
 
 
     public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
@@ -129,8 +130,8 @@ public class ProduccionManagementService {
 
         // 2. Obtener estructura COMPLETA desde la versión de receta
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
-        List<SeccionResponseDTO> estructura = versionRecetaMetadataService
-                .findAllSeccionesByVersionReceta(codigoVersion);
+        VersionRecetaCompletaResponseDTO estructura = versionRecetaEstructuraService
+                .getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
 
         // 3. Obtener respuestas de campos
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findByIdProduccion(produccion);

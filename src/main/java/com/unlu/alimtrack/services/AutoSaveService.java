@@ -61,7 +61,7 @@ public class AutoSaveService {
 
             // 2. Buscar auto-save existente o crear nuevo
             AutoSaveProduccionModel autoSave = autoSaveRepository
-                    .findByProduccionIdProduccion(produccion.getProduccion())
+                    .findByProduccionProduccion(produccion.getProduccion())
                     .orElse(new AutoSaveProduccionModel());
 
             // 3. Configurar el modelo según tu esquema
@@ -117,7 +117,7 @@ public class AutoSaveService {
      * Recupera el último auto-save de una producción
      */
     public Map<String, Object> recuperarUltimoAutoSave(ProduccionModel produccion) {
-        return autoSaveRepository.findByProduccionIdProduccion(produccion.getProduccion())
+        return autoSaveRepository.findByProduccionProduccion(produccion.getProduccion())
                 .map(AutoSaveProduccionModel::getDatos)
                 .orElse(new HashMap<>());
     }
@@ -126,7 +126,7 @@ public class AutoSaveService {
      * Obtiene el timestamp del último auto-save
      */
     public LocalDateTime obtenerUltimoAutoSaveTimestamp(ProduccionModel produccion) {
-        return autoSaveRepository.findByProduccionIdProduccion(produccion.getProduccion())
+        return autoSaveRepository.findByProduccionProduccion(produccion.getProduccion())
                 .map(AutoSaveProduccionModel::getTimestamp)
                 .orElse(null);
     }
@@ -135,6 +135,6 @@ public class AutoSaveService {
      * Verifica si existe auto-save para una producción
      */
     public boolean existeAutoSave(ProduccionModel produccion) {
-        return autoSaveRepository.existsByProduccionIdProduccion(produccion.getProduccion());
+        return autoSaveRepository.existsByProduccionProduccion(produccion.getProduccion());
     }
 }

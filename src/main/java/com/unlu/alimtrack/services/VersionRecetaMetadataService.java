@@ -2,7 +2,6 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.BorradoFallidoException;
 import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
@@ -161,11 +160,6 @@ public class VersionRecetaMetadataService {
         VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);
         validateDelete(codigoVersion);
         versionRecetaRepository.delete(receta);
-    }
-
-    public List<SeccionResponseDTO> findAllSeccionesByVersionReceta(String codigoVersion) {
-        VersionRecetaModel versionReceta = findVersionModelByCodigo(codigoVersion);
-        return seccionService.obtenerSeccionesDTOCompletasPorVersion(versionReceta.getCodigoVersionReceta());
     }
 
 

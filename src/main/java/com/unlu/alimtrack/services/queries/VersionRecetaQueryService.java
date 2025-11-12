@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.services.queries;
 
-import com.unlu.alimtrack.DTOS.response.VersionRecetaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ public interface VersionRecetaQueryService {
 
     boolean existsByCreadaPorUsername(String username);
 
-    List<VersionRecetaResponseDTO> findAllByCreadoPorUsername(String username);
+    List<VersionRecetaMetadataResponseDTO> findAllByCreadoPorUsername(String username);
 
     boolean existsByRecetaPadre(String codigoRecetaPadre);
 

@@ -3,6 +3,8 @@ package com.unlu.alimtrack.services.validators;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
+import com.unlu.alimtrack.models.CampoSimpleModel;
+import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ public class VersionRecetaValidator {
             throw new RecursoNoEncontradoException("No existen versiones para la receta");
         }
     }
+
 
     public void validateModification(VersionRecetaModifyDTO modificacion) {
         if (modificacion.nombre() != null) {
@@ -52,4 +55,15 @@ public class VersionRecetaValidator {
         }
     }
 
+    public void validarCampoPerteneceAVersion(ProduccionModel produccion, CampoSimpleModel campo) {
+        if (produccion == null || campo == null) {
+            throw new RecursoNoEncontradoException("Produccion o campo no encontrado");
+        }
+
+        if (!campo.getSeccion().getVersionRecetaPadre().equals(produccion.getVersionReceta())) {
+            throw new ModificacionInvalidaException("El campo no pertenece a la version de la produccion");
+        }
+
+
+    }
 }

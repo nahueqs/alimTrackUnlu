@@ -10,6 +10,8 @@ public record RecetaResponseDTO(
         @NotNull
         String descripcion,
         @NotNull
+        String nombre,
+        @NotNull
         String creadaPor,
         @NotNull
         LocalDateTime fechaCreacion

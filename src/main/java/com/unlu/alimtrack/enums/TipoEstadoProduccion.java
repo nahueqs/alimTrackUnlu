@@ -6,7 +6,9 @@ public enum TipoEstadoProduccion {
     @JsonProperty("EN_PROCESO")
     EN_PROCESO,
     @JsonProperty("FINALIZADA")
-    FINALIZADA;
+    FINALIZADA,
+    @JsonProperty("CANCELADA")
+    CANCELADA;
 
 //  public String getValorBaseDatos() {
 //    return name().toUpperCase();

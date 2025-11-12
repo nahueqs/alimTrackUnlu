@@ -28,7 +28,7 @@ public record VersionRecetaLlenaCreateDTO(
         String usernameCreador,
 
         @NotNull
-        @UniqueElements(message = "Los títulos de las secciones deben ser únicos")
+        @UniqueElements(message = "Los títulos de las estructura deben ser únicos")
         List<SeccionCreateDTO> secciones
 ) {
 }

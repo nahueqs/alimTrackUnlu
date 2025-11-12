@@ -2,8 +2,8 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.VersionRecetaResponseDTO;
-import com.unlu.alimtrack.services.VersionRecetaService;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
+import com.unlu.alimtrack.services.VersionRecetaMetadataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,17 +30,17 @@ public class VersionRecetaControllerTest {
     private final String codigoPrimeraVersion = "VER001";
 
     @Mock
-    private VersionRecetaService versionRecetaService;
+    private VersionRecetaMetadataService versionRecetaMetadataService;
     @InjectMocks
     private VersionRecetaController versionRecetaController;
-    private VersionRecetaResponseDTO version1;
-    private VersionRecetaResponseDTO version2;
+    private VersionRecetaMetadataResponseDTO version1;
+    private VersionRecetaMetadataResponseDTO version2;
 
 
     @BeforeEach
     void setUpDosVersionesResponseDTO() {
 
-        version1 = new VersionRecetaResponseDTO(
+        version1 = new VersionRecetaMetadataResponseDTO(
                 codigoPrimeraVersion,
                 "1.0",
                 "receta padre",
@@ -50,7 +50,7 @@ public class VersionRecetaControllerTest {
                 fechaFija
         );
 
-        version2 = new VersionRecetaResponseDTO(
+        version2 = new VersionRecetaMetadataResponseDTO(
                 "VER002",
                 "1.1",
                 "Nombre segunda versión",
@@ -63,43 +63,43 @@ public class VersionRecetaControllerTest {
 
     @Test
     void getAllVersiones_ShouldReturnListOfVersions() {
-        List<VersionRecetaResponseDTO> versiones = Arrays.asList(version1, version2);
+        List<VersionRecetaMetadataResponseDTO> versiones = Arrays.asList(version1, version2);
 
-        when(versionRecetaService.findAllVersiones()).thenReturn(versiones);
+        when(versionRecetaMetadataService.findAllVersiones()).thenReturn(versiones);
 
-        ResponseEntity<List<VersionRecetaResponseDTO>> response = versionRecetaController.getAllVersiones();
+        ResponseEntity<List<VersionRecetaMetadataResponseDTO>> response = versionRecetaController.getAllVersiones();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
-        verify(versionRecetaService).findAllVersiones();
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).findAllVersiones();
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 
     @Test
     void getByCodigoVersion_ShouldReturnVersion() {
-        when(versionRecetaService.findByCodigoVersion(codigoPrimeraVersion)).thenReturn(version1);
+        when(versionRecetaMetadataService.findByCodigoVersion(codigoPrimeraVersion)).thenReturn(version1);
 
-        ResponseEntity<VersionRecetaResponseDTO> response =
+        ResponseEntity<VersionRecetaMetadataResponseDTO> response =
                 versionRecetaController.getByCodigoVersion(codigoPrimeraVersion);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(codigoPrimeraVersion, response.getBody().codigoVersionReceta());
-        verify(versionRecetaService).findByCodigoVersion(codigoPrimeraVersion);
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).findByCodigoVersion(codigoPrimeraVersion);
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 
     @Test
     void getAllByCodigoReceta_ShouldReturnVersionsForRecipe() {
-        List<VersionRecetaResponseDTO> versiones = Arrays.asList(version1, version2);
-        when(versionRecetaService.findAllByCodigoReceta(codigoReceta)).thenReturn(versiones);
+        List<VersionRecetaMetadataResponseDTO> versiones = Arrays.asList(version1, version2);
+        when(versionRecetaMetadataService.findAllByCodigoReceta(codigoReceta)).thenReturn(versiones);
 
-        ResponseEntity<List<VersionRecetaResponseDTO>> response =
+        ResponseEntity<List<VersionRecetaMetadataResponseDTO>> response =
                 versionRecetaController.getAllByCodigoReceta(codigoReceta);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
-        verify(versionRecetaService).findAllByCodigoReceta(codigoReceta);
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).findAllByCodigoReceta(codigoReceta);
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 
     @Test
@@ -114,19 +114,19 @@ public class VersionRecetaControllerTest {
         );
 
         // Expectations
-        when(versionRecetaService.saveVersionReceta(codigoReceta, createDTO))
+        when(versionRecetaMetadataService.saveVersionReceta(codigoReceta, createDTO))
                 .thenReturn(version1);
 
         // Act
-        ResponseEntity<VersionRecetaResponseDTO> response =
+        ResponseEntity<VersionRecetaMetadataResponseDTO> response =
                 versionRecetaController.saveVersionReceta(codigoReceta, createDTO);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/api/v1/recetas/" + codigoReceta + "/versiones/" + version1.codigoVersionReceta(),
                 response.getHeaders().getLocation().getPath());
-        verify(versionRecetaService).saveVersionReceta(codigoReceta, createDTO);
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).saveVersionReceta(codigoReceta, createDTO);
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 
     @Test
@@ -137,38 +137,39 @@ public class VersionRecetaControllerTest {
                 "Descripción primera versión actualizada"
         );
 
-        VersionRecetaResponseDTO version1Actualizada = new VersionRecetaResponseDTO(
+        VersionRecetaMetadataResponseDTO version1Actualizada = new VersionRecetaMetadataResponseDTO(
                 codigoPrimeraVersion,
                 "1.0",
+                "Nombre receta padre",
                 "Nombre primera versión actualizada",
-                "receta padre",
                 "Descripción primera versión actualizada",
                 "Usuario1",
                 fechaFija
         );
 
-        when(versionRecetaService.updateVersionReceta(codigoPrimeraVersion, modifyDTO))
+        when(versionRecetaMetadataService.updateVersionReceta(codigoPrimeraVersion, modifyDTO))
                 .thenReturn(version1Actualizada);
 
-        ResponseEntity<VersionRecetaResponseDTO> response =
+        ResponseEntity<VersionRecetaMetadataResponseDTO> response =
                 versionRecetaController.updateVersionReceta(codigoPrimeraVersion, modifyDTO);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Nombre receta padre", response.getBody().nombreRecetaPadre());
         assertEquals("Nombre primera versión actualizada", response.getBody().nombre());
         assertEquals("Descripción primera versión actualizada", response.getBody().descripcion());
-        verify(versionRecetaService).updateVersionReceta(anyString(), any(VersionRecetaModifyDTO.class));
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).updateVersionReceta(anyString(), any(VersionRecetaModifyDTO.class));
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 
     @Test
     void deleteVersionReceta_ShouldDeleteVersion() {
-        doNothing().when(versionRecetaService).deleteVersionReceta(codigoPrimeraVersion);
+        doNothing().when(versionRecetaMetadataService).deleteVersionReceta(codigoPrimeraVersion);
 
         ResponseEntity<Void> response =
                 versionRecetaController.deleteVersionReceta(codigoPrimeraVersion);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(versionRecetaService).deleteVersionReceta(codigoPrimeraVersion);
-        verifyNoMoreInteractions(versionRecetaService);
+        verify(versionRecetaMetadataService).deleteVersionReceta(codigoPrimeraVersion);
+        verifyNoMoreInteractions(versionRecetaMetadataService);
     }
 }

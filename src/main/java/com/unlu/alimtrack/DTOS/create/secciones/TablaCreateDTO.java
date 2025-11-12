@@ -12,17 +12,17 @@ public record TablaCreateDTO(
         @Size(min = 2, max = 255)
         String nombre,
 
-        @NotNull
         @Size(min = 2, max = 255)
         String descripcion,
 
-        @NotNull
         @UniqueElements(message = "Los nombres de las filas deben ser únicos")
         List<FilaTablaCreateDTO> filas,
 
-        @NotNull
         @UniqueElements(message = "Los nombres de las columnas deben ser únicos")
-        List<ColumnaTablaCreateDTO> columnas
+        List<ColumnaTablaCreateDTO> columnas,
+
+        @NotNull Integer orden
+
 ) {
     @Override
     public boolean equals(Object o) {

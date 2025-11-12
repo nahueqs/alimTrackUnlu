@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionRecetaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
-import com.unlu.alimtrack.services.VersionRecetaService;
+import com.unlu.alimtrack.services.VersionRecetaMetadataService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,17 +25,17 @@ public class VersionRecetaControllerUnitTest {
 
 
     @Mock
-    private VersionRecetaService versionRecetaService;
+    private VersionRecetaMetadataService versionRecetaMetadataService;
 
     @InjectMocks
     private VersionRecetaController versionRecetaController;
 
     @Test
     void testGetAllVersionRecetas() {
-        List<VersionRecetaResponseDTO> listaResponseDTOs = List.of(
-                new VersionRecetaResponseDTO(
+        List<VersionRecetaMetadataResponseDTO> listaResponseDTOs = List.of(
+                new VersionRecetaMetadataResponseDTO(
                         "RTEST-001",
-                        "COD 1",
+                        "COD_1",
                         "Nombre receta padre test",
                         "Nombre version test",
                         "Descripcion test",
@@ -43,12 +43,12 @@ public class VersionRecetaControllerUnitTest {
                         LocalDateTime.parse("2025-08-17T00:00:00")
                 )
         );
-        when(versionRecetaService.findAllVersiones()).thenReturn(listaResponseDTOs);
-        ResponseEntity<List<VersionRecetaResponseDTO>> resp = versionRecetaController.getAllVersiones();
+        when(versionRecetaMetadataService.findAllVersiones()).thenReturn(listaResponseDTOs);
+        ResponseEntity<List<VersionRecetaMetadataResponseDTO>> resp = versionRecetaController.getAllVersiones();
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertEquals(1, resp.getBody().size());
-        verify(versionRecetaService).findAllVersiones();
+        verify(versionRecetaMetadataService).findAllVersiones();
     }
 
     @Test
@@ -61,7 +61,7 @@ public class VersionRecetaControllerUnitTest {
                 "usernameCreador");
 
         // Simulamos excepción de usuario inexistente
-        when(versionRecetaService.saveVersionReceta("codPadre", createDTO)).thenThrow(
+        when(versionRecetaMetadataService.saveVersionReceta("codPadre", createDTO)).thenThrow(
                 new RecursoNoEncontradoException("Usuario no encontrado"));
 
         Exception exception = assertThrows(RecursoNoEncontradoException.class, () -> {
@@ -69,7 +69,7 @@ public class VersionRecetaControllerUnitTest {
         });
 
         assertEquals("Usuario no encontrado", exception.getMessage());
-        verify(versionRecetaService).saveVersionReceta("codPadre", createDTO);
+        verify(versionRecetaMetadataService).saveVersionReceta("codPadre", createDTO);
     }
 
     @Test
@@ -77,22 +77,22 @@ public class VersionRecetaControllerUnitTest {
         VersionRecetaCreateDTO createDTO = new VersionRecetaCreateDTO(
                 "codPadre",
                 "codVersion",
-                "nombre",
+                "Nombre version",
                 "descripcion",
                 "usernameCreador");
 
-        VersionRecetaResponseDTO responseDTO = new VersionRecetaResponseDTO(
-                "cod Version",
-                "cod receta padre",
+        VersionRecetaMetadataResponseDTO responseDTO = new VersionRecetaMetadataResponseDTO(
+                "codVersion",
+                "codrPadre",
                 "nombre",
                 "Nombre version",
                 "descripcion",
                 "usernameCreador",
                 LocalDateTime.now());
 
-        when(versionRecetaService.saveVersionReceta("codPadre", createDTO)).thenReturn(responseDTO);
+        when(versionRecetaMetadataService.saveVersionReceta("codPadre", createDTO)).thenReturn(responseDTO);
 
-        ResponseEntity<VersionRecetaResponseDTO> resp = versionRecetaController.saveVersionReceta("codPadre", createDTO);
+        ResponseEntity<VersionRecetaMetadataResponseDTO> resp = versionRecetaController.saveVersionReceta("codPadre", createDTO);
 
         assertEquals(HttpStatus.CREATED, resp.getStatusCode());
         assertEquals("codVersion", resp.getBody().codigoVersionReceta());
@@ -100,8 +100,7 @@ public class VersionRecetaControllerUnitTest {
         assertEquals("Nombre version", resp.getBody().nombre());
         assertEquals("descripcion", resp.getBody().descripcion());
         assertEquals("usernameCreador", resp.getBody().creadaPor());
-        assertEquals(LocalDateTime.now(), resp.getBody().fechaCreacion());
-        verify(versionRecetaService).saveVersionReceta("codPadre", createDTO);
+        verify(versionRecetaMetadataService).saveVersionReceta("codPadre", createDTO);
     }
 
 

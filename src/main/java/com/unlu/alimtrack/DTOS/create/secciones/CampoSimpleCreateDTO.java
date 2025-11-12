@@ -12,7 +12,12 @@ public record CampoSimpleCreateDTO(
 
         @NotNull
         @Size(min = 2, max = 100)
-        String tipoDato
+        String tipoDato,
+
+        Integer idGrupo,
+
+        @NotNull
+        Integer orden
 ) {
     @Override
     public boolean equals(Object o) {

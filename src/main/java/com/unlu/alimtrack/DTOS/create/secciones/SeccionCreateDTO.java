@@ -35,11 +35,12 @@ public record SeccionCreateDTO(
         @NotNull
         Integer orden,
 
+        @UniqueElements(message = "Los nombres de los campos simples deben ser únicos")
+        List<CampoSimpleCreateDTO> camposSimples,
+
         @UniqueElements(message = "Los subtítulos de los grupos de campos deben ser únicos")
         List<GrupoCamposCreateDTO> gruposCampos,
 
-        @UniqueElements(message = "Los nombres de los campos simples deben ser únicos")
-        List<CampoSimpleCreateDTO> camposSimples,
 
         @UniqueElements(message = "Los nombres de las tablas deben ser únicos")
         List<TablaCreateDTO> tablas

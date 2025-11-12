@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response;
+package com.unlu.alimtrack.DTOS.response.VersionReceta;
 
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import jakarta.validation.constraints.NotNull;
@@ -9,11 +9,15 @@ public record CampoSimpleResponseDTO(
         Long id,
         @NotNull
         Long idSeccion,
-        Long idGrupoCampos,
+
+        Long idGrupo,
+
         @NotNull
         String nombre,
+
         @NotNull
-        TipoDatoCampo tipoDato,  // ← Usar el enum, no String
+        TipoDatoCampo tipoDato,
+
         @NotNull
         Integer orden
 ) {

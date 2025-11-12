@@ -2,9 +2,11 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.SeccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionRecetaResponseDTO;
-import com.unlu.alimtrack.services.VersionRecetaService;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
+import com.unlu.alimtrack.services.VersionRecetaEstructuraService;
+import com.unlu.alimtrack.services.VersionRecetaMetadataService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,40 +21,41 @@ import java.util.List;
 public class VersionRecetaController {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VersionRecetaController.class);
-    final VersionRecetaService versionRecetaService;
+    private final VersionRecetaMetadataService versionRecetaMetadataService;
+    private final VersionRecetaEstructuraService versionEstructuraService;
 
     //devuelve todas las versiones
     @GetMapping("/recetas/versiones")
-    public ResponseEntity<List<VersionRecetaResponseDTO>> getAllVersiones() {
+    public ResponseEntity<List<VersionRecetaMetadataResponseDTO>> getAllVersiones() {
         log.debug("Obteniendo todas las versiones de recetas");
-        List<VersionRecetaResponseDTO> versiones = versionRecetaService.findAllVersiones();
+        List<VersionRecetaMetadataResponseDTO> versiones = versionRecetaMetadataService.findAllVersiones();
         log.debug("Retornando {} versiones de recetas", versiones.size());
         return ResponseEntity.ok(versiones);
     }
 
     @GetMapping("/recetas/versiones/{codigoVersion}")
-    public ResponseEntity<VersionRecetaResponseDTO> getByCodigoVersion(
+    public ResponseEntity<VersionRecetaMetadataResponseDTO> getByCodigoVersion(
             @PathVariable String codigoVersion) {
         log.debug("Buscando versión de receta con código: {}", codigoVersion);
-        VersionRecetaResponseDTO version = versionRecetaService.findByCodigoVersion(codigoVersion);
+        VersionRecetaMetadataResponseDTO version = versionRecetaMetadataService.findByCodigoVersion(codigoVersion);
         log.debug("Versión de receta encontrada: {}", version != null ? version.codigoVersionReceta() : "No encontrada");
         return ResponseEntity.ok(version);
     }
 
     @GetMapping("/recetas/{codigoReceta}/versiones")
-    public ResponseEntity<List<VersionRecetaResponseDTO>> getAllByCodigoReceta(
+    public ResponseEntity<List<VersionRecetaMetadataResponseDTO>> getAllByCodigoReceta(
             @PathVariable String codigoReceta) {
         log.debug("Buscando todas las versiones para la receta con código: {}", codigoReceta);
-        List<VersionRecetaResponseDTO> versiones = versionRecetaService.findAllByCodigoReceta(codigoReceta);
+        List<VersionRecetaMetadataResponseDTO> versiones = versionRecetaMetadataService.findAllByCodigoReceta(codigoReceta);
         log.debug("Retornando {} versiones para la receta: {}", versiones.size(), codigoReceta);
         return ResponseEntity.ok(versiones);
     }
 
     @PostMapping("/recetas/{codigoReceta}/versiones")
-    public ResponseEntity<VersionRecetaResponseDTO> saveVersionReceta(
+    public ResponseEntity<VersionRecetaMetadataResponseDTO> saveVersionReceta(
             @PathVariable String codigoReceta, @Valid @RequestBody VersionRecetaCreateDTO dto) {
         log.debug("Creando nueva versión para la receta con código: {}", codigoReceta);
-        VersionRecetaResponseDTO created = versionRecetaService.saveVersionReceta(codigoReceta, dto);
+        VersionRecetaMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(codigoReceta, dto);
         log.debug("Versión creada exitosamente: {} para la receta: {}", created.codigoVersionReceta(), codigoReceta);
         return ResponseEntity.created(
                         URI.create("/api/v1/recetas/" + codigoReceta + "/versiones/" + created.codigoVersionReceta()))
@@ -60,10 +63,10 @@ public class VersionRecetaController {
     }
 
     @PutMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
-    public ResponseEntity<VersionRecetaResponseDTO> updateVersionReceta(@PathVariable String codigoVersion,
-                                                                        @RequestBody VersionRecetaModifyDTO receta) {
+    public ResponseEntity<VersionRecetaMetadataResponseDTO> updateVersionReceta(@PathVariable String codigoVersion,
+                                                                                @RequestBody VersionRecetaModifyDTO receta) {
         log.debug("Actualizando versión de receta con código: {}", codigoVersion);
-        VersionRecetaResponseDTO actualizada = versionRecetaService.updateVersionReceta(codigoVersion, receta);
+        VersionRecetaMetadataResponseDTO actualizada = versionRecetaMetadataService.updateVersionReceta(codigoVersion, receta);
         log.debug("Versión de receta actualizada exitosamente: {}", actualizada.codigoVersionReceta());
         return ResponseEntity.ok(actualizada);
     }
@@ -71,17 +74,25 @@ public class VersionRecetaController {
     @DeleteMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}")
     public ResponseEntity<Void> deleteVersionReceta(@PathVariable String codigoVersion) {
         log.debug("Eliminando versión de receta con código: {}", codigoVersion);
-        versionRecetaService.deleteVersionReceta(codigoVersion);
+        versionRecetaMetadataService.deleteVersionReceta(codigoVersion);
         log.debug("Versión de receta eliminada exitosamente: {}", codigoVersion);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}/secciones")
     public ResponseEntity<List<SeccionResponseDTO>> getAllSeccionesByVersionReceta(@PathVariable String codigoVersion) {
-        log.debug("Obteniendo todas las secciones para la versión de receta con código: {}", codigoVersion);
-        List<SeccionResponseDTO> secciones = versionRecetaService.findAllSeccionesByVersionReceta(codigoVersion);
-        log.debug("Retornando {} secciones para la versión de receta: {}", secciones.size(), codigoVersion);
+        log.debug("Obteniendo todas las estructura para la versión de receta con código: {}", codigoVersion);
+        List<SeccionResponseDTO> secciones = versionRecetaMetadataService.findAllSeccionesByVersionReceta(codigoVersion);
+        log.debug("Retornando {} estructura para la versión de receta: {}", secciones.size(), codigoVersion);
         return ResponseEntity.ok(secciones);
+    }
+
+    @GetMapping("/{codigoVersion}/estructura-completa")
+    public ResponseEntity<VersionRecetaCompletaResponseDTO> obtenerEstructuraCompleta(
+            @PathVariable String codigoVersion) {
+
+        VersionRecetaCompletaResponseDTO estructura = versionEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
+        return ResponseEntity.ok(estructura);
     }
 
 

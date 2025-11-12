@@ -2,8 +2,12 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.ProduccionResponseDTO;
-import com.unlu.alimtrack.services.ProduccionService;
+import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.respuestas.EstadoActualProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.respuestas.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
+import com.unlu.alimtrack.services.ProduccionManagementService;
+import com.unlu.alimtrack.services.queries.ProduccionQueryServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,8 @@ import java.util.List;
 @RequestMapping("/api/v1/producciones")
 public class ProduccionController {
 
-    private final ProduccionService produccionService;
+    private final ProduccionQueryServiceImpl produccionService;
+    private final ProduccionManagementService produccionManagementService;
 
     @GetMapping
     public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(ProduccionFilterRequestDTO filtros) {
@@ -47,17 +52,38 @@ public class ProduccionController {
 
         log.debug("Solicitando crear producción con el código: {}, y la requestBody, {}", codigoProduccion, createDTO);
 
-        ProduccionResponseDTO created = produccionService.saveProduccion(codigoProduccion, createDTO);
+        ProduccionResponseDTO created = produccionManagementService.saveProduccion(codigoProduccion, createDTO);
 
         log.debug("Retornando producción: {}", created);
         return ResponseEntity.created(URI.create("/api/v1/producciones/" + created.codigoProduccion())).body(created);
     }
 
-//  @GetMapping("/{idProduccion}/estructura")
-//  public ResponseEntity<EstructuraProduccionDTO> getEstructuraCompleta(
-//      @PathVariable Long idProduccion) {
-//    EstructuraProduccionDTO estructura = produccionService.getEstructuraCompleta(idProduccion);
-//    return ResponseEntity.ok(estructura);
+    @PutMapping("/{codigoProduccion}/campos/{idCampo}")
+    public ResponseEntity<RespuestaCampoResponseDTO> guardarRespuestaCampo(
+            @PathVariable String codigoProduccion,
+            @PathVariable Long idCampo,
+            @Valid @RequestBody RespuestaCampoRequestDTO request) {
+
+        log.debug("Guardando respuesta para campo: {}, producción: {}", idCampo, codigoProduccion);
+
+        RespuestaCampoResponseDTO respuesta = produccionManagementService.guardarRespuestaCampo(
+                codigoProduccion, idCampo, request);
+        log.debug("Respuesta guardada exitosamente: {}", respuesta);
+        return ResponseEntity.ok(respuesta);
+
+    }
+
+    @GetMapping("/{codigoProduccion}/estado-actual")
+    public ResponseEntity<EstadoActualProduccionResponseDTO> obtenerEstadoActual(
+            @PathVariable String codigoProduccion) {
+
+        log.debug("Solicitando estado actual de producción: {}", codigoProduccion);
+
+        EstadoActualProduccionResponseDTO estado = produccionManagementService.obtenerEstadoActual(codigoProduccion);
+
+        log.debug("Retornando estado actual para: {}", codigoProduccion);
+        return ResponseEntity.ok(estado);
+    }
 
 
 }

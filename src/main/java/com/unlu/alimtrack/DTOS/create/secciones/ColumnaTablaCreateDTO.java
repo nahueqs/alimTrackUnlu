@@ -11,8 +11,9 @@ public record ColumnaTablaCreateDTO(
 
         @NotNull
         @Size(min = 2, max = 100)
-        String tipoDato
+        String tipoDato,
 
+        @NotNull Integer orden
 
 ) {
 }

@@ -2,12 +2,12 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.SeccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionRecetaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.BorradoFallidoException;
 import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.VersionRecetaMapper;
+import com.unlu.alimtrack.mappers.VersionRecetaMetadataMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.queries.ProduccionQueryService;
@@ -22,11 +22,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class VersionRecetaService {
+public class VersionRecetaMetadataService {
 
     private final VersionRecetaRepository versionRecetaRepository;
     private final RecetaService recetaService;
-    private final VersionRecetaMapper versionRecetaMapper;
+    private final VersionRecetaMetadataMapper versionRecetaMetadataMapper;
     private final UsuarioQueryService usuarioQueryService;
     private final VersionRecetaValidator versionRecetaValidator;
     private final ProduccionQueryService produccionQueryService;
@@ -35,10 +35,10 @@ public class VersionRecetaService {
 
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaResponseDTO> findAllVersiones() {
+    public List<VersionRecetaMetadataResponseDTO> findAllVersiones() {
         List<VersionRecetaModel> versiones = versionRecetaRepository.findAll();
         verificarListaVersionesObtenida(versiones);
-        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMetadataMapper.toVersionRecetaResponseDTOList(versiones);
     }
 
     private void verificarListaVersionesObtenida(List<VersionRecetaModel> versiones) {
@@ -56,18 +56,18 @@ public class VersionRecetaService {
     }
 
     @Transactional(readOnly = true)
-    public VersionRecetaResponseDTO findByCodigoVersion(String codigoVersion) {
+    public VersionRecetaMetadataResponseDTO findByCodigoVersion(String codigoVersion) {
         VersionRecetaModel model = versionRecetaRepository.findByCodigoVersionReceta(codigoVersion);
         verificarVersionModelNotNull(model, codigoVersion);
-        return VersionRecetaMapper.mapper.toVersionRecetaResponseDTO(model);
+        return VersionRecetaMetadataMapper.mapper.toVersionRecetaResponseDTO(model);
     }
 
     @Transactional(readOnly = true)
-    public List<VersionRecetaResponseDTO> findAllByCodigoReceta(String codigoRecetaPadre) {
+    public List<VersionRecetaMetadataResponseDTO> findAllByCodigoReceta(String codigoRecetaPadre) {
         List<VersionRecetaModel> versiones = versionRecetaRepository.findAllVersionesByCodigoRecetaPadre(
                 codigoRecetaPadre);
         verificarListaVersionesObtenidaByCodigoReceta(versiones, codigoRecetaPadre);
-        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMetadataMapper.toVersionRecetaResponseDTOList(versiones);
     }
 
     private void verificarCreacionVersionReceta(String codigoRecetaPadre,
@@ -107,17 +107,17 @@ public class VersionRecetaService {
     }
 
     @Transactional
-    public VersionRecetaResponseDTO saveVersionReceta(String codigoRecetaPadre,
-                                                      VersionRecetaCreateDTO versionRecetaCreateDTO) {
+    public VersionRecetaMetadataResponseDTO saveVersionReceta(String codigoRecetaPadre,
+                                                              VersionRecetaCreateDTO versionRecetaCreateDTO) {
         // verifico que no exista una version con ese codigo
         // verifico que exista la receta padre
         // verifico que exista el usuario creador
         verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
         // mapeo el dto a un nuevo model
-        VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(
+        VersionRecetaModel versionModelFinal = versionRecetaMetadataMapper.toVersionRecetaModel(
                 versionRecetaCreateDTO);
         versionRecetaRepository.save(versionModelFinal);
-        return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
+        return versionRecetaMetadataMapper.toVersionRecetaResponseDTO(versionModelFinal);
     }
 
     private void verificarVersionModelNotNull(VersionRecetaModel model, String codigoVersion) {
@@ -134,12 +134,12 @@ public class VersionRecetaService {
         return model;
     }
 
-    public VersionRecetaResponseDTO updateVersionReceta(String codigoReceta, VersionRecetaModifyDTO modificacion) {
+    public VersionRecetaMetadataResponseDTO updateVersionReceta(String codigoReceta, VersionRecetaModifyDTO modificacion) {
         versionRecetaValidator.validateModification(modificacion);
         VersionRecetaModel model = findVersionModelByCodigo(codigoReceta);
-        versionRecetaMapper.updateModelFromModifyDTO(modificacion, model);
+        versionRecetaMetadataMapper.updateModelFromModifyDTO(modificacion, model);
         saveVersionModel(model);
-        return versionRecetaMapper.toVersionRecetaResponseDTO(model);
+        return versionRecetaMetadataMapper.toVersionRecetaResponseDTO(model);
     }
 
     private void saveVersionModel(VersionRecetaModel model) {
@@ -165,7 +165,7 @@ public class VersionRecetaService {
 
     public List<SeccionResponseDTO> findAllSeccionesByVersionReceta(String codigoVersion) {
         VersionRecetaModel versionReceta = findVersionModelByCodigo(codigoVersion);
-        return seccionService.obtenerSeccionesDTOPorVersion(codigoVersion);
+        return seccionService.obtenerSeccionesDTOCompletasPorVersion(versionReceta.getCodigoVersionReceta());
     }
 
 

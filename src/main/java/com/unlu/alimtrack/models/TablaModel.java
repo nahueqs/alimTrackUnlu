@@ -3,6 +3,7 @@ package com.unlu.alimtrack.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -14,11 +15,13 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "tabla")
 public class TablaModel {
 
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id_tabla", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -32,7 +35,7 @@ public class TablaModel {
 
     @Column(name = "descripcion")
     private String descripcion;
-    
+
     @ColumnDefault("0")
     @Column(name = "orden")
     private Integer orden;

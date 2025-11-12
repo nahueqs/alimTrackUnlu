@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class ProduccionValidator {
+public class ProduccionQueryServiceValidator {
 
     private final VersionRecetaRepository versionRecetaRepository;
     private final ProduccionRepository produccionRepository;

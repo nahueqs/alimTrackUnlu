@@ -30,13 +30,16 @@ public class RecetaControllerTest {
 
     @Test
     public void testGetAllRecetas() {
+
+        LocalDateTime fechaFija = LocalDateTime.of(2025, 9, 30, 0, 0);
+
         List<RecetaResponseDTO> listaResponseDTOs = List.of(
                 new RecetaResponseDTO(
                         "RTEST-001",
                         "Milanesa",
                         "Nombre creador",
-                        LocalDateTime.parse("2025-08-17T00:00:00")
-
+                        "Usuario creador",
+                        fechaFija
                 )
         );
 
@@ -54,7 +57,8 @@ public class RecetaControllerTest {
         RecetaResponseDTO responseDTO = new RecetaResponseDTO(
                 "RTEST-001",
                 "Milanesa",
-                "Nombre creador",
+                "Nombre receta",
+                "Usuario creador",
                 LocalDateTime.parse("2025-08-17T00:00:00")
         );
 
@@ -66,7 +70,8 @@ public class RecetaControllerTest {
         assertEquals("RTEST-001", resp.getBody().codigoReceta());
         assertEquals("Milanesa", resp.getBody().descripcion());
         assertEquals(LocalDateTime.parse("2025-08-17T00:00:00"), resp.getBody().fechaCreacion());
-        assertEquals("Nombre creador", resp.getBody().creadaPor());
+        assertEquals("Usuario creador", resp.getBody().creadaPor());
+        assertEquals("Nombre receta", resp.getBody().nombre());
         verify(recetaService).findReceta("RTEST-001");
 
     }
@@ -83,8 +88,9 @@ public class RecetaControllerTest {
 
         RecetaResponseDTO respuesta = new RecetaResponseDTO(
                 "RTEST-001",
-                "Descripcion receta",
-                "Creada por",
+                "Descripcion modificada",
+                "Nombre receta",
+                "Creador",
                 fechaFija
         );
 
@@ -94,9 +100,10 @@ public class RecetaControllerTest {
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertEquals("RTEST-001", resp.getBody().codigoReceta());
-        assertEquals("Nombre modificado", resp.getBody().descripcion());
+        assertEquals("Descripcion modificada", resp.getBody().descripcion());
+        assertEquals("Nombre receta", resp.getBody().nombre());
         assertEquals(fechaFija, resp.getBody().fechaCreacion());
-        assertEquals("Creada por", resp.getBody().creadaPor());
+        assertEquals("Creador", resp.getBody().creadaPor());
         verify(recetaService).updateReceta("RTEST-001", modificacion);
 
     }
@@ -115,7 +122,8 @@ public class RecetaControllerTest {
         RecetaResponseDTO respuestaEsperada = new RecetaResponseDTO(
                 "RTEST-002",
                 "Descripción de la nueva receta",
-                "Usuario Test",
+                "Nombre receta",
+                "Usuario creador",
                 fechaFija
 
         );
@@ -130,7 +138,8 @@ public class RecetaControllerTest {
         assertEquals("RTEST-002", respuesta.getBody().codigoReceta());
         assertEquals("Descripción de la nueva receta", respuesta.getBody().descripcion());
         assertEquals(fechaFija, respuesta.getBody().fechaCreacion());
-        assertEquals("Usuario Test", respuesta.getBody().creadaPor());
+        assertEquals("Nombre receta", respuesta.getBody().nombre());
+        assertEquals("Usuario creador", respuesta.getBody().creadaPor());
         verify(recetaService).addReceta("RTEST-002", nuevaReceta);
     }
 

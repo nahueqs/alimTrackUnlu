@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response;
+package com.unlu.alimtrack.DTOS.response.VersionReceta;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -10,6 +10,7 @@ public record ProduccionResponseDTO(
         @NotNull
         String codigoVersion,
         String encargado,
+        String usernameCreador,
         String lote,
         @NotNull
         String estado,

@@ -32,7 +32,7 @@ public class SeccionModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_version_receta_padre", nullable = false)
-    @JsonIgnoreProperties("secciones")
+    @JsonIgnoreProperties("estructura")
     private VersionRecetaModel versionRecetaPadre;
 
     @Column(name = "creado_por", nullable = false)

@@ -1,8 +1,8 @@
-package com.unlu.alimtrack.validators;
+package com.unlu.alimtrack.mappers;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ProduccionValidatorTest {
+public class VersionRecetaMetadataMapperTest {
 }

@@ -13,31 +13,27 @@ import java.util.List;
 
 @Repository
 public interface SeccionRepository extends JpaRepository<SeccionModel, Long> {
-    // ✅ Consulta básica - solo estructura
-    @Query("SELECT s FROM SeccionModel s WHERE s.versionRecetaPadre = :versionRecetaPadre ORDER BY s.orden")
-    List<SeccionModel> findByVersionRecetaPadre(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
 
-    // ✅ Cargar campos simples por separado
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.camposSimples WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithCamposSimples(@Param("estructura") List<SeccionModel> secciones);
 
-    // ✅ Cargar grupos por separado
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.gruposCampos WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithGruposCampos(@Param("estructura") List<SeccionModel> secciones);
+    @Query("SELECT DISTINCT s FROM SeccionModel s " +
+            "LEFT JOIN FETCH s.gruposCampos g " +
+            "LEFT JOIN FETCH g.campos c " +
+            "LEFT JOIN FETCH s.camposSimples cs " +
+            "LEFT JOIN FETCH s.tablas t " +
+            "LEFT JOIN FETCH t.columnas " +
+            "LEFT JOIN FETCH t.filas " +
+            "WHERE s.versionRecetaPadre = :versionRecetaPadre " +
+            "ORDER BY s.orden, g.orden, c.orden")
+    List<SeccionModel> findByVersionRecetaPadreCompleto(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
 
-    // ✅ Cargar tablas por separado
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.tablas WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithTablas(@Param("estructura") List<SeccionModel> secciones);
+    // ✅ CONSULTA OPTIMIZADA para grupos con campos
+    @Query("SELECT DISTINCT s FROM SeccionModel s " +
+            "LEFT JOIN FETCH s.gruposCampos g " +
+            "LEFT JOIN FETCH g.campos " +
+            "WHERE s.versionRecetaPadre = :versionRecetaPadre " +
+            "ORDER BY s.orden, g.orden")
+    List<SeccionModel> findByVersionRecetaPadreWithGruposAndCampos(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
 
-    // ✅ Cargar campos dentro de grupos
-    @Query("SELECT DISTINCT gc FROM GrupoCamposModel gc LEFT JOIN FETCH gc.campos WHERE gc.seccion IN :secciones")
-    List<GrupoCamposModel> findGruposWithCampos(@Param("estructura") List<SeccionModel> secciones);
-
-    @Query("SELECT DISTINCT gc FROM GrupoCamposModel gc " +
-            "LEFT JOIN FETCH gc.campos c " +
-            "WHERE gc.seccion.idSeccion IN :idsSecciones " +
-            "ORDER BY gc.orden, c.orden")
-    List<GrupoCamposModel> findGruposWithCamposBySeccionIds(@Param("idsSecciones") List<Long> idsSecciones);
 
     // ✅ Cargar columnas de tablas POR SEPARADO (evitar multiple bag)
     @Query("SELECT DISTINCT t FROM TablaModel t LEFT JOIN FETCH t.columnas WHERE t IN :tablas")
@@ -57,4 +53,26 @@ public interface SeccionRepository extends JpaRepository<SeccionModel, Long> {
 
     @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.recetaPadre.codigoReceta = :codigoVersion")
     boolean existsByCodigoVersionRecetaPadreAndOrden(String codigoVersion, Integer orden);
+
+
+    //--------------------------
+    // ✅ Consulta básica - solo secciones
+    @Query("SELECT s FROM SeccionModel s WHERE s.versionRecetaPadre = :versionRecetaPadre ORDER BY s.orden")
+    List<SeccionModel> findByVersionRecetaPadre(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
+
+    // ✅ Cargar campos simples por separado
+    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.camposSimples WHERE s IN :secciones ORDER BY s.orden")
+    List<SeccionModel> findWithCamposSimples(@Param("secciones") List<SeccionModel> secciones);
+
+    // ✅ Cargar grupos por separado (SIN CAMPOS)
+    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.gruposCampos WHERE s IN :secciones ORDER BY s.orden")
+    List<SeccionModel> findWithGruposCampos(@Param("secciones") List<SeccionModel> secciones);
+
+    // ✅ Cargar tablas por separado
+    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.tablas WHERE s IN :secciones ORDER BY s.orden")
+    List<SeccionModel> findWithTablas(@Param("secciones") List<SeccionModel> secciones);
+
+    // ✅ Cargar campos dentro de grupos (CONSULTA CLAVE)
+    @Query("SELECT DISTINCT gc FROM GrupoCamposModel gc LEFT JOIN FETCH gc.campos WHERE gc.seccion.idSeccion IN :idsSecciones ORDER BY gc.orden")
+    List<GrupoCamposModel> findGruposWithCamposBySeccionIds(@Param("idsSecciones") List<Long> idsSecciones);
 }

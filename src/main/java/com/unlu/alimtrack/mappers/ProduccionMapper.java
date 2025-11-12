@@ -33,10 +33,11 @@ public abstract class ProduccionMapper {
     public abstract List<ProduccionResponseDTO> modelListToResponseDTOList(List<ProduccionModel> modelList);
 
     @Mapping(target = "usuarioCreador", source = "usernameCreador", qualifiedByName = "usernameToUsuarioModel")
-    @Mapping(target = "idProduccion", ignore = true)
+    @Mapping(target = "produccion", ignore = true)
     @Mapping(target = "versionReceta", source = "codigoVersionReceta", qualifiedByName = "codigoVersionToVersionModel")
     @Mapping(target = "fechaInicio", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "estado", expression = "java(com.unlu.alimtrack.enums.TipoEstadoProduccion.EN_PROCESO)")
+    @Mapping(target = "fechaFin", expression = "java(null)")
     public abstract ProduccionModel createDTOtoModel(ProduccionCreateDTO createDTO);
 
     @Named("usernameToUsuarioModel")

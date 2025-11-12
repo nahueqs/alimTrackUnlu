@@ -4,7 +4,6 @@ import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
 import com.unlu.alimtrack.mappers.VersionRecetaMetadataMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import com.unlu.alimtrack.repositories.SeccionRepository;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +16,15 @@ import java.util.List;
 @Slf4j
 public class VersionRecetaEstructuraService {
 
-    VersionRecetaRepository versionRecetaRepository;
-    SeccionRepository seccionRepository;
-    SeccionService seccionService;
-    VersionRecetaMetadataMapper versionRecetaMetadataMapper;
+    private final VersionRecetaRepository versionRecetaRepository;
+    private final SeccionService seccionService;
+    private final VersionRecetaMetadataMapper versionRecetaMetadataMapper;
 
 
     public VersionRecetaCompletaResponseDTO getVersionRecetaCompletaResponseDTOByCodigo(String codigoVersion) {
+        log.debug("Obteniendo todas las estructura para la versión de receta con código: {}", codigoVersion);
         VersionRecetaModel versionReceta = versionRecetaRepository.findByCodigoVersionReceta(codigoVersion);
+        log.debug("Version encontrada");
         List<SeccionResponseDTO> secciones = seccionService.obtenerSeccionesDTOCompletasPorVersion(codigoVersion);
 
         return new VersionRecetaCompletaResponseDTO(

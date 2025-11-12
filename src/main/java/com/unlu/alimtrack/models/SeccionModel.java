@@ -58,4 +58,19 @@ public class SeccionModel {
     @Column(name = "orden")
     private Integer orden;
 
+
+    public void addCampoSimple(CampoSimpleModel campo) {
+        camposSimples.add(campo);
+        campo.setSeccion(this);
+    }
+
+    public void addGrupo(GrupoCamposModel grupo) {
+        gruposCampos.add(grupo);
+        grupo.setSeccion(this);
+    }
+
+    public void addTabla(TablaModel tabla) {
+        tablas.add(tabla);
+        tabla.setSeccion(this);
+    }
 }

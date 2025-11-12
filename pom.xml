@@ -10,18 +10,9 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
-                    <encoding></encoding>
+                    <encoding>UTF-8</encoding>
                     <useDefaultDelimiters>true</useDefaultDelimiters>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <jvmArguments>-Djava.version=17</jvmArguments>
-                    <mainClass>com.unlu.alimtrack.AlimtrackApplication</mainClass>
-                </configuration>
-                <groupId>org.springframework.boot</groupId>
             </plugin>
 
             <plugin>

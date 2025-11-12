@@ -9,7 +9,6 @@ import com.unlu.alimtrack.repositories.SeccionRepository;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.SeccionValidator;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -46,16 +45,7 @@ public class SeccionService {
     private final FilaTablaMapper filaTablaMapper;
 
 
-    public SeccionService(
-            SeccionRepository seccionRepository,
-            SeccionValidator seccionValidator,
-            VersionRecetaQueryService versionRecetaQueryService,
-            UsuarioQueryService usuarioQueryService,
-            SeccionMapper seccionMapper,
-            CampoSimpleMapper campoSimpleMapper,
-            GrupoCamposMapper grupoCamposMapper,
-            TablaMapper tablaMapper,
-            @Lazy VersionRecetaMetadataService versionRecetaMetadataService, ColumnaTablaMapper columnaTablaMapper, FilaTablaMapper filaTablaMapper) {
+    public SeccionService(SeccionRepository seccionRepository, SeccionValidator seccionValidator, VersionRecetaQueryService versionRecetaQueryService, UsuarioQueryService usuarioQueryService, SeccionMapper seccionMapper, CampoSimpleMapper campoSimpleMapper, GrupoCamposMapper grupoCamposMapper, TablaMapper tablaMapper, @Lazy VersionRecetaMetadataService versionRecetaMetadataService, ColumnaTablaMapper columnaTablaMapper, FilaTablaMapper filaTablaMapper) {
         this.seccionRepository = seccionRepository;
         this.seccionValidator = seccionValidator;
         this.versionRecetaQueryService = versionRecetaQueryService;
@@ -128,14 +118,12 @@ public class SeccionService {
      */
     private void llenarCamposSimples(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.camposSimples() != null && !seccionDTO.camposSimples().isEmpty()) {
-            List<CampoSimpleModel> camposSimples = seccionDTO.camposSimples().stream()
-                    .map(dto -> {
-                        CampoSimpleModel campo = campoSimpleMapper.toModel(dto);
-                        campo.setSeccion(seccion);
-                        campo.setGrupo(null);
-                        return campo;
-                    })
-                    .collect(Collectors.toList());
+            List<CampoSimpleModel> camposSimples = seccionDTO.camposSimples().stream().map(dto -> {
+                CampoSimpleModel campo = campoSimpleMapper.toModel(dto);
+                campo.setSeccion(seccion);
+                campo.setGrupo(null);
+                return campo;
+            }).collect(Collectors.toList());
             seccion.setCamposSimples(camposSimples);
             log.debug("Asignados {} campos simples a la sección", camposSimples.size());
         } else {
@@ -145,31 +133,27 @@ public class SeccionService {
 
     private void llenarGrupoCampos(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.gruposCampos() != null && !seccionDTO.gruposCampos().isEmpty()) {
-            List<GrupoCamposModel> gruposCampos = seccionDTO.gruposCampos().stream()
-                    .map(dto -> {
-                        // 1. Mapear DTO a Model (sin relaciones)
-                        GrupoCamposModel grupo = grupoCamposMapper.toModel(dto);
+            List<GrupoCamposModel> gruposCampos = seccionDTO.gruposCampos().stream().map(dto -> {
+                // 1. Mapear DTO a Model (sin relaciones)
+                GrupoCamposModel grupo = grupoCamposMapper.toModel(dto);
 
-                        // 2. Asignar seccion manualmente
-                        grupo.setSeccion(seccion);
+                // 2. Asignar seccion manualmente
+                grupo.setSeccion(seccion);
 
-                        // 3. Si el DTO tiene campos, mapearlos
-                        if (dto.camposSimples() != null && !dto.camposSimples().isEmpty()) {
-                            List<CampoSimpleModel> camposDelGrupo = dto.camposSimples().stream()
-                                    .map(campoDTO -> {
-                                        CampoSimpleModel campo = campoSimpleMapper.toModel(campoDTO);
-                                        campo.setSeccion(seccion); // FK obligatoria
-                                        campo.setGrupo(grupo);     // FK opcional (pertenece al grupo)
-                                        return campo;
-                                    })
-                                    .collect(Collectors.toList());
+                // 3. Si el DTO tiene campos, mapearlos
+                if (dto.camposSimples() != null && !dto.camposSimples().isEmpty()) {
+                    List<CampoSimpleModel> camposDelGrupo = dto.camposSimples().stream().map(campoDTO -> {
+                        CampoSimpleModel campo = campoSimpleMapper.toModel(campoDTO);
+                        campo.setSeccion(seccion); // FK obligatoria
+                        campo.setGrupo(grupo);     // FK opcional (pertenece al grupo)
+                        return campo;
+                    }).collect(Collectors.toList());
 
-                            grupo.setCampos(camposDelGrupo);
-                        }
+                    grupo.setCampos(camposDelGrupo);
+                }
 
-                        return grupo;
-                    })
-                    .collect(Collectors.toList());
+                return grupo;
+            }).collect(Collectors.toList());
 
             seccion.setGruposCampos(gruposCampos);
             log.debug("Asignados {} grupos de campos a la sección", gruposCampos.size());
@@ -184,41 +168,35 @@ public class SeccionService {
      */
     private void llenarTablas(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.tablas() != null && !seccionDTO.tablas().isEmpty()) {
-            List<TablaModel> tablas = seccionDTO.tablas().stream()
-                    .map(dto -> {
-                        // 1. Mapear DTO a Model (sin relaciones)
-                        TablaModel tabla = tablaMapper.toModel(dto);
+            List<TablaModel> tablas = seccionDTO.tablas().stream().map(dto -> {
+                // 1. Mapear DTO a Model (sin relaciones)
+                TablaModel tabla = tablaMapper.toModel(dto);
 
-                        // 2. Asignar seccion manualmente
-                        tabla.setSeccion(seccion);
+                // 2. Asignar seccion manualmente
+                tabla.setSeccion(seccion);
 
-                        // 3. Mapear columnas si existen
-                        if (dto.columnas() != null && !dto.columnas().isEmpty()) {
-                            List<ColumnaTablaModel> columnas = dto.columnas().stream()
-                                    .map(colDTO -> {
-                                        ColumnaTablaModel columna = columnaTablaMapper.toModel(colDTO);
-                                        columna.setTabla(tabla);
-                                        return columna;
-                                    })
-                                    .collect(Collectors.toList());
-                            tabla.setColumnas(columnas);
-                        }
+                // 3. Mapear columnas si existen
+                if (dto.columnas() != null && !dto.columnas().isEmpty()) {
+                    List<ColumnaTablaModel> columnas = dto.columnas().stream().map(colDTO -> {
+                        ColumnaTablaModel columna = columnaTablaMapper.toModel(colDTO);
+                        columna.setTabla(tabla);
+                        return columna;
+                    }).collect(Collectors.toList());
+                    tabla.setColumnas(columnas);
+                }
 
-                        // 4. Mapear filas si existen
-                        if (dto.filas() != null && !dto.filas().isEmpty()) {
-                            List<FilaTablaModel> filas = dto.filas().stream()
-                                    .map(filaDTO -> {
-                                        FilaTablaModel fila = filaTablaMapper.toModel(filaDTO);
-                                        fila.setTabla(tabla);
-                                        return fila;
-                                    })
-                                    .collect(Collectors.toList());
-                            tabla.setFilas(filas);
-                        }
+                // 4. Mapear filas si existen
+                if (dto.filas() != null && !dto.filas().isEmpty()) {
+                    List<FilaTablaModel> filas = dto.filas().stream().map(filaDTO -> {
+                        FilaTablaModel fila = filaTablaMapper.toModel(filaDTO);
+                        fila.setTabla(tabla);
+                        return fila;
+                    }).collect(Collectors.toList());
+                    tabla.setFilas(filas);
+                }
 
-                        return tabla;
-                    })
-                    .collect(Collectors.toList());
+                return tabla;
+            }).collect(Collectors.toList());
 
             seccion.setTablas(tablas);
             log.debug("Asignadas {} tablas a la sección", tablas.size());
@@ -228,190 +206,150 @@ public class SeccionService {
     }
 
     /**
-     * Obtiene todas las secciones de una versión de receta con todas sus relaciones cargadas.
-     *
-     * @param versionReceta Versión de receta padre
-     * @return Lista de secciones completas
+     * Obtiene todas las secciones de una versión de receta con TODAS sus relaciones cargadas.
+     * Versión CORREGIDA que evita MultipleBagFetchException.
      */
     @Transactional(readOnly = true)
     public List<SeccionModel> obtenerSeccionesCompletasPorVersion(VersionRecetaModel versionReceta) {
-        log.debug("Obteniendo secciones completas para versión ID: {}", versionReceta.getCodigoVersionReceta());
+        log.debug("🔍 Obteniendo secciones completas para versión ID: {}", versionReceta.getCodigoVersionReceta());
 
+        // 1. Obtener secciones básicas (sin relaciones)
         List<SeccionModel> secciones = seccionRepository.findByVersionRecetaPadre(versionReceta);
 
         if (secciones.isEmpty()) {
-            log.debug("No se encontraron secciones para la versión");
+            log.debug("No se encontraron secciones");
             return secciones;
         }
 
-        cargarRelacionesSecciones(secciones);
-        log.debug("Cargadas {} secciones con todas sus relaciones", secciones.size());
+        List<Long> seccionIds = secciones.stream().map(SeccionModel::getIdSeccion).collect(Collectors.toList());
+
+        log.debug("📋 Procesando {} secciones con IDs: {}", secciones.size(), seccionIds);
+
+        // 2. Cargar relaciones PRIMER NIVEL en consultas separadas
+        cargarRelacionesPrimerNivel(secciones);
+
+        // 3. Cargar relaciones ANIDADAS (campos dentro de grupos)
+        cargarCamposDeGrupos(secciones, seccionIds);
+
+        // 4. Cargar relaciones de tablas (columnas y filas)
+        cargarRelacionesDeTablas(secciones);
+
+        // Debug final
+        logResultadosCarga(secciones);
 
         return secciones;
     }
 
     /**
-     * Carga todas las relaciones de las secciones incluyendo:
-     * - Campos simples
-     * - Grupos de campos con sus campos anidados
-     * - Tablas con columnas y filas
-     *
-     * @param secciones Lista de secciones a enriquecer
+     * Carga las relaciones de primer nivel: camposSimples, gruposCampos, tablas
      */
-    private void cargarRelacionesSecciones(List<SeccionModel> secciones) {
-        List<Long> idsSecciones = obtenerIdsSecciones(secciones);
+    private void cargarRelacionesPrimerNivel(List<SeccionModel> secciones) {
+        log.debug("🔄 Cargando relaciones de primer nivel...");
 
-        cargarRelacionesPrincipales(secciones);
-        cargarCamposDeGrupos(secciones, idsSecciones);
-        cargarTablasCompletas(secciones);
-        inicializarRelaciones(secciones);
+        // Cargar campos simples
+        List<SeccionModel> seccionesConCamposSimples = seccionRepository.findWithCamposSimples(secciones);
+        log.debug("✅ Campos simples cargados");
+
+        // Cargar grupos (sin campos anidados todavía)
+        List<SeccionModel> seccionesConGrupos = seccionRepository.findWithGruposCampos(secciones);
+        log.debug("✅ Grupos cargados (sin campos)");
+
+        // Cargar tablas (sin columnas/filas todavía)
+        List<SeccionModel> seccionesConTablas = seccionRepository.findWithTablas(secciones);
+        log.debug("✅ Tablas cargadas");
     }
 
     /**
-     * Extrae los IDs de todas las secciones.
+     * Carga los campos dentro de los grupos
      */
-    private List<Long> obtenerIdsSecciones(List<SeccionModel> secciones) {
-        return secciones.stream()
-                .map(SeccionModel::getIdSeccion)
-                .collect(Collectors.toList());
+    private void cargarCamposDeGrupos(List<SeccionModel> secciones, List<Long> seccionIds) {
+        log.debug("🔄 Cargando campos dentro de grupos...");
+
+        List<GrupoCamposModel> gruposConCampos = seccionRepository.findGruposWithCamposBySeccionIds(seccionIds);
+        log.debug("📦 Encontrados {} grupos con campos", gruposConCampos.size());
+
+        // Organizar grupos por sección
+        Map<Long, List<GrupoCamposModel>> gruposPorSeccion = gruposConCampos.stream().collect(Collectors.groupingBy(grupo -> grupo.getSeccion().getIdSeccion()));
+
+        // Asignar grupos con campos a cada sección
+        for (SeccionModel seccion : secciones) {
+            List<GrupoCamposModel> gruposDeEstaSeccion = gruposPorSeccion.get(seccion.getIdSeccion());
+            if (gruposDeEstaSeccion != null && seccion.getGruposCampos() != null) {
+                // Reemplazar los grupos vacíos con los grupos que tienen campos cargados
+                Map<Long, GrupoCamposModel> gruposExistentes = seccion.getGruposCampos().stream().collect(Collectors.toMap(GrupoCamposModel::getId, grupo -> grupo));
+
+                for (GrupoCamposModel grupoConCampos : gruposDeEstaSeccion) {
+                    GrupoCamposModel grupoExistente = gruposExistentes.get(grupoConCampos.getId());
+                    if (grupoExistente != null) {
+                        // Mantener la referencia original pero actualizar los campos
+                        grupoExistente.setCampos(grupoConCampos.getCampos());
+                    }
+                }
+
+                log.debug("✅ Sección {}: {} grupos actualizados con campos", seccion.getIdSeccion(), gruposDeEstaSeccion.size());
+            }
+        }
     }
 
     /**
-     * Carga las relaciones de primer nivel: campos simples, grupos y tablas.
+     * Carga columnas y filas de las tablas
      */
-    private void cargarRelacionesPrincipales(List<SeccionModel> secciones) {
-        log.debug("Cargando relaciones principales de {} secciones", secciones.size());
-        seccionRepository.findWithCamposSimples(secciones);
-        seccionRepository.findWithGruposCampos(secciones);
-        seccionRepository.findWithTablas(secciones);
-    }
+    private void cargarRelacionesDeTablas(List<SeccionModel> secciones) {
+        log.debug("🔄 Cargando relaciones de tablas...");
 
-    /**
-     * Carga los campos de los grupos de forma anidada y los asigna a los grupos correspondientes.
-     */
-    private void cargarCamposDeGrupos(List<SeccionModel> secciones, List<Long> idsSecciones) {
-        log.debug("Cargando campos de grupos para {} secciones", idsSecciones.size());
-        List<GrupoCamposModel> gruposConCampos = seccionRepository.findGruposWithCamposBySeccionIds(idsSecciones);
-        asignarCamposAGrupos(secciones, gruposConCampos);
-    }
-
-    /**
-     * Carga las columnas y filas de todas las tablas en dos pasos separados
-     * para evitar el problema de múltiples bags en Hibernate.
-     */
-    private void cargarTablasCompletas(List<SeccionModel> secciones) {
-        List<TablaModel> todasLasTablas = obtenerTodasLasTablas(secciones);
+        List<TablaModel> todasLasTablas = secciones.stream().map(SeccionModel::getTablas).filter(Objects::nonNull).flatMap(List::stream).collect(Collectors.toList());
 
         if (!todasLasTablas.isEmpty()) {
-            log.debug("Cargando columnas y filas de {} tablas", todasLasTablas.size());
             seccionRepository.findTablasWithColumnas(todasLasTablas);
             seccionRepository.findTablasWithFilas(todasLasTablas);
+            log.debug("✅ {} tablas con columnas y filas cargadas", todasLasTablas.size());
         }
     }
 
     /**
-     * Obtiene todas las tablas de todas las secciones.
+     * Log de resultados finales
      */
-    private List<TablaModel> obtenerTodasLasTablas(List<SeccionModel> secciones) {
-        return secciones.stream()
-                .map(SeccionModel::getTablas)
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
+    private void logResultadosCarga(List<SeccionModel> secciones) {
+        log.debug("🎉 CARGA COMPLETADA - Resumen:");
 
-    /**
-     * Asigna los campos cargados a sus grupos correspondientes.
-     * Utiliza un mapa para búsqueda eficiente por ID.
-     */
-    private void asignarCamposAGrupos(List<SeccionModel> secciones, List<GrupoCamposModel> gruposConCampos) {
-        if (gruposConCampos.isEmpty()) {
-            log.debug("No hay grupos con campos para asignar");
-            return;
-        }
-
-        Map<Long, GrupoCamposModel> gruposMap = crearMapaGrupos(secciones);
-
-        int camposAsignados = 0;
-        for (GrupoCamposModel grupoConCampos : gruposConCampos) {
-            GrupoCamposModel grupoOriginal = gruposMap.get(grupoConCampos.getId());
-            if (grupoOriginal != null && grupoConCampos.getCampos() != null) {
-                grupoOriginal.getCampos().addAll(grupoConCampos.getCampos());
-                camposAsignados += grupoConCampos.getCampos().size();
-            }
-        }
-
-        log.debug("Asignados {} campos a {} grupos", camposAsignados, gruposConCampos.size());
-    }
-
-    /**
-     * Crea un mapa de grupos indexados por ID para búsqueda eficiente.
-     * Limpia los campos existentes de cada grupo.
-     */
-    private Map<Long, GrupoCamposModel> crearMapaGrupos(List<SeccionModel> secciones) {
-        Map<Long, GrupoCamposModel> gruposMap = new HashMap<>();
+        int totalCamposSimples = 0;
+        int totalGrupos = 0;
+        int totalCamposEnGrupos = 0;
+        int totalTablas = 0;
 
         for (SeccionModel seccion : secciones) {
+            log.debug("📄 Sección {}: '{}'", seccion.getIdSeccion(), seccion.getTitulo());
+
+            // Campos simples
+            if (seccion.getCamposSimples() != null) {
+                totalCamposSimples += seccion.getCamposSimples().size();
+                log.debug("   📝 Campos simples: {}", seccion.getCamposSimples().size());
+            }
+
+            // Grupos con campos
             if (seccion.getGruposCampos() != null) {
+                totalGrupos += seccion.getGruposCampos().size();
+                log.debug("   📦 Grupos: {}", seccion.getGruposCampos().size());
+
                 for (GrupoCamposModel grupo : seccion.getGruposCampos()) {
-                    gruposMap.put(grupo.getId(), grupo);
-                    grupo.getCampos().clear();
+                    if (grupo.getCampos() != null) {
+                        totalCamposEnGrupos += grupo.getCampos().size();
+                        log.debug("      👉 Grupo {}: '{}' - {} campos", grupo.getId(), grupo.getSubtitulo(), grupo.getCampos().size());
+                    }
                 }
+            }
+
+            // Tablas
+            if (seccion.getTablas() != null) {
+                totalTablas += seccion.getTablas().size();
+                log.debug("   📊 Tablas: {}", seccion.getTablas().size());
             }
         }
 
-        log.debug("Creado mapa con {} grupos", gruposMap.size());
-        return gruposMap;
+        log.debug("📊 TOTALES - Secciones: {}, Campos simples: {}, Grupos: {}, Campos en grupos: {}, Tablas: {}", secciones.size(), totalCamposSimples, totalGrupos, totalCamposEnGrupos, totalTablas);
     }
 
-    /**
-     * Inicializa todas las relaciones lazy de las secciones para evitar
-     * LazyInitializationException fuera del contexto transaccional.
-     */
-    private void inicializarRelaciones(List<SeccionModel> secciones) {
-        log.debug("Inicializando relaciones lazy de {} secciones", secciones.size());
-        for (SeccionModel seccion : secciones) {
-            inicializarCamposSimples(seccion);
-            inicializarGruposCampos(seccion);
-            inicializarTablas(seccion);
-        }
-    }
 
-    private void inicializarCamposSimples(SeccionModel seccion) {
-        if (seccion.getCamposSimples() != null) {
-            Hibernate.initialize(seccion.getCamposSimples());
-        }
-    }
-
-    private void inicializarGruposCampos(SeccionModel seccion) {
-        if (seccion.getGruposCampos() != null) {
-            Hibernate.initialize(seccion.getGruposCampos());
-            for (GrupoCamposModel grupo : seccion.getGruposCampos()) {
-                if (grupo.getCampos() != null) {
-                    Hibernate.initialize(grupo.getCampos());
-                }
-            }
-        }
-    }
-
-    private void inicializarTablas(SeccionModel seccion) {
-        if (seccion.getTablas() != null) {
-            Hibernate.initialize(seccion.getTablas());
-            seccion.getTablas().forEach(tabla -> {
-                if (tabla.getColumnas() != null) Hibernate.initialize(tabla.getColumnas());
-                if (tabla.getFilas() != null) Hibernate.initialize(tabla.getFilas());
-            });
-        }
-    }
-
-    /**
-     * Obtiene todas las secciones de una versión de receta como DTOs completos.
-     *
-     * @param codigoVersion Código de la versión de receta
-     * @return Lista de DTOs de secciones ordenadas por orden
-     * @throws IllegalArgumentException     si el código es nulo o vacío
-     * @throws RecursoNoEncontradoException si la versión no existe
-     */
     @Transactional(readOnly = true)
     public List<SeccionResponseDTO> obtenerSeccionesDTOCompletasPorVersion(String codigoVersion) {
         if (codigoVersion == null || codigoVersion.trim().isEmpty()) {
@@ -423,39 +361,11 @@ public class SeccionService {
         VersionRecetaModel versionReceta = versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
         List<SeccionModel> seccionesCompletas = obtenerSeccionesCompletasPorVersion(versionReceta);
 
-        verificarEstadoGruposAntesMapeo(seccionesCompletas);
-
         List<SeccionResponseDTO> seccionesDTO = seccionMapper.toResponseDTOList(seccionesCompletas);
 
         log.info("Obtenidas {} secciones DTO para versión {}", seccionesDTO.size(), codigoVersion);
-        return ordenarSeccionesPorOrden(seccionesDTO);
-    }
 
-    /**
-     * Verifica y registra el estado de los grupos antes del mapeo a DTO.
-     * Útil para debugging y validación.
-     */
-    private void verificarEstadoGruposAntesMapeo(List<SeccionModel> secciones) {
-        if (log.isDebugEnabled()) {
-            for (SeccionModel seccion : secciones) {
-                log.debug("Sección {} - {}", seccion.getIdSeccion(), seccion.getTitulo());
-                if (seccion.getGruposCampos() != null) {
-                    for (GrupoCamposModel grupo : seccion.getGruposCampos()) {
-                        log.debug("   Grupo {} - Campos: {}",
-                                grupo.getId(),
-                                grupo.getCampos() != null ? grupo.getCampos().size() : "NULL");
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Ordena las secciones por su campo orden de forma ascendente.
-     */
-    private List<SeccionResponseDTO> ordenarSeccionesPorOrden(List<SeccionResponseDTO> seccionesDTO) {
-        return seccionesDTO.stream()
-                .sorted(Comparator.comparingInt(SeccionResponseDTO::orden))
-                .collect(Collectors.toList());
+        // Ordenar por orden
+        return seccionesDTO.stream().sorted(Comparator.comparingInt(SeccionResponseDTO::orden)).collect(Collectors.toList());
     }
 }

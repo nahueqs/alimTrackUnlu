@@ -47,7 +47,10 @@ public class VersionRecetaControllerTest {
                 "Version1 ",
                 "Descripción primera version",
                 "Usuario1",
-                fechaFija
+                fechaFija,
+                10,
+                10,
+                10
         );
 
         version2 = new VersionRecetaMetadataResponseDTO(
@@ -57,7 +60,10 @@ public class VersionRecetaControllerTest {
                 "Nombre segunda versión",
                 "Descripción segunda versión",
                 "Usuario1",
-                fechaFija
+                fechaFija,
+                10,
+                10,
+                10
         );
     }
 
@@ -144,7 +150,10 @@ public class VersionRecetaControllerTest {
                 "Nombre primera versión actualizada",
                 "Descripción primera versión actualizada",
                 "Usuario1",
-                fechaFija
+                fechaFija,
+                10,
+                10,
+                10
         );
 
         when(versionRecetaMetadataService.updateVersionReceta(codigoPrimeraVersion, modifyDTO))

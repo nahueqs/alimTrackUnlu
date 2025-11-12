@@ -2,7 +2,6 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
 import com.unlu.alimtrack.services.VersionRecetaEstructuraService;
@@ -79,19 +78,13 @@ public class VersionRecetaController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/recetas/{codigoReceta}/versiones/{codigoVersion}/secciones")
-    public ResponseEntity<List<SeccionResponseDTO>> getAllSeccionesByVersionReceta(@PathVariable String codigoVersion) {
-        log.debug("Obteniendo todas las estructura para la versión de receta con código: {}", codigoVersion);
-        List<SeccionResponseDTO> secciones = versionRecetaMetadataService.findAllSeccionesByVersionReceta(codigoVersion);
-        log.debug("Retornando {} estructura para la versión de receta: {}", secciones.size(), codigoVersion);
-        return ResponseEntity.ok(secciones);
-    }
-
-    @GetMapping("/{codigoVersion}/estructura-completa")
+    @GetMapping("/recetas/versiones/{codigoVersion}/estructura-completa")
     public ResponseEntity<VersionRecetaCompletaResponseDTO> obtenerEstructuraCompleta(
             @PathVariable String codigoVersion) {
-
+        log.debug("Obteniendo todas las estructura para la versión de receta con código: {}", codigoVersion);
         VersionRecetaCompletaResponseDTO estructura = versionEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
+        log.debug("Retornando {} estructura para la versión de receta: {}", estructura.versionRecetaMetadata().codigoVersionReceta(), codigoVersion);
+
         return ResponseEntity.ok(estructura);
     }
 

@@ -2,9 +2,9 @@ package com.unlu.alimtrack.DTOS.response.VersionReceta;
 
 public record ColumnaTablaResponseDTO(
 
-        String id,
+        Long id,
 
-        String idTabla,
+        Long idTabla,
 
         String nombre,
 

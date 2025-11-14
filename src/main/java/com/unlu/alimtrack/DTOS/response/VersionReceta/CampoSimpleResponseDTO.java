@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record CampoSimpleResponseDTO(
         @NotNull
         Long id,
+
         @NotNull
         Long idSeccion,
 

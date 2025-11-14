@@ -5,44 +5,56 @@ import com.unlu.alimtrack.DTOS.response.VersionReceta.FilaTablaResponseDTO;
 import com.unlu.alimtrack.models.FilaTablaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper para convertir entre FilaTablaModel y sus DTOs.
- */
 @Mapper(componentModel = "spring")
 public interface FilaTablaMapper {
 
-    /**
-     * Convierte un DTO de creación a modelo de entidad.
-     * La relación 'tabla' debe ser asignada manualmente en el servicio.
-     *
-     * @param dto DTO con los datos para crear la fila
-     * @return Modelo de fila (sin tabla asignada)
-     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tabla", ignore = true)
-    // Se asigna en el servicio
     FilaTablaModel toModel(FilaTablaCreateDTO dto);
 
     /**
-     * Convierte el modelo de fila a DTO de respuesta.
-     *
-     * @param model Modelo de fila
-     * @return DTO de respuesta
+     * ✅ CORREGIDO: Método manual para asegurar que idTabla se asigne correctamente
      */
-    @Mapping(target = "idTabla", source = "tabla.id")
-    FilaTablaResponseDTO toResponseDTO(FilaTablaModel model);
+    default FilaTablaResponseDTO toResponseDTO(FilaTablaModel model) {
+        if (model == null) {
+            return null;
+        }
 
-    /**
-     * Convierte una lista de modelos de filas a DTOs de respuesta.
-     *
-     * @param models Lista de modelos de filas
-     * @return Lista de DTOs de respuesta
-     */
+        Long idTabla = model.getTabla() != null ? model.getTabla().getId() : null;
+
+        System.out.println("🎯 FilaTablaMapper.toResponseDTO - Fila " + model.getId() +
+                ": idTabla = " + idTabla + ", tabla objeto = " + model.getTabla());
+
+        return new FilaTablaResponseDTO(
+                model.getId(),
+                idTabla,
+                model.getNombre(),
+                model.getOrden()
+        );
+    }
+
+    @Named("mapFilaManual")
+    default FilaTablaResponseDTO mapFilaManual(FilaTablaModel model) {
+        System.out.println("🎯🎯🎯 FilaTablaMapper.mapFilaManual EJECUTADO - Fila " + model.getId());
+
+        Long idTabla = model.getTabla() != null ? model.getTabla().getId() : null;
+
+        System.out.println("🎯🎯🎯 Fila " + model.getId() + ": idTabla = " + idTabla);
+
+        return new FilaTablaResponseDTO(
+                model.getId(),
+                idTabla,
+                model.getNombre(),
+                model.getOrden()
+        );
+    }
+
     default List<FilaTablaResponseDTO> toResponseDTOList(List<FilaTablaModel> models) {
         if (models == null || models.isEmpty()) {
             return List.of();

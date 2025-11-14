@@ -14,65 +14,75 @@ import java.util.List;
 @Repository
 public interface SeccionRepository extends JpaRepository<SeccionModel, Long> {
 
-
-    @Query("SELECT DISTINCT s FROM SeccionModel s " +
-            "LEFT JOIN FETCH s.gruposCampos g " +
-            "LEFT JOIN FETCH g.campos c " +
-            "LEFT JOIN FETCH s.camposSimples cs " +
-            "LEFT JOIN FETCH s.tablas t " +
-            "LEFT JOIN FETCH t.columnas " +
-            "LEFT JOIN FETCH t.filas " +
-            "WHERE s.versionRecetaPadre = :versionRecetaPadre " +
-            "ORDER BY s.orden, g.orden, c.orden")
-    List<SeccionModel> findByVersionRecetaPadreCompleto(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
-
-    // ✅ CONSULTA OPTIMIZADA para grupos con campos
-    @Query("SELECT DISTINCT s FROM SeccionModel s " +
-            "LEFT JOIN FETCH s.gruposCampos g " +
-            "LEFT JOIN FETCH g.campos " +
-            "WHERE s.versionRecetaPadre = :versionRecetaPadre " +
-            "ORDER BY s.orden, g.orden")
-    List<SeccionModel> findByVersionRecetaPadreWithGruposAndCampos(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
-
-
-    // ✅ Cargar columnas de tablas POR SEPARADO (evitar multiple bag)
-    @Query("SELECT DISTINCT t FROM TablaModel t LEFT JOIN FETCH t.columnas WHERE t IN :tablas")
-    List<TablaModel> findTablasWithColumnas(@Param("tablas") List<TablaModel> tablas);
-
-
-    // ✅ Cargar filas de tablas POR SEPARADO (evitar multiple bag)
-    @Query("SELECT DISTINCT t FROM TablaModel t LEFT JOIN FETCH t.filas WHERE t IN :tablas")
-    List<TablaModel> findTablasWithFilas(@Param("tablas") List<TablaModel> tablas);
-
     /**
-     * Verifica si existe una sección con un título específico en una versión de receta
+     * ✅ SOLUCIÓN PROFESIONAL - Consultas completamente separadas por nivel
+     * Evita todos los MultipleBagFetchException
      */
-    @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.recetaPadre.codigoReceta = :versionReceta")
-    boolean existsByCodigoVersionRecetaPadreAndTitulo(String codigoVersion, String titulo);
 
+    // ========== NIVEL 1: SECCIONES ==========
+    @Query("SELECT s FROM SeccionModel s " +
+            "WHERE s.versionRecetaPadre = :version " +
+            "ORDER BY s.orden")
+    List<SeccionModel> findSeccionesBasicas(@Param("version") VersionRecetaModel version);
 
-    @Query(value = "SELECT v FROM VersionRecetaModel v WHERE v.recetaPadre.codigoReceta = :codigoVersion")
-    boolean existsByCodigoVersionRecetaPadreAndOrden(String codigoVersion, Integer orden);
+    // ========== NIVEL 2: COLECCIONES DIRECTAS DE SECCIÓN ==========
 
+    @Query("SELECT DISTINCT s FROM SeccionModel s " +
+            "LEFT JOIN FETCH s.camposSimples cs " +
+            "WHERE s IN :secciones " +
+            "ORDER BY s.orden")
+    List<SeccionModel> findSeccionesConCamposSimples(@Param("secciones") List<SeccionModel> secciones);
 
-    //--------------------------
-    // ✅ Consulta básica - solo secciones
-    @Query("SELECT s FROM SeccionModel s WHERE s.versionRecetaPadre = :versionRecetaPadre ORDER BY s.orden")
-    List<SeccionModel> findByVersionRecetaPadre(@Param("versionRecetaPadre") VersionRecetaModel versionRecetaPadre);
+    @Query("SELECT DISTINCT s FROM SeccionModel s " +
+            "LEFT JOIN FETCH s.gruposCampos g " +
+            "WHERE s IN :secciones " +
+            "ORDER BY s.orden")
+    List<SeccionModel> findSeccionesConGrupos(@Param("secciones") List<SeccionModel> secciones);
 
-    // ✅ Cargar campos simples por separado
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.camposSimples WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithCamposSimples(@Param("secciones") List<SeccionModel> secciones);
+    @Query("SELECT DISTINCT s FROM SeccionModel s " +
+            "LEFT JOIN FETCH s.tablas t " +
+            "WHERE s IN :secciones " +
+            "ORDER BY s.orden")
+    List<SeccionModel> findSeccionesConTablas(@Param("secciones") List<SeccionModel> secciones);
 
-    // ✅ Cargar grupos por separado (SIN CAMPOS)
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.gruposCampos WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithGruposCampos(@Param("secciones") List<SeccionModel> secciones);
+    // ========== NIVEL 3: COLECCIONES ANIDADAS (DESDE SUS PROPIAS ENTIDADES) ==========
 
-    // ✅ Cargar tablas por separado
-    @Query("SELECT s FROM SeccionModel s LEFT JOIN FETCH s.tablas WHERE s IN :secciones ORDER BY s.orden")
-    List<SeccionModel> findWithTablas(@Param("secciones") List<SeccionModel> secciones);
-
-    // ✅ Cargar campos dentro de grupos (CONSULTA CLAVE)
-    @Query("SELECT DISTINCT gc FROM GrupoCamposModel gc LEFT JOIN FETCH gc.campos WHERE gc.seccion.idSeccion IN :idsSecciones ORDER BY gc.orden")
+    // Cargar campos dentro de grupos (desde GrupoCamposModel)
+    @Query("SELECT DISTINCT gc FROM GrupoCamposModel gc " +
+            "LEFT JOIN FETCH gc.campos c " +
+            "WHERE gc.seccion.idSeccion IN :idsSecciones " +
+            "ORDER BY gc.orden")
     List<GrupoCamposModel> findGruposWithCamposBySeccionIds(@Param("idsSecciones") List<Long> idsSecciones);
+
+    // Cargar columnas de tablas (desde TablaModel)
+    @Query("SELECT DISTINCT t FROM TablaModel t " +
+            "LEFT JOIN FETCH t.columnas col " +
+            "WHERE t.seccion.idSeccion IN :idsSecciones " +
+            "ORDER BY t.orden")
+    List<TablaModel> findTablasWithColumnasBySeccionIds(@Param("idsSecciones") List<Long> idsSecciones);
+
+    // Cargar filas de tablas (desde TablaModel)
+    @Query("SELECT DISTINCT t FROM TablaModel t " +
+            "LEFT JOIN FETCH t.filas f " +
+            "WHERE t.seccion.idSeccion IN :idsSecciones " +
+            "ORDER BY t.orden")
+    List<TablaModel> findTablasWithFilasBySeccionIds(@Param("idsSecciones") List<Long> idsSecciones);
+
+    // ========== VALIDACIONES ==========
+
+    @Query("SELECT COUNT(s) > 0 FROM SeccionModel s " +
+            "WHERE s.versionRecetaPadre.codigoVersionReceta = :codigoVersion " +
+            "AND s.titulo = :titulo")
+    boolean existsByCodigoVersionRecetaPadreAndTitulo(
+            @Param("codigoVersion") String codigoVersion,
+            @Param("titulo") String titulo
+    );
+
+    @Query("SELECT COUNT(s) > 0 FROM SeccionModel s " +
+            "WHERE s.versionRecetaPadre.codigoVersionReceta = :codigoVersion " +
+            "AND s.orden = :orden")
+    boolean existsByCodigoVersionRecetaPadreAndOrden(
+            @Param("codigoVersion") String codigoVersion,
+            @Param("orden") Integer orden
+    );
 }

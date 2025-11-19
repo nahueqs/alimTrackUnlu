@@ -8,7 +8,6 @@ import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.ColumnaTablaRepository;
 import com.unlu.alimtrack.repositories.FilaTablaRepository;
 import com.unlu.alimtrack.repositories.SeccionRepository;
-import com.unlu.alimtrack.repositories.TablaRepository;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.SeccionValidator;
@@ -36,10 +35,10 @@ public class SeccionService {
     private static final String ERROR_USUARIO_NO_ENCONTRADO = "Usuario no encontrado con el username: %s";
     private static final String ERROR_CODIGO_VERSION_INVALIDO = "El código de versión no puede ser nulo o vacío";
 
+
     private final VersionRecetaMetadataService versionRecetaMetadataService;
     private final VersionRecetaQueryService versionRecetaQueryService;
     private final UsuarioQueryService usuarioQueryService;
-    private final TablaRepository tablaRepository;
     private final ColumnaTablaRepository columnaTablaRepository;
     private final FilaTablaRepository filaTablaRepository;
 
@@ -47,34 +46,29 @@ public class SeccionService {
     private final SeccionRepository seccionRepository;
     private final SeccionValidator seccionValidator;
 
-    private final SeccionMapper seccionMapper;
-    private final CampoSimpleMapper campoSimpleMapper;
-    private final GrupoCamposMapper grupoCamposMapper;
-    private final TablaMapper tablaMapper;
+    private final TablaMapperManual tablaMapper;
+    private final SeccionMapperManual seccionMapperManual;
     private final ColumnaTablaMapper columnaTablaMapper;
     private final FilaTablaMapper filaTablaMapper;
+    private final CampoSimpleMapper campoSimpleMapper;
+    private final GrupoCamposMapper grupoCamposMapper;
 
-    public SeccionService(SeccionRepository seccionRepository, SeccionValidator seccionValidator,
-                          VersionRecetaQueryService versionRecetaQueryService, UsuarioQueryService usuarioQueryService, TablaRepository tablaRepository, ColumnaTablaRepository columnaTablaRepository, FilaTablaRepository filaTablaRepository,
-                          SeccionMapper seccionMapper, CampoSimpleMapper campoSimpleMapper,
-                          GrupoCamposMapper grupoCamposMapper, TablaMapper tablaMapper,
-                          @Lazy VersionRecetaMetadataService versionRecetaMetadataService,
-                          ColumnaTablaMapper columnaTablaMapper, FilaTablaMapper filaTablaMapper) {
-        this.seccionRepository = seccionRepository;
-        this.seccionValidator = seccionValidator;
+    public SeccionService(@Lazy VersionRecetaMetadataService versionRecetaMetadataService, @Lazy VersionRecetaQueryService versionRecetaQueryService, UsuarioQueryService usuarioQueryService, ColumnaTablaRepository columnaTablaRepository, FilaTablaRepository filaTablaRepository, SeccionRepository seccionRepository, SeccionValidator seccionValidator, TablaMapperManual tablaMapper, SeccionMapperManual seccionMapperManual, ColumnaTablaMapper columnaTablaMapper, FilaTablaMapper filaTablaMapper, CampoSimpleMapper campoSimpleMapper, GrupoCamposMapper grupoCamposMapper) {
+        this.versionRecetaMetadataService = versionRecetaMetadataService;
         this.versionRecetaQueryService = versionRecetaQueryService;
         this.usuarioQueryService = usuarioQueryService;
-        this.tablaRepository = tablaRepository;
         this.columnaTablaRepository = columnaTablaRepository;
         this.filaTablaRepository = filaTablaRepository;
-        this.seccionMapper = seccionMapper;
-        this.campoSimpleMapper = campoSimpleMapper;
-        this.grupoCamposMapper = grupoCamposMapper;
+        this.seccionRepository = seccionRepository;
+        this.seccionValidator = seccionValidator;
         this.tablaMapper = tablaMapper;
-        this.versionRecetaMetadataService = versionRecetaMetadataService;
+        this.seccionMapperManual = seccionMapperManual;
         this.columnaTablaMapper = columnaTablaMapper;
         this.filaTablaMapper = filaTablaMapper;
+        this.campoSimpleMapper = campoSimpleMapper;
+        this.grupoCamposMapper = grupoCamposMapper;
     }
+
 
     /**
      * Crea una nueva sección para una versión de receta.
@@ -440,12 +434,38 @@ public class SeccionService {
 
         VersionRecetaModel versionReceta = versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
         List<SeccionModel> seccionesCompletas = obtenerSeccionesCompletasPorVersion(versionReceta);
-        List<SeccionResponseDTO> seccionesDTO = seccionMapper.toResponseDTOList(seccionesCompletas);
+
+        // ✅ Usar SOLO el mapper manual
+        List<SeccionResponseDTO> seccionesDTO = seccionMapperManual.toResponseDTOList(seccionesCompletas);
 
         log.info("Obtenidas {} secciones DTO para versión {}", seccionesDTO.size(), codigoVersion);
 
-        return seccionesDTO.stream()
-                .sorted(Comparator.comparingInt(SeccionResponseDTO::orden))
-                .collect(Collectors.toList());
+        return seccionesDTO;
+    }
+
+    public Integer getCantidadCampos(List<SeccionResponseDTO> secciones) {
+        return secciones.stream()
+                .mapToInt(seccion -> {
+                    int camposSimples = seccion.camposSimples().size();
+
+                    int camposEnGrupos = seccion.gruposCampos().stream()
+                            .mapToInt(grupo -> grupo.campos().size())
+                            .sum();
+
+                    return camposSimples + camposEnGrupos;
+                })
+                .sum();
+    }
+
+    public Integer getCantidadTablas(List<SeccionResponseDTO> secciones) {
+        return secciones.stream().mapToInt(seccion -> seccion.tablas().size()).sum();
+
+    }
+
+    public Integer getCantidadCeldasTablas(List<SeccionResponseDTO> secciones) {
+        return secciones.stream()
+                .flatMap(seccion -> seccion.tablas().stream())
+                .mapToInt(tabla -> tabla.filas().size() * tabla.columnas().size())
+                .sum();
     }
 }

@@ -1,11 +1,12 @@
 package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.EstadoActualProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.RespuestaCampoResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.queries.ProduccionQueryServiceImpl;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class ProduccionController {
     private final ProduccionManagementService produccionManagementService;
 
     @GetMapping
-    public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(ProduccionFilterRequestDTO filtros) {
+    public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(@ModelAttribute ProduccionFilterRequestDTO filtros) {
 
         log.info("Solicitud de búsqueda de producciones recibida: {}", filtros);
 
@@ -46,13 +47,12 @@ public class ProduccionController {
         return ResponseEntity.ok(produccionService.findByCodigoProduccion(codigoProduccion));
     }
 
-    @PostMapping("/{codigoProduccion}")
-    public ResponseEntity<ProduccionResponseDTO> saveProduccion(@PathVariable String codigoProduccion,
-                                                                @Valid @RequestBody ProduccionCreateDTO createDTO) {
+    @PostMapping()
+    public ResponseEntity<ProduccionResponseDTO> iniciarProduccion(@Valid @RequestBody ProduccionCreateDTO createDTO) {
 
-        log.debug("Solicitando crear producción con el código: {}, y la requestBody, {}", codigoProduccion, createDTO);
+        log.debug("Solicitando crear producción con el código: {}, y la requestBody", createDTO);
 
-        ProduccionResponseDTO created = produccionManagementService.saveProduccion(codigoProduccion, createDTO);
+        ProduccionResponseDTO created = produccionManagementService.iniciarProduccion(createDTO);
 
         log.debug("Retornando producción: {}", created);
         return ResponseEntity.created(URI.create("/api/v1/producciones/" + created.codigoProduccion())).body(created);
@@ -83,6 +83,16 @@ public class ProduccionController {
 
         log.debug("Retornando estado actual para: {}", codigoProduccion);
         return ResponseEntity.ok(estado);
+    }
+
+    @PutMapping("/{codigoProduccion}/cambiar-estado")
+    public ResponseEntity<ProduccionCambioEstadoRequestDTO> cambiarEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
+        log.debug("Solicitando cambio de estado a {}, para la produccion  {}", request.valor(), codigoProduccion);
+
+        ProduccionCambioEstadoRequestDTO updated = produccionManagementService.updateEstado(codigoProduccion, request);
+        log.debug("Estado actualizado exitosamente: {}", updated);
+        return ResponseEntity.ok(updated);
+
     }
 
 

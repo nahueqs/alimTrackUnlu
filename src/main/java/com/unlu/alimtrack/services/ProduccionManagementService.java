@@ -6,16 +6,21 @@ import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.EstadoActualProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.respuestas.ProgresoProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.produccion.respuestas.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
+import com.unlu.alimtrack.enums.TipoEstadoProduccion;
+import com.unlu.alimtrack.exceptions.CambioEstadoProduccionInvalido;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.mappers.RespuestaCampoMapper;
 import com.unlu.alimtrack.models.CampoSimpleModel;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.RespuestaCampoModel;
+import com.unlu.alimtrack.models.RespuestaTablaModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaCampoRepository;
+import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.services.validators.ProductionManagerServiceValidator;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import com.unlu.alimtrack.services.validators.inputs.InputValidator;
@@ -42,32 +47,80 @@ public class ProduccionManagementService {
     private final VersionRecetaMetadataService versionRecetaMetadataService;
     private final InputValidator inputValidator;
     private final RespuestaCampoRepository respuestaCampoRepository;
+    private final RespuestaTablaRepository respuestaTablaRepository;
     private final AutoSaveService autoSaveService;
     private final VersionRecetaEstructuraService versionRecetaEstructuraService;
 
 
-    public ProduccionCambioEstadoRequestDTO updateEstado(Long productionId,
-                                                         ProduccionCambioEstadoRequestDTO nuevoEstado) {
+    public ProduccionCambioEstadoRequestDTO updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstado) {
         // Validar transiciones de estado válidas
-        // Ej: No se puede cancelar una producción completada
+        log.debug("Validando transición de estado para producción: {}", codigoProduccion);
+        validarCambioEstado(codigoProduccion, nuevoEstado);
+        log.debug("Transición de estado válida para producción: {}", codigoProduccion);
+
+        ProduccionModel produccion = produccionRepository.findByCodigoProduccion(codigoProduccion);
+        if (produccion == null) {
+            throw new RecursoNoEncontradoException("Produccion no encontrada con el codigo " + codigoProduccion);
+        }
+
+        produccion.setEstado(TipoEstadoProduccion.valueOf(nuevoEstado.valor()));
+        produccion.setFechaFin(LocalDateTime.now());
+        log.debug("Produccion actualizada: {}", produccion);
+        autoSaveService.ejecutarAutoSaveInmediato(produccion.getProduccion());
+        produccionRepository.save(produccion);
         return null;
     }
 
-    public ProduccionResponseDTO saveProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
+    private void validarCambioEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstado) {
+
+        ProduccionModel produccion = produccionRepository.findByCodigoProduccion(codigoProduccion);
+        if (produccion == null) {
+            throw new RecursoNoEncontradoException("Produccion no encontrada con el codigo " + codigoProduccion);
+        }
+
+        switch (nuevoEstado.valor()) {
+            case "EN_PROCESO": {
+                if (produccion.getEstado().equals(TipoEstadoProduccion.FINALIZADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a En proceso, ya que la producción se encuentra finalizada");
+                }
+                if (produccion.getEstado().equals(TipoEstadoProduccion.CANCELADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a En proceso, ya que la producción se encuentra cancelada");
+                }
+            }
+            case "FINALIZADA": {
+                if (produccion.getEstado().equals(TipoEstadoProduccion.FINALIZADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a FINALIZADA, la misma ya se encuentra finalizada.");
+                }
+                if (produccion.getEstado().equals(TipoEstadoProduccion.CANCELADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a FINALIZADA, la misma ya se encuentra cancelada.");
+                }
+            }
+            case "CANCELADO": {
+                if (produccion.getEstado().equals(TipoEstadoProduccion.FINALIZADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a cancelada, la misma se encuentra finalizada.");
+                }
+                if (produccion.getEstado().equals(TipoEstadoProduccion.CANCELADA)) {
+                    throw new CambioEstadoProduccionInvalido("No se puede cambiar el estado a cancelada, la misma ya se encuentra cancelada.");
+                }
+            }
+        }
+    }
+
+    public ProduccionResponseDTO iniciarProduccion(ProduccionCreateDTO createDTO) {
 
         // verifico la que el cuerpo del dto coincida con la url de la peticion
         // verifico que no exista una produccion con el mismo codigo verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
         // verifico que exista el usuario creador
         // verifico que la version padre exista
-        productionManagerServiceValidator.verificarCreacionProduccion(codigoProduccion, createDTO);
+        log.debug("Intentando crear produccion con el código: {}, el username: {}, y la requestBody, {}", createDTO.codigoProduccion(), createDTO.usernameCreador(), createDTO);
+        productionManagerServiceValidator.verificarCreacionProduccion(createDTO);
         ProduccionModel modelFinal = produccionMapper.createDTOtoModel(createDTO);
         produccionRepository.save(modelFinal);
         return produccionMapper.modelToResponseDTO(modelFinal);
     }
 
     @Transactional
-    public RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo,
-                                                           RespuestaCampoRequestDTO request) {
+    public RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo, RespuestaCampoRequestDTO request) {
         log.debug("Guardando respuesta para campo: {}, producción: {}", idCampo, codigoProduccion);
 
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
@@ -95,12 +148,9 @@ public class ProduccionManagementService {
         }
     }
 
-    private RespuestaCampoModel guardarOActualizarRespuesta(ProduccionModel produccion,
-                                                            CampoSimpleModel campo,
-                                                            RespuestaCampoRequestDTO request) {
+    private RespuestaCampoModel guardarOActualizarRespuesta(ProduccionModel produccion, CampoSimpleModel campo, RespuestaCampoRequestDTO request) {
 
-        RespuestaCampoModel respuestaExistente = respuestaCampoRepository
-                .findByIdProduccionAndIdCampo(produccion, campo);
+        RespuestaCampoModel respuestaExistente = respuestaCampoRepository.findByIdProduccionAndIdCampo(produccion, campo);
 
         if (respuestaExistente != null) {
             // UPDATE
@@ -130,27 +180,28 @@ public class ProduccionManagementService {
 
         // 2. Obtener estructura COMPLETA desde la versión de receta
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
-        VersionRecetaCompletaResponseDTO estructura = versionRecetaEstructuraService
-                .getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
+        VersionRecetaCompletaResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
 
         // 3. Obtener respuestas de campos
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findByIdProduccion(produccion);
-        Map<Long, String> respuestasCamposMap = respuestasCampos.stream()
-                .collect(Collectors.toMap(
-                        r -> r.getIdCampo().getId(),
-                        RespuestaCampoModel::getValor
-                ));
+        Map<Long, String> respuestasCamposMap = respuestasCampos.stream().collect(Collectors.toMap(r -> r.getIdCampo().getId(), RespuestaCampoModel::getValor));
+
+        // 3. Obtener respuestas de tablas
+        List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findByIdProduccion(produccion);
+        Map<String, Map<String, String>> respuestasTablasMap = respuestasTablas.stream().collect(Collectors.groupingBy(rt -> rt.getIdColumna().getId().toString(), // tablaId como String
+                Collectors.toMap(rt -> rt.getIdFila().getId() + "_" + rt.getIdColumna().getId(), // "fila_columna"
+                        RespuestaTablaModel::getValor, (existing, replacement) -> existing // Manejar duplicados
+                )));
 
         // 4. Calcular progreso
-        //ProgresoResponseDTO progreso = calcularProgreso(estructura, respuestasCamposMap);
+        ProgresoProduccionResponseDTO progreso = calcularProgreso(estructura, respuestasCamposMap, respuestasTablasMap);
 
-        return new EstadoActualProduccionResponseDTO(
-                produccionMapper.modelToResponseDTO(produccion),
-                estructura,
-                respuestasCamposMap,
-                //  new HashMap<>(), // respuestasTablas placeholder
-                //   progreso,
-                LocalDateTime.now()
-        );
+        return new EstadoActualProduccionResponseDTO(produccionMapper.modelToResponseDTO(produccion), estructura, respuestasCamposMap, respuestasTablasMap, progreso, LocalDateTime.now());
+    }
+
+    private ProgresoProduccionResponseDTO calcularProgreso(VersionRecetaCompletaResponseDTO estructura, Map<Long, String> respuestasCamposMap, Map<String, Map<String, String>> respuestasTablasMap) {
+
+
+        return null;
     }
 }

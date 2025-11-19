@@ -1,5 +1,7 @@
 package com.unlu.alimtrack.DTOS.modify;
 
-public record ProduccionCambioEstadoRequestDTO() {
+public record ProduccionCambioEstadoRequestDTO(
 
+        String valor
+) {
 }

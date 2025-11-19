@@ -23,13 +23,8 @@ public record VersionRecetaMetadataResponseDTO(
         String creadaPor,
 
         @NotNull
-        LocalDateTime fechaCreacion,
+        LocalDateTime fechaCreacion
 
-        Integer totalSecciones,
-
-        Integer totalCampos,
-
-        Integer totalTablas
 
 ) {
 

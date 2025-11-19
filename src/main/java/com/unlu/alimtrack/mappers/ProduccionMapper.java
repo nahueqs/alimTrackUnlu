@@ -32,7 +32,7 @@ public abstract class ProduccionMapper {
 
     public abstract List<ProduccionResponseDTO> modelListToResponseDTOList(List<ProduccionModel> modelList);
 
-    @Mapping(target = "usuarioCreador", source = "usernameCreador", qualifiedByName = "usernameToUsuarioModel")
+    @Mapping(target = "usuarioCreador", source = "usernameCreador", qualifiedByName = "usernameEmailToModel")
     @Mapping(target = "produccion", ignore = true)
     @Mapping(target = "versionReceta", source = "codigoVersionReceta", qualifiedByName = "codigoVersionToVersionModel")
     @Mapping(target = "fechaInicio", expression = "java(java.time.LocalDateTime.now())")
@@ -43,6 +43,11 @@ public abstract class ProduccionMapper {
     @Named("usernameToUsuarioModel")
     protected UsuarioModel usernameToUsuarioModel(String username) {
         return usuarioService.getUsuarioModelByUsername(username);
+    }
+
+    @Named("usernameEmailToModel")
+    protected UsuarioModel usernameEmailToModel(String email) {
+        return usuarioService.getUsuarioModelByEmail(email);
     }
 
     @Named("codigoVersionToVersionModel")

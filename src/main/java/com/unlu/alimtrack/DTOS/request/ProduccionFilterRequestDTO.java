@@ -20,7 +20,7 @@ import java.time.LocalDate;
  */
 @Schema(description = "Filtros para búsqueda de producciones")
 public record ProduccionFilterRequestDTO(
-
+        
         @Schema(description = "Código de versión de receta para filtrar", example = "REC-V1-2024")
         @Size(max = 50, message = "El código de versión no puede exceder 50 caracteres")
         String codigoVersionReceta,

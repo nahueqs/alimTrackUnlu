@@ -26,13 +26,22 @@ public class VersionRecetaEstructuraService {
         VersionRecetaModel versionReceta = versionRecetaRepository.findByCodigoVersionReceta(codigoVersion);
         log.debug("Version encontrada");
         List<SeccionResponseDTO> secciones = seccionService.obtenerSeccionesDTOCompletasPorVersion(codigoVersion);
+        Integer cantCampos = seccionService.getCantidadCampos(secciones);
+        Integer cantTablas = seccionService.getCantidadTablas(secciones);
+        Integer cantCeldasTablas = seccionService.getCantidadCeldasTablas(secciones);
 
         return new VersionRecetaCompletaResponseDTO(
                 true,
                 versionReceta.getCodigoVersionReceta(),
                 versionRecetaMetadataMapper.toVersionRecetaResponseDTO(versionReceta),
-                secciones
+                secciones,
+                secciones.size(),
+                cantCampos,
+                cantTablas,
+                cantCeldasTablas
+
         );
     }
+
 
 }

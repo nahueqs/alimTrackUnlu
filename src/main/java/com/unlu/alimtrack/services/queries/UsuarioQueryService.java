@@ -2,13 +2,17 @@ package com.unlu.alimtrack.services.queries;
 
 public interface UsuarioQueryService {
 
-  boolean usuarioPuedeSerEliminado(String username);
+    boolean usuarioPuedeSerEliminado(String username);
 
-  boolean usuarioTieneRecetasAsociadas(String username);
+    boolean usuarioTieneRecetasAsociadas(String username);
 
-  boolean usuarioTieneVersionesRecetasAsociadas(String username);
+    boolean usuarioTieneVersionesRecetasAsociadas(String username);
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  boolean estaActivoByUsername(String username);
+    boolean estaActivoByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    boolean estaActivoByEmail(String username);
 }

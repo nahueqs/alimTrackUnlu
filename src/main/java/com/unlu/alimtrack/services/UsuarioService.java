@@ -136,4 +136,10 @@ public class UsuarioService {
         UsuarioModel model = usuarioRepository.findByEmail(email).orElseThrow();
         return usuarioMapper.convertToResponseDTO(model);
     }
+
+    public UsuarioModel getUsuarioModelByEmail(String email) {
+        return usuarioRepository.findByEmail(email).orElseThrow(
+                () -> new RecursoNoEncontradoException("Usuario no encontrado con email" + email)
+        );
+    }
 }

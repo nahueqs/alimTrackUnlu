@@ -10,33 +10,46 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UsuarioQueryServiceImpl implements UsuarioQueryService {
 
-  private final UsuarioRepository usuarioRepository;
-  private final RecetaQueryService recetaQueryService;
-  private final VersionRecetaQueryService versionRecetaQueryService;
+    private final UsuarioRepository usuarioRepository;
+    private final RecetaQueryService recetaQueryService;
+    private final VersionRecetaQueryService versionRecetaQueryService;
 
-  @Override
-  public boolean usuarioPuedeSerEliminado(String username) {
-    return !usuarioTieneRecetasAsociadas(username) &&
-        !usuarioTieneVersionesRecetasAsociadas(username);
-  }
+    @Override
+    public boolean usuarioPuedeSerEliminado(String username) {
+        return !usuarioTieneRecetasAsociadas(username) &&
+                !usuarioTieneVersionesRecetasAsociadas(username);
+    }
 
-  @Override
-  public boolean usuarioTieneRecetasAsociadas(String username) {
-    return recetaQueryService.existsByCreadoPorUsername(username);
-  }
+    @Override
+    public boolean usuarioTieneRecetasAsociadas(String username) {
+        return recetaQueryService.existsByCreadoPorUsername(username);
+    }
 
-  @Override
-  public boolean usuarioTieneVersionesRecetasAsociadas(String username) {
-    return versionRecetaQueryService.existsByCreadaPorUsername(username);
-  }
+    @Override
+    public boolean usuarioTieneVersionesRecetasAsociadas(String username) {
+        return versionRecetaQueryService.existsByCreadaPorUsername(username);
+    }
 
-  @Override
-  public boolean existsByUsername(String username) {
-    return usuarioRepository.existsByUsername(username);
-  }
+    @Override
+    public boolean existsByUsername(String username) {
+        return usuarioRepository.existsByUsername(username);
+    }
 
-  @Override
-  public boolean estaActivoByUsername(String username) {
-    return usuarioRepository.findByUsername(username).get().getEstaActivo();
-  }
+    @Override
+    public boolean estaActivoByUsername(String username) {
+        return usuarioRepository.findByUsername(username).get().getEstaActivo();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean estaActivoByEmail(String email) {
+        if (!usuarioRepository.existsByEmail(email)) {
+            return false;
+        }
+        return usuarioRepository.findByEmail(email).get().getEstaActivo();
+    }
 }

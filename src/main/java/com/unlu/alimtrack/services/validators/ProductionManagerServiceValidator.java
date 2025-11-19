@@ -14,8 +14,10 @@ import com.unlu.alimtrack.services.queries.ProduccionQueryService;
 import com.unlu.alimtrack.services.queries.UsuarioQueryService;
 import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ProductionManagerServiceValidator {
@@ -42,11 +44,10 @@ public class ProductionManagerServiceValidator {
     }
 
 
-    public void verificarCreacionProduccion(String codigoProduccion, ProduccionCreateDTO createDTO) {
-        verificarIntegridadDatosCreacion(codigoProduccion, createDTO);
-        verificarCodigoProduccionNoExiste(codigoProduccion);
+    public void verificarCreacionProduccion(ProduccionCreateDTO createDTO) {
+        verificarCodigoProduccionNoExiste(createDTO.codigoProduccion());
         verificarVersionExiste(createDTO.codigoVersionReceta());
-        verificarUsuarioExisteYEstaActivo(createDTO.usernameCreador());
+        verificarUsuarioExisteYEstaActivoByEmail(createDTO.usernameCreador());
     }
 
     public void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
@@ -70,13 +71,16 @@ public class ProductionManagerServiceValidator {
         }
     }
 
-    public void verificarUsuarioExisteYEstaActivo(String username) {
-        if (!usuarioQueryService.existsByUsername(username)) {
-            throw new RecursoNoEncontradoException("Usuario no existe con id: " + username);
+    public void verificarUsuarioExisteYEstaActivoByEmail(String email) {
+        if (!usuarioQueryService.existsByEmail(email)) {
+            log.debug("Usuario no existe con email {}", email);
+            throw new RecursoNoEncontradoException("Usuario no existe con id: " + email);
         }
-        if (!usuarioQueryService.estaActivoByUsername(username)) {
+
+
+        if (!usuarioQueryService.estaActivoByEmail(email)) {
             throw new OperacionNoPermitida(
-                    "El usuario que intenta guardar la producción se encuentra inactivo. username: " + username);
+                    "El usuario que intenta guardar la producción se encuentra inactivo. username: " + email);
         }
     }
 

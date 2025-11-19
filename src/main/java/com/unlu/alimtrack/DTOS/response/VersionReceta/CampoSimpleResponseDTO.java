@@ -1,6 +1,5 @@
 package com.unlu.alimtrack.DTOS.response.VersionReceta;
 
-import com.unlu.alimtrack.enums.TipoDatoCampo;
 import jakarta.validation.constraints.NotNull;
 
 
@@ -17,7 +16,7 @@ public record CampoSimpleResponseDTO(
         String nombre,
 
         @NotNull
-        TipoDatoCampo tipoDato,
+        String tipoDato,
 
         @NotNull
         Integer orden

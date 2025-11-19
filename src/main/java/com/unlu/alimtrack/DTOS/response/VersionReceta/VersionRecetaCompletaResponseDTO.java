@@ -5,11 +5,20 @@ import java.util.List;
 public record VersionRecetaCompletaResponseDTO(
 
         Boolean success,
+
         String message,
+
         VersionRecetaMetadataResponseDTO versionRecetaMetadata,
-        List<SeccionResponseDTO> estructura
+
+        List<SeccionResponseDTO> estructura,
+
+        Integer totalSecciones,
+
+        Integer totalCampos,
+
+        Integer totalTablas,
+
+        Integer totalCeldasTablas
 
 ) {
-
-
 }

@@ -40,10 +40,7 @@ public class VersionRecetaControllerUnitTest {
                         "Nombre version test",
                         "Descripcion test",
                         "Id creador",
-                        LocalDateTime.parse("2025-08-17T00:00:00"),
-                        10,
-                        10,
-                        10
+                        LocalDateTime.parse("2025-08-17T00:00:00")
                 )
         );
         when(versionRecetaMetadataService.findAllVersiones()).thenReturn(listaResponseDTOs);
@@ -91,10 +88,7 @@ public class VersionRecetaControllerUnitTest {
                 "Nombre version",
                 "descripcion",
                 "usernameCreador",
-                LocalDateTime.now(),
-                10,
-                10,
-                10
+                LocalDateTime.now()
         );
 
         when(versionRecetaMetadataService.saveVersionReceta("codPadre", createDTO)).thenReturn(responseDTO);

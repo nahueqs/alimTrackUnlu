@@ -48,6 +48,11 @@ public class UsuarioModel implements UserDetails {
     private String password;
 
     @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(rol.name()));
     }
@@ -70,5 +75,6 @@ public class UsuarioModel implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+        
     }
 }

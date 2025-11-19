@@ -22,6 +22,7 @@
                         <path>
                             <artifactId>lombok</artifactId>
                             <groupId>org.projectlombok</groupId>
+                            <version>1.18.30</version>
                         </path>
                         <path>
                             <artifactId>mapstruct-processor</artifactId>
@@ -55,6 +56,11 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <groupId>org.springframework.boot</groupId>
         </dependency>
+        <dependency>
+            <groupId>p6spy</groupId>
+            <artifactId>p6spy</artifactId>
+            <version>3.9.1</version>
+        </dependency>
 
         <dependency>
             <artifactId>spring-boot-devtools</artifactId>
@@ -81,7 +87,7 @@
         <dependency>
             <artifactId>lombok</artifactId>
             <groupId>org.projectlombok</groupId>
-            <optional>true</optional>
+            <version>1.18.30</version>
         </dependency>
         <dependency>
             <artifactId>spring-boot-starter-test</artifactId>

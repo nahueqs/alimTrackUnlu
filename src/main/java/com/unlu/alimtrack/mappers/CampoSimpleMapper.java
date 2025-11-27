@@ -18,7 +18,7 @@ public interface CampoSimpleMapper {
      * @param model Modelo de campo simple
      * @return DTO de respuesta con los datos del campo
      */
-    @Mapping(target = "idSeccion", source = "seccion.idSeccion")
+    @Mapping(target = "idSeccion", source = "seccion.id")
     @Mapping(target = "idGrupo", source = "grupo.id")
     @Mapping(target = "tipoDato", source = "tipoDato", qualifiedByName = "tipoDatoToString")
     CampoSimpleResponseDTO toResponseDTO(CampoSimpleModel model);

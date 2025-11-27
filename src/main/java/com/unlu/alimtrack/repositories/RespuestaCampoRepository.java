@@ -13,8 +13,5 @@ public interface RespuestaCampoRepository extends JpaRepository<RespuestaCampoMo
 
     RespuestaCampoModel findByIdProduccionAndIdCampo(ProduccionModel produccion, CampoSimpleModel campo);
 
-    boolean existsByIdProduccionAndIdCampo(ProduccionModel produccion, CampoSimpleModel campo);
-
-
     List<RespuestaCampoModel> findByIdProduccion(ProduccionModel produccion);
 }

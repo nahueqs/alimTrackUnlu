@@ -36,7 +36,7 @@ public interface GrupoCamposMapper {
      * @param entity Modelo de grupo de campos
      * @return DTO de respuesta con campos ordenados
      */
-    @Mapping(target = "idSeccion", source = "seccion.idSeccion")
+    @Mapping(target = "idSeccion", source = "seccion.id")
     @Mapping(target = "campos", source = "campos")
     GrupoCamposResponseDTO toResponseDTO(GrupoCamposModel entity);
 

@@ -1,13 +1,11 @@
 package com.unlu.alimtrack.DTOS.response.VersionReceta;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
 import java.util.List;
 
-@Builder
 public record SeccionResponseDTO(
-        
+
         @NotNull
         Long id,
         @NotNull

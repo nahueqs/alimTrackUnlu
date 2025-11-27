@@ -23,7 +23,7 @@ public class FilaTablaModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_tabla", nullable = false)
     @JsonIgnoreProperties("filas")
@@ -33,7 +33,7 @@ public class FilaTablaModel {
     private String nombre;
 
     @ColumnDefault("0")
-    @Column(name = "orden")
+    @Column(name = "orden", nullable = false)
     private Integer orden;
 
 }

@@ -4,11 +4,12 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.respuestas.EstadoActualProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.respuestas.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.protegido.UltimasRespuestasProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.services.ProduccionManagementService;
-import com.unlu.alimtrack.services.queries.ProduccionQueryServiceImpl;
+import com.unlu.alimtrack.services.ProduccionQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,37 +25,32 @@ import java.util.List;
 @RequestMapping("/api/v1/producciones")
 public class ProduccionController {
 
-    private final ProduccionQueryServiceImpl produccionService;
+    private final ProduccionQueryService produccionQueryService;
     private final ProduccionManagementService produccionManagementService;
 
     @GetMapping
-    public ResponseEntity<List<ProduccionResponseDTO>> getAllProducciones(@ModelAttribute ProduccionFilterRequestDTO filtros) {
-
-        log.info("Solicitud de búsqueda de producciones recibida: {}", filtros);
-
-        List<ProduccionResponseDTO> producciones = produccionService.findAllByFilters(filtros);
-
-        log.debug("Retornando {} producciones para los filtros: {}", producciones.size(), filtros);
-
+    public ResponseEntity<List<ProduccionMetadataResponseDTO>> getAllProduccionesMetadata(@ModelAttribute ProduccionFilterRequestDTO filtros) {
+        log.info("Solicitud para obtener todas las producciones con filtros: {}", filtros);
+        List<ProduccionMetadataResponseDTO> producciones = produccionQueryService.getAllProduccionesMetadata(filtros);
+        log.debug("Retornando {} producciones", producciones.size());
         return ResponseEntity.ok(producciones);
     }
 
     @GetMapping("/{codigoProduccion}")
-    public ResponseEntity<ProduccionResponseDTO> getProduccionByCodigoProduccion(
+    public ResponseEntity<ProduccionMetadataResponseDTO> getMetadataByCodigoProduccion(
             @PathVariable String codigoProduccion) {
-
-        log.debug("Solicitando produccion con codigo: {}", codigoProduccion);
-        return ResponseEntity.ok(produccionService.findByCodigoProduccion(codigoProduccion));
+        log.info("Solicitud para obtener la producción con código: {}", codigoProduccion);
+        ProduccionMetadataResponseDTO produccion = produccionQueryService.findByCodigoProduccion(codigoProduccion);
+        log.debug("Retornando producción: {}", produccion.codigoProduccion());
+        return ResponseEntity.ok(produccion);
     }
 
+
     @PostMapping()
-    public ResponseEntity<ProduccionResponseDTO> iniciarProduccion(@Valid @RequestBody ProduccionCreateDTO createDTO) {
-
-        log.debug("Solicitando crear producción con el código: {}, y la requestBody", createDTO);
-
-        ProduccionResponseDTO created = produccionManagementService.iniciarProduccion(createDTO);
-
-        log.debug("Retornando producción: {}", created);
+    public ResponseEntity<ProduccionMetadataResponseDTO> iniciarProduccion(@Valid @RequestBody ProduccionCreateDTO createDTO) {
+        log.info("Solicitud para iniciar una nueva producción con código: {}", createDTO.codigoProduccion());
+        ProduccionMetadataResponseDTO created = produccionManagementService.iniciarProduccion(createDTO);
+        log.info("Producción {} iniciada exitosamente", created.codigoProduccion());
         return ResponseEntity.created(URI.create("/api/v1/producciones/" + created.codigoProduccion())).body(created);
     }
 
@@ -63,37 +59,42 @@ public class ProduccionController {
             @PathVariable String codigoProduccion,
             @PathVariable Long idCampo,
             @Valid @RequestBody RespuestaCampoRequestDTO request) {
-
-        log.debug("Guardando respuesta para campo: {}, producción: {}", idCampo, codigoProduccion);
-
+        log.info("Solicitud para guardar respuesta en el campo {} de la producción {}", idCampo, codigoProduccion);
         RespuestaCampoResponseDTO respuesta = produccionManagementService.guardarRespuestaCampo(
                 codigoProduccion, idCampo, request);
-        log.debug("Respuesta guardada exitosamente: {}", respuesta);
+        log.info("Respuesta guardada exitosamente para el campo {} en la producción {}", idCampo, codigoProduccion);
         return ResponseEntity.ok(respuesta);
-
     }
 
     @GetMapping("/{codigoProduccion}/estado-actual")
-    public ResponseEntity<EstadoActualProduccionResponseDTO> obtenerEstadoActual(
+    public ResponseEntity<UltimasRespuestasProduccionResponseDTO> getUltimasRespuestas(
             @PathVariable String codigoProduccion) {
-
-        log.debug("Solicitando estado actual de producción: {}", codigoProduccion);
-
-        EstadoActualProduccionResponseDTO estado = produccionManagementService.obtenerEstadoActual(codigoProduccion);
-
-        log.debug("Retornando estado actual para: {}", codigoProduccion);
+        log.info("Solicitud para obtener el estado actual completo de la producción: {}", codigoProduccion);
+        UltimasRespuestasProduccionResponseDTO estado = produccionManagementService.getUltimasRespuestas(codigoProduccion);
+        log.debug("Retornando estado actual completo para la producción {}", codigoProduccion);
         return ResponseEntity.ok(estado);
     }
 
     @PutMapping("/{codigoProduccion}/cambiar-estado")
-    public ResponseEntity<ProduccionCambioEstadoRequestDTO> cambiarEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
-        log.debug("Solicitando cambio de estado a {}, para la produccion  {}", request.valor(), codigoProduccion);
-
-        ProduccionCambioEstadoRequestDTO updated = produccionManagementService.updateEstado(codigoProduccion, request);
-        log.debug("Estado actualizado exitosamente: {}", updated);
-        return ResponseEntity.ok(updated);
-
+    public ResponseEntity<Void> cambiarEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
+        log.info("Solicitud para cambiar el estado de la producción {} a {}", codigoProduccion, request.valor());
+        produccionManagementService.updateEstado(codigoProduccion, request);
+        log.info("Estado de la producción {} cambiado exitosamente a {}", codigoProduccion, request.valor());
+        return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{codigoProduccion}/public")
+    public ResponseEntity<ProduccionEstadoPublicaResponseDTO> getProduccionPublic(
+            @PathVariable String codigoProduccion) {
+        log.info("Solicitud para obtener la información pública de la producción: {}", codigoProduccion);
+        ProduccionEstadoPublicaResponseDTO produccion = produccionQueryService.getProduccionPublic(codigoProduccion);
+        log.debug("Retornando información pública para la producción {}", codigoProduccion);
+        return ResponseEntity.ok(produccion);
+    }
+
+    @GetMapping("/test")
+    public UltimasRespuestasProduccionResponseDTO test() {
+        return produccionManagementService.test();
+    }
 
 }

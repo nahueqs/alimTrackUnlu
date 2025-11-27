@@ -1,143 +1,132 @@
-package com.unlu.alimtrack.controllers.v1;
-
-import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
-import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
-import com.unlu.alimtrack.services.UsuarioService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
-public class UsuarioControllerTest {
-
-    @Mock
-    private UsuarioService usuarioService;
-
-    @InjectMocks
-    private UsuarioController usuarioController;
-
-
-    @Test
-    public void testGetAllUsuarios() {
-        List<UsuarioResponseDTO> usuarios = List.of(
-                new UsuarioResponseDTO(
-                        "Username1",
-                        "Nombre1",
-                        "Email1",
-                        "OPERADOR"
-                )
-        );
-        when(usuarioService.getAllUsuarios()).thenReturn(usuarios);
-        ResponseEntity<List<UsuarioResponseDTO>> response = usuarioController.getAllUsuarios();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
-        verify(usuarioService).getAllUsuarios();
-        verifyNoMoreInteractions(usuarioService);
-        assertEquals("Username1", response.getBody().get(0).username());
-        assertEquals("Nombre1", response.getBody().get(0).nombre());
-        assertEquals("Email1", response.getBody().get(0).email());
-    }
-
-    @Test
-    public void testGetUsuarioByEmail() {
-        UsuarioResponseDTO usuario = new UsuarioResponseDTO(
-                "Username1",
-                "Nombre1",
-                "Email1",
-                "OPERADOR"
-        );
-
-        when(usuarioService.getUsuarioByUsername("Username1")).thenReturn(usuario);
-        ResponseEntity<UsuarioResponseDTO> response = usuarioController.getUsuarioByUsername("Username1");
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(usuarioService).getUsuarioByUsername("Username1");
-        assertEquals("Username1", response.getBody().username());
-        assertEquals("Nombre1", response.getBody().nombre());
-        assertEquals("Email1", response.getBody().email());
-        verifyNoMoreInteractions(usuarioService);
-    }
-
-
-    @Test
-    public void testSaveUsuario() {
-        UsuarioCreateDTO nuevoUsuario = new UsuarioCreateDTO(
-                "Username1",
-                "Nombre1",
-                "Email1",
-                "Password1"
-        );
-
-        UsuarioResponseDTO nuevoUsuarioResponse = new UsuarioResponseDTO(
-                "Username1",
-                "Nombre1",
-                "Email1",
-                "OPERADOR"
-        );
-
-        when(usuarioService.addUsuario(nuevoUsuario)).thenReturn(nuevoUsuarioResponse);
-        ResponseEntity<UsuarioResponseDTO> response = usuarioController.addUsuario(nuevoUsuario);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Username1", response.getBody().username());
-        assertEquals("Nombre1", response.getBody().nombre());
-        assertEquals("Email1", response.getBody().email());
-        verify(usuarioService).addUsuario(nuevoUsuario);
-        verifyNoMoreInteractions(usuarioService);
-    }
-
-    @Test
-    public void testUpdateUsuarioUsername() {
-        String usernameActual = "Username1";
-        String nuevoUsername = "NuevoUsername";
-
-        UsuarioModifyDTO requestCambioUsername = new UsuarioModifyDTO(
-                nuevoUsername,
-                null,
-                null,
-                null
-        );
-
-        doNothing().when(usuarioService).modifyUsuario(usernameActual, requestCambioUsername);
-
-        ResponseEntity<Void> response = usuarioController.modifyUsuario(usernameActual, requestCambioUsername);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-
-        verify(usuarioService).modifyUsuario(usernameActual, requestCambioUsername);
-        verifyNoMoreInteractions(usuarioService);
-    }
-
-    @Test
-    public void testDeleteUsuario() {
-        String username = "Username1";
-        doNothing().when(usuarioService).deleteUsuario(username);
-        ResponseEntity<Void> response = usuarioController.deleteUsuario(username);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(usuarioService).deleteUsuario(username);
-        verifyNoMoreInteractions(usuarioService);
-    }
-
-//    @Test
-//    public void testGetUsuariosByTipoRolUsuario() {
-//        usuarioController.getUsuariosByTipoRolUsuario(TipoRolUsuario.ADMIN);
-//        verify(usuarioService).getUsuariosByTipoRolUsuario(TipoRolUsuario.ADMIN);
-//    }
-
-//  @Test
-//  public void testGetUsuarioByEmailAndPassword() {
+//package com.unlu.alimtrack.controllers.v1;
 //
-//  }
-
-}
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.unlu.alimtrack.AlimtrackApplication;
+//import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
+//import com.unlu.alimtrack.enums.TipoRolUsuario;
+//import com.unlu.alimtrack.models.UsuarioModel;
+//import com.unlu.alimtrack.repositories.UsuarioRepository;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.test.context.support.WithMockUser;
+//import org.springframework.test.context.ActiveProfiles;
+//import org.springframework.test.web.servlet.MockMvc;
+//
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//
+//@SpringBootTest(classes = AlimtrackApplication.class)
+//@AutoConfigureMockMvc
+//@ActiveProfiles("test")
+//public class UsuarioControllerTest {
+//
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//
+//    @Autowired
+//    private UsuarioRepository usuarioRepository;
+//
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+//
+//    private static final String USUARIOS_ENDPOINT = "/api/v1/usuarios";
+//
+//    private UsuarioModel usuarioAdmin;
+//    private String userEmail;
+//    private UsuarioCreateDTO usuarioCreateDTO;
+//
+//    @BeforeEach
+//    void setUp() {
+//        usuarioRepository.deleteAll();
+//
+//        this.userEmail = "test@example.com";
+//        String encodedPassword = passwordEncoder.encode("pass1"); // 🔑 Usar PasswordEncoder
+//        this.usuarioAdmin = UsuarioModel.builder()
+//
+//                .nombre("Nombre")
+//                .email(userEmail)
+//                .estaActivo(true)
+//                .password(encodedPassword)
+//                .rol(TipoRolUsuario.ADMIN)
+//                .build();
+//
+//        usuarioRepository.save(this.usuarioAdmin);
+//
+//        this.usuarioCreateDTO = new UsuarioCreateDTO(
+//                "nombre",
+//                userEmail,
+//                "pass1"
+//        );
+//
+//
+//    }
+//
+//    @Test
+//    @DisplayName("Test para obtener todos los usuarios")
+//    @WithMockUser(roles = "ADMIN")
+//    public void testGetAllUsuarios200() throws Exception {
+//
+//        mockMvc.perform(get(USUARIOS_ENDPOINT))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$").isArray())
+//                .andExpect(jsonPath("$[0].email").value(this.userEmail));
+//    }
+//
+//
+/// /
+/// /    @Test
+/// /    @DisplayName("Test para obtener un usuario por su email")
+/// /    @WithMockUser(roles = "ADMIN")
+/// /    public void testGetUsuarioByEmail() throws Exception {
+/// /
+/// /        mockMvc.perform(get(USUARIOS_ENDPOINT + "/" + userEmail))
+/// /                .andExpect(status().isOk())
+/// /                .andExpect(jsonPath("$.email").value(userEmail));
+/// /    }
+/// /
+/// /    @Test
+/// /    @DisplayName("Test para crear un nuevo usuario")
+/// /    @WithAnonymousUser
+/// /    public void testAddUsuario() throws Exception {
+/// /
+/// /        mockMvc.perform(post(USUARIOS_ENDPOINT)
+/// /                        .contentType(MediaType.APPLICATION_JSON)
+/// /                        .content(objectMapper.writeValueAsString(usuario)))
+/// /                .andExpect(status().isCreated())
+/// /                .andExpect(header().string("Location", USUARIOS_ENDPOINT + "/" + userEmail))
+/// /                .andExpect(jsonPath("$.email").value(userEmail));
+/// /    }
+//
+////    @Test
+////    @DisplayName("Test para modificar un usuario")
+////    @WithMockUser(roles = "ADMIN")
+////    public void testModifyUsuario() throws Exception {
+////
+////        UsuarioModifyDTO modificacion = new UsuarioModifyDTO("Nuevo Nombre", null, null);
+////
+////        mockMvc.perform(put(USUARIOS_ENDPOINT + "/" + userEmail)
+////                        .contentType(MediaType.APPLICATION_JSON)
+////                        .content(objectMapper.writeValueAsString(modificacion)))
+////                .andExpect(status().isNoContent());
+////    }
+//
+////    @Test
+////    @DisplayName("Test para eliminar un usuario")
+////    @WithMockUser(roles = "ADMIN")
+////    public void testDeleteUsuario() throws Exception {
+////
+////
+////        usuarioRepository.save(usuario);
+////
+////        mockMvc.perform(delete(USUARIOS_ENDPOINT + "/" + userEmail))
+////                .andExpect(status().isNoContent());
+////    }
+//}

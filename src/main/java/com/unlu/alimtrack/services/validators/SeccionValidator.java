@@ -2,7 +2,7 @@ package com.unlu.alimtrack.services.validators;
 
 import com.unlu.alimtrack.DTOS.create.secciones.SeccionCreateDTO;
 import com.unlu.alimtrack.exceptions.ValidationException;
-import com.unlu.alimtrack.services.queries.SeccionQueryService;
+import com.unlu.alimtrack.services.SeccionQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

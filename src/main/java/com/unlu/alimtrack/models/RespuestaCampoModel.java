@@ -32,6 +32,11 @@ public class RespuestaCampoModel {
     @JoinColumn(name = "id_campo", nullable = false)
     private CampoSimpleModel idCampo;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // Assuming optional = true based on schema (creado_por bigint)
+    @OnDelete(action = OnDeleteAction.RESTRICT) // Consistent with other creado_por FKs
+    @JoinColumn(name = "creado_por", referencedColumnName = "id_usuario")
+    private UsuarioModel creadoPor;
+
     @Lob
     @Column(name = "valor", columnDefinition = "TEXT")
     private String valor;

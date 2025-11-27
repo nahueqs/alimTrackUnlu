@@ -20,8 +20,8 @@ public record SeccionCreateDTO(
         String codigoVersionRecetaPadre,
 
         @NotNull
-        @NotBlank(message = "El usernameCreador de la sección es obligatorio")
-        String usernameCreador,
+        @NotBlank(message = "El emailCreador de la sección es obligatorio")
+        String emailCreador,
 
         @NotBlank(message = "El título de la sección es obligatorio")
         @NotNull

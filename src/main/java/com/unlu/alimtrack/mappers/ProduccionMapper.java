@@ -1,16 +1,16 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import com.unlu.alimtrack.services.UsuarioService;
-import com.unlu.alimtrack.services.VersionRecetaMetadataService;
+import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
+import com.unlu.alimtrack.services.impl.VersionRecetaMetadataServiceImpl;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
@@ -18,21 +18,19 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public abstract class ProduccionMapper {
 
-    @Autowired
     @Lazy
-    protected UsuarioService usuarioService;
+    protected UsuarioServiceImpl usuarioServiceImpl;
 
     @Lazy
-    @Autowired
-    private VersionRecetaMetadataService versionRecetaMetadataService;
+    private VersionRecetaMetadataServiceImpl versionRecetaMetadataServiceImpl;
 
-    @Mapping(target = "usernameCreador", source = "usuarioCreador.username")
+    @Mapping(target = "emailCreador", source = "usuarioCreador.email")
     @Mapping(target = "codigoVersion", source = "versionReceta.codigoVersionReceta")
-    public abstract ProduccionResponseDTO modelToResponseDTO(ProduccionModel model);
+    public abstract ProduccionMetadataResponseDTO modelToResponseDTO(ProduccionModel model);
 
-    public abstract List<ProduccionResponseDTO> modelListToResponseDTOList(List<ProduccionModel> modelList);
+    public abstract List<ProduccionMetadataResponseDTO> modelListToResponseDTOList(List<ProduccionModel> modelList);
 
-    @Mapping(target = "usuarioCreador", source = "usernameCreador", qualifiedByName = "usernameEmailToModel")
+    @Mapping(target = "usuarioCreador", source = "emailCreador", qualifiedByName = "emailToModel")
     @Mapping(target = "produccion", ignore = true)
     @Mapping(target = "versionReceta", source = "codigoVersionReceta", qualifiedByName = "codigoVersionToVersionModel")
     @Mapping(target = "fechaInicio", expression = "java(java.time.LocalDateTime.now())")
@@ -40,19 +38,18 @@ public abstract class ProduccionMapper {
     @Mapping(target = "fechaFin", expression = "java(null)")
     public abstract ProduccionModel createDTOtoModel(ProduccionCreateDTO createDTO);
 
-    @Named("usernameToUsuarioModel")
-    protected UsuarioModel usernameToUsuarioModel(String username) {
-        return usuarioService.getUsuarioModelByUsername(username);
-    }
 
-    @Named("usernameEmailToModel")
+    public abstract ProduccionMetadataPublicaResponseDTO modelToPublicDTO(ProduccionModel model);
+
+
+    @Named("emailToModel")
     protected UsuarioModel usernameEmailToModel(String email) {
-        return usuarioService.getUsuarioModelByEmail(email);
+        return usuarioServiceImpl.getUsuarioModelByEmail(email);
     }
 
     @Named("codigoVersionToVersionModel")
     protected VersionRecetaModel codigoVersionToVersionModel(String codigoVersion) {
-        return versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
+        return versionRecetaMetadataServiceImpl.findVersionModelByCodigo(codigoVersion);
     }
 
 

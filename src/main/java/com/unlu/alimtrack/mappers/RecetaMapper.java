@@ -2,7 +2,7 @@ package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.RecetaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.RecetaMetadataResponseDTO;
 import com.unlu.alimtrack.models.RecetaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,13 +15,13 @@ import java.util.List;
 public interface RecetaMapper {
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
-    RecetaResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);
+    RecetaMetadataResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);
 
-    @Mapping(target = "creadoPor.username", source = "usernameCreador")
+    @Mapping(target = "creadoPor.email", source = "emailCreador")
     RecetaModel recetaCreateDTOtoModel(RecetaCreateDTO receta);
 
     void updateModelFromModifyDTO(RecetaModifyDTO dto, @MappingTarget RecetaModel model);
 
-    List<RecetaResponseDTO> recetaModelsToRecetaResponseDTOs(List<RecetaModel> recetas);
+    List<RecetaMetadataResponseDTO> recetaModelsToRecetaResponseDTOs(List<RecetaModel> recetas);
 
 }

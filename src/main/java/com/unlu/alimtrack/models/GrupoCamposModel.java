@@ -31,11 +31,11 @@ public class GrupoCamposModel {
     @JsonIgnoreProperties("gruposCampos")
     private SeccionModel seccion;
 
-    @Column(name = "subtitulo")
+    @Column(name = "subtitulo", nullable = false)
     @Length(min = 1, max = 255)
     private String subtitulo;
 
-    @Column(name = "orden")
+    @Column(name = "orden", nullable = false)
     private Integer orden;
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)

@@ -2,13 +2,12 @@ package com.unlu.alimtrack.models;
 
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
@@ -38,11 +37,16 @@ public class ProduccionModel {
     @Column(name = "codigo_produccion")
     private String codigoProduccion;
 
-    @Column(name = "fecha_inicio")
+    @CreationTimestamp
+    @Column(name = "fecha_inicio", updatable = false)
     private LocalDateTime fechaInicio;
 
     @Column(name = "fecha_fin")
     private LocalDateTime fechaFin;
+
+    @UpdateTimestamp
+    @Column(name = "fecha_modificacion")
+    private LocalDateTime fechaModificacion;
 
     @Size(max = 100)
     @Column(name = "lote")

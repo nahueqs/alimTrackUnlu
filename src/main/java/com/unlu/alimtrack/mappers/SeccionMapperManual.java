@@ -8,8 +8,6 @@ import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.models.CampoSimpleModel;
 import com.unlu.alimtrack.models.GrupoCamposModel;
 import com.unlu.alimtrack.models.SeccionModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +18,10 @@ import java.util.stream.Collectors;
 @Component
 public class SeccionMapperManual {
 
-    private static final Logger log = LoggerFactory.getLogger(SeccionMapperManual.class);
-
     @Autowired
     private TablaMapperManual tablaMapperManual;
 
     public SeccionResponseDTO toResponseDTO(SeccionModel seccion) {
-        log.debug("🔧 SeccionMapperManual - Procesando sección ID: {}", seccion != null ? seccion.getIdSeccion() : "null");
-
         if (seccion == null) {
             return null;
         }
@@ -44,11 +38,8 @@ public class SeccionMapperManual {
         // ✅ Mapear tablas usando el mapper manual
         List<TablaResponseDTO> tablasDTO = tablaMapperManual.toResponseDTOList(seccion.getTablas());
 
-        log.debug("🔧 SeccionMapperManual - Sección {} mapeada: {} campos, {} grupos, {} tablas",
-                seccion.getIdSeccion(), camposSimplesDTO.size(), gruposCamposDTO.size(), tablasDTO.size());
-
         return new SeccionResponseDTO(
-                seccion.getIdSeccion(),
+                seccion.getId(),
                 codigoVersion,
                 seccion.getTitulo(),
                 seccion.getOrden(),
@@ -72,7 +63,7 @@ public class SeccionMapperManual {
     }
 
     private CampoSimpleResponseDTO mapCampoSimple(CampoSimpleModel campo) {
-        Long idSeccion = campo.getSeccion() != null ? campo.getSeccion().getIdSeccion() : null;
+        Long idSeccion = campo.getSeccion() != null ? campo.getSeccion().getId() : null;
         Long idGrupo = campo.getGrupo() != null ? campo.getGrupo().getId() : null;
         TipoDatoCampo tipoDato = campo.getTipoDato() != null ? campo.getTipoDato() : null;
 
@@ -98,7 +89,7 @@ public class SeccionMapperManual {
     }
 
     private GrupoCamposResponseDTO mapGrupoCampos(GrupoCamposModel grupo) {
-        Long idSeccion = grupo.getSeccion() != null ? grupo.getSeccion().getIdSeccion() : null;
+        Long idSeccion = grupo.getSeccion() != null ? grupo.getSeccion().getId() : null;
 
         // Mapear campos del grupo
         List<CampoSimpleResponseDTO> camposDTO = grupo.getCampos() != null ?
@@ -127,8 +118,6 @@ public class SeccionMapperManual {
         if (secciones == null || secciones.isEmpty()) {
             return List.of();
         }
-
-        log.debug("🔧 SeccionMapperManual - Mapeando {} secciones", secciones.size());
 
         return secciones.stream()
                 .sorted(Comparator.comparingInt(seccion -> seccion.getOrden() != null ? seccion.getOrden() : 0))

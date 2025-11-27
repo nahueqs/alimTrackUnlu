@@ -16,7 +16,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 @Table(name = "columna_tabla",
         uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
-
 public class ColumnaTablaModel {
 
     @Id
@@ -24,7 +23,7 @@ public class ColumnaTablaModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_tabla", nullable = false)
     @JsonIgnoreProperties("columnas")
@@ -38,7 +37,7 @@ public class ColumnaTablaModel {
     private TipoDatoCampo tipoDato;
 
     @ColumnDefault("0")
-    @Column(name = "orden")
+    @Column(name = "orden", nullable = false)
     private Integer orden;
 
 }

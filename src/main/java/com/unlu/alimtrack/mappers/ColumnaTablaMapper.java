@@ -8,12 +8,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ColumnaTablaMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tabla", ignore = true)
     @Mapping(target = "tipoDato", source = "tipoDato", qualifiedByName = "stringToTipoDato")
     ColumnaTablaModel toModel(ColumnaTablaCreateDTO dto);
+
+    List<ColumnaTablaModel> toModelList(List<ColumnaTablaCreateDTO> dtos);
 
 
     @Named("stringToTipoDato")

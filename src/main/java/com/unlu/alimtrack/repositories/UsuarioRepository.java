@@ -12,13 +12,8 @@ public interface UsuarioRepository extends JpaRepository<UsuarioModel, Long> {
 
     boolean existsByEmail(String email);
 
-    Optional<UsuarioModel> findByUsername(String username);
-
-    boolean existsByUsername(String username);
-
-    void deleteByUsername(String username);
-
-    boolean estaActivo(Boolean estaActivo);
 
     Optional<UsuarioModel> findByEmail(@NotNull String email);
+
+    void deleteByEmail(String email);
 }

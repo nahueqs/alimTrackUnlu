@@ -6,11 +6,6 @@ import jakarta.validation.constraints.Size;
 
 public record RegisterRequestDTO(
 
-
-        @Size(min = 2, max = 50, message = "El usuario debe tener entre 2 y 50 caracteres")
-        @NotNull
-        String username,
-
         @NotNull(message = "El nombre debe tener entre 2 y 100 caracteres")
         @Email
         String email,

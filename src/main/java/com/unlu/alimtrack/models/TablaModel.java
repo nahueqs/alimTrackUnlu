@@ -30,14 +30,14 @@ public class TablaModel {
     @JsonIgnoreProperties("tablas")
     private SeccionModel seccion;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
     @Column(name = "descripcion")
     private String descripcion;
 
     @ColumnDefault("0")
-    @Column(name = "orden")
+    @Column(name = "orden", nullable = false)
     private Integer orden;
 
     @OneToMany(mappedBy = "tabla", cascade = CascadeType.ALL)

@@ -56,10 +56,6 @@ public class UsuarioValidator {
             throw new ModificacionInvalidaException("No se puede realizar la modificacion solicitada");
         }
 
-        if (modificacion.username() != null) {
-            validateUsername(modificacion.username());
-        }
-
 
     }
 

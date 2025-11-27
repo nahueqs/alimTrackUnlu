@@ -11,18 +11,19 @@ import java.util.List;
 @Repository
 public interface TablaRepository extends JpaRepository<TablaModel, Long> {
 
-    @Query("SELECT t FROM TablaModel t WHERE t.seccion.idSeccion IN :seccionIds ORDER BY t.orden")
-    List<TablaModel> findBySeccionIds(@Param("seccionIds") List<Long> seccionIds);
-
     @Query("SELECT DISTINCT t FROM TablaModel t " +
             "LEFT JOIN FETCH t.columnas col " +
-            "WHERE t.seccion.idSeccion IN :seccionIds " +
-            "ORDER BY t.orden")
-    List<TablaModel> findWithColumnasBySeccionIds(@Param("seccionIds") List<Long> seccionIds);
+            "WHERE t.id IN :tablaIds " +
+            "ORDER BY t.orden, col.orden")
+    List<TablaModel> findWithColumnasByTablaIds(@Param("tablaIds") List<Long> tablaIds);
 
     @Query("SELECT DISTINCT t FROM TablaModel t " +
             "LEFT JOIN FETCH t.filas f " +
-            "WHERE t.seccion.idSeccion IN :seccionIds " +
-            "ORDER BY t.orden")
-    List<TablaModel> findWithFilasBySeccionIds(@Param("seccionIds") List<Long> seccionIds);
+            "WHERE t.id IN :tablaIds " +
+            "ORDER BY t.orden, f.orden")
+    List<TablaModel> findWithFilasByTablaIds(@Param("tablaIds") List<Long> tablaIds);
+
+    // Método para encontrar tablas por IDs básico (sin relaciones)
+    List<TablaModel> findByIdIn(List<Long> tablaIds);
+
 }

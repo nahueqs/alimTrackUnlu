@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +18,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "usuario", uniqueConstraints = @UniqueConstraint(columnNames = {"username", "email"}))
+@Table(name = "usuario") // Removed uniqueConstraints from @Table
 public class UsuarioModel implements UserDetails {
 
     @Id
@@ -27,17 +26,13 @@ public class UsuarioModel implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false, length = 50, unique = true)
-    private String username;
-
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100, unique = true) // Added unique = true here
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("OPERADOR")
     @Column(name = "rol", nullable = false)
     private TipoRolUsuario rol;
 
@@ -74,7 +69,13 @@ public class UsuarioModel implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
-        
+        return estaActivo;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (rol == null) {
+            rol = TipoRolUsuario.OPERADOR;
+        }
     }
 }

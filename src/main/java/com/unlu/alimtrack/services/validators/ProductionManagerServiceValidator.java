@@ -10,11 +10,12 @@ import com.unlu.alimtrack.models.CampoSimpleModel;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.repositories.CampoSimpleRepository;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.services.queries.ProduccionQueryService;
-import com.unlu.alimtrack.services.queries.UsuarioQueryService;
-import com.unlu.alimtrack.services.queries.VersionRecetaQueryService;
+import com.unlu.alimtrack.services.ProduccionQueryService;
+import com.unlu.alimtrack.services.VersionRecetaQueryService;
+import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -24,70 +25,66 @@ public class ProductionManagerServiceValidator {
 
     private final ProduccionQueryService produccionQueryService;
     private final VersionRecetaQueryService versionRecetaQueryService;
-    private final UsuarioQueryService usuarioQueryService;
     private final CampoSimpleRepository campoSimpleRepository;
     private final ProduccionRepository produccionRepository;
+    @Lazy
+    private final UsuarioServiceImpl usuarioServiceImpl;
 
     public ProduccionModel validarProduccionParaEdicion(String codigoProduccion) {
-        ProduccionModel produccion = produccionRepository.findByCodigoProduccion(codigoProduccion);
-
-        if (produccion == null) {
-            throw new RecursoNoEncontradoException("Producción no encontrada: " + codigoProduccion);
-        }
+        log.debug("Validando si la producción {} es editable", codigoProduccion);
+        ProduccionModel produccion = produccionRepository.findByCodigoProduccion(codigoProduccion)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producción no encontrada: " + codigoProduccion));
 
         if (produccion.getEstado() != TipoEstadoProduccion.EN_PROCESO) {
-            throw new OperacionNoPermitida(
-                    "No se puede modificar una producción en estado: " + produccion.getEstado());
+            log.warn("Intento de modificar la producción {} que no está en estado EN_PROCESO (estado actual: {})", codigoProduccion, produccion.getEstado());
+            throw new OperacionNoPermitida("No se puede modificar una producción en estado: " + produccion.getEstado());
         }
-
+        log.debug("La producción {} es válida para edición", codigoProduccion);
         return produccion;
     }
 
-
     public void verificarCreacionProduccion(ProduccionCreateDTO createDTO) {
+        log.debug("Iniciando validaciones para la creación de la producción {}", createDTO.codigoProduccion());
         verificarCodigoProduccionNoExiste(createDTO.codigoProduccion());
         verificarVersionExiste(createDTO.codigoVersionReceta());
-        verificarUsuarioExisteYEstaActivoByEmail(createDTO.usernameCreador());
+        verificarUsuarioExisteYEstaActivoByEmail(createDTO.emailCreador());
+        log.debug("Validaciones para la creación de la producción {} superadas", createDTO.codigoProduccion());
     }
 
     public void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
         if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
             throw new RecursoIdentifierConflictException(
-                    "El codigo de la url no coincide con el cuerpo de la petición. Codigo de produccion: " + codigoProduccion
-                            + " Codigo que desea crear: " + createDTO.codigoProduccion());
+                    "El código de la URL no coincide con el del cuerpo de la petición. URL: " + codigoProduccion
+                            + ", Cuerpo: " + createDTO.codigoProduccion());
         }
     }
 
-    public void verificarCodigoProduccionNoExiste(String codigoProduccion) {
+    private void verificarCodigoProduccionNoExiste(String codigoProduccion) {
         if (produccionQueryService.existsByCodigoProduccion(codigoProduccion)) {
-            throw new RecursoDuplicadoException("El codigo de la producción que desea agregar ya ha sido usado.");
+            throw new RecursoDuplicadoException("El código de producción '" + codigoProduccion + "' ya está en uso.");
         }
     }
 
-    public void verificarVersionExiste(String codigoVersion) {
+    private void verificarVersionExiste(String codigoVersion) {
         if (!versionRecetaQueryService.existsByCodigoVersion(codigoVersion)) {
-            throw new RecursoNoEncontradoException(
-                    "La producción que desea agregar no corresponde a una version existente.");
+            throw new RecursoNoEncontradoException("La versión de receta especificada no existe: " + codigoVersion);
         }
     }
 
-    public void verificarUsuarioExisteYEstaActivoByEmail(String email) {
-        if (!usuarioQueryService.existsByEmail(email)) {
-            log.debug("Usuario no existe con email {}", email);
-            throw new RecursoNoEncontradoException("Usuario no existe con id: " + email);
+    private void verificarUsuarioExisteYEstaActivoByEmail(String email) {
+        if (!usuarioServiceImpl.existsByEmail(email)) {
+            log.warn("Intento de crear producción con un usuario no existente: {}", email);
+            throw new RecursoNoEncontradoException("El usuario creador especificado no existe: " + email);
         }
-
-
-        if (!usuarioQueryService.estaActivoByEmail(email)) {
-            throw new OperacionNoPermitida(
-                    "El usuario que intenta guardar la producción se encuentra inactivo. username: " + email);
+        if (!usuarioServiceImpl.estaActivoByEmail(email)) {
+            log.warn("Intento de crear producción con un usuario inactivo: {}", email);
+            throw new OperacionNoPermitida("El usuario creador especificado se encuentra inactivo: " + email);
         }
     }
 
     public CampoSimpleModel validarCampoExiste(Long idCampo) {
+        log.debug("Validando existencia del campo con ID: {}", idCampo);
         return campoSimpleRepository.findById(idCampo)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Campo no encontrado: " + idCampo));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Campo no encontrado con ID: " + idCampo));
     }
-
-
 }

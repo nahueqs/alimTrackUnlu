@@ -5,6 +5,8 @@ import com.unlu.alimtrack.models.FilaTablaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface FilaTablaMapper {
 
@@ -12,5 +14,6 @@ public interface FilaTablaMapper {
     @Mapping(target = "tabla", ignore = true)
     FilaTablaModel toModel(FilaTablaCreateDTO dto);
 
-}
+    List<FilaTablaModel> toModelList(List<FilaTablaCreateDTO> dtos);
 
+}

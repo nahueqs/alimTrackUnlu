@@ -1,16 +1,17 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;
+import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.services.queries.ProduccionQueryServiceImpl;
+import com.unlu.alimtrack.services.impl.ProduccionQueryServiceImpl;
 import com.unlu.alimtrack.services.validators.ProduccionQueryServiceValidator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,12 +20,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProduccionServiceTest {
@@ -39,136 +41,105 @@ public class ProduccionServiceTest {
     private ProduccionQueryServiceValidator produccionQueryServiceValidator;
 
     @InjectMocks
-    private ProduccionQueryServiceImpl produccionManagementService;
+    private ProduccionQueryServiceImpl produccionQueryService;
 
-    private String codigoProduccion;
-    private String codigoVersionReceta;
-    private String username;
-    private String lote;
-    private String encargado;
-    private LocalDateTime fechaInicio;
-    private LocalDateTime fechaFin;
-    private LocalDate fechaInicioDate;
-    private LocalDate fechaFinDate;
     private ProduccionModel produccionModel;
-    private ProduccionResponseDTO produccionResponseDTO;
-    private ProduccionFilterRequestDTO produccionFilterRequestDTO;
-    private List<ProduccionModel> produccionModelList;
-    private List<ProduccionResponseDTO> produccionResponseDTOList;
+    private ProduccionMetadataResponseDTO produccionMetadataResponseDTO;
 
     @BeforeEach
     void setUp() {
-        codigoProduccion = "PROD-001";
-        codigoVersionReceta = "VR-001";
-        username = "testuser";
-        lote = "LOTE-001";
-        encargado = "Juan Perez";
-        fechaInicio = LocalDateTime.of(2025, 1, 1, 0, 0);
-        fechaFin = LocalDateTime.of(2025, 12, 31, 23, 59);
-        fechaInicioDate = LocalDate.of(2025, 1, 1);
-        fechaFinDate = LocalDate.of(2025, 12, 31);
-        String observaciones = "Observaciones de prueba";
+        String codigoProduccion = "PROD-001";
+        String codigoVersionReceta = "VR-001";
+        String lote = "LOTE-001";
+        String encargado = "Juan Perez";
+        String email = "email@test.com";
+        LocalDateTime fecha = LocalDateTime.of(2025, 1, 1, 10, 0);
+
+        VersionRecetaModel versionReceta = new VersionRecetaModel();
+        versionReceta.setCodigoVersionReceta(codigoVersionReceta);
 
         produccionModel = new ProduccionModel();
         produccionModel.setCodigoProduccion(codigoProduccion);
         produccionModel.setLote(lote);
         produccionModel.setEncargado(encargado);
         produccionModel.setEstado(TipoEstadoProduccion.EN_PROCESO);
-        produccionModel.setFechaInicio(fechaInicio);
-        produccionModel.setFechaFin(fechaFin);
-        produccionModel.setObservaciones("Observaciones de prueba");
+        produccionModel.setFechaInicio(fecha);
+        produccionModel.setVersionReceta(versionReceta);
 
-        produccionResponseDTO = new ProduccionResponseDTO(
+        produccionMetadataResponseDTO = new ProduccionMetadataResponseDTO(
                 codigoProduccion,
                 codigoVersionReceta,
                 encargado,
-                "testuser",
+                email,
                 lote,
                 "EN_PROCESO",
-                fechaInicio,
-                fechaFin,
-                observaciones
+                fecha,
+                null,
+                "Observaciones"
         );
-
-        ProduccionCreateDTO produccionCreateDTO = new ProduccionCreateDTO(
-                codigoVersionReceta,
-                codigoProduccion,
-                username,
-                lote,
-                encargado,
-                "Observaciones de prueba"
-        );
-
-        produccionFilterRequestDTO = new ProduccionFilterRequestDTO(
-                codigoVersionReceta,
-                lote,
-                encargado,
-                fechaInicioDate,
-                fechaFinDate,
-                "EN_PROCESO"
-        );
-
-        produccionModelList = new ArrayList<>();
-        produccionModelList.add(produccionModel);
-
-        produccionResponseDTOList = new ArrayList<>();
-        produccionResponseDTOList.add(produccionResponseDTO);
     }
 
     @Test
-    void testFindByCodigoProduccion() {
-        when(produccionRepository.findByCodigoProduccion(codigoProduccion)).thenReturn(produccionModel);
-        when(produccionMapper.modelToResponseDTO(produccionModel)).thenReturn(produccionResponseDTO);
+    @DisplayName("Test para encontrar una producción por su código exitosamente")
+    void testFindByCodigoProduccion_Success() {
+        // Arrange
+        when(produccionRepository.findByCodigoProduccion(produccionModel.getCodigoProduccion()))
+                .thenReturn(Optional.of(produccionModel));
+        when(produccionMapper.modelToResponseDTO(produccionModel)).thenReturn(produccionMetadataResponseDTO);
 
-        ProduccionResponseDTO result = produccionManagementService.findByCodigoProduccion(codigoProduccion);
+        // Act
+        ProduccionMetadataResponseDTO result = produccionQueryService.findByCodigoProduccion(produccionModel.getCodigoProduccion());
 
+        // Assert
         assertNotNull(result);
-        assertEquals(codigoProduccion, result.codigoProduccion());
-        assertEquals(codigoVersionReceta, result.codigoVersion());
-        assertEquals(encargado, result.encargado());
-        assertEquals(lote, result.lote());
-        assertEquals("EN_PROCESO", result.estado());
-        verify(produccionRepository).findByCodigoProduccion(codigoProduccion);
+        assertEquals(produccionMetadataResponseDTO.codigoProduccion(), result.codigoProduccion());
+        assertEquals(produccionMetadataResponseDTO.lote(), result.lote());
+        verify(produccionRepository).findByCodigoProduccion(produccionModel.getCodigoProduccion());
         verify(produccionMapper).modelToResponseDTO(produccionModel);
     }
 
     @Test
-    void testFindByCodigoProduccionNoEncontrado() {
+    @DisplayName("Test para lanzar excepción cuando no se encuentra una producción por su código")
+    void testFindByCodigoProduccion_NotFound() {
+        // Arrange
         String codigoInexistente = "CODIGO_INEXISTENTE";
-        when(produccionRepository.findByCodigoProduccion(codigoInexistente)).thenReturn(null);
+        when(produccionRepository.findByCodigoProduccion(codigoInexistente)).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(RecursoNoEncontradoException.class, () -> {
-            produccionManagementService.findByCodigoProduccion(codigoInexistente);
+            produccionQueryService.findByCodigoProduccion(codigoInexistente);
         });
 
         verify(produccionRepository).findByCodigoProduccion(codigoInexistente);
+        verify(produccionMapper, never()).modelToResponseDTO(any());
     }
 
     @Test
-    void testFindAllByFiltersVacios() {
-        LocalDateTime fechaInicioConverted = fechaInicioDate.atStartOfDay();
-        LocalDateTime fechaFinConverted = fechaFinDate.atTime(23, 59, 59);
-        TipoEstadoProduccion estado = TipoEstadoProduccion.EN_PROCESO;
-
-        when(produccionQueryServiceValidator.convertToStartOfDay(fechaInicioDate)).thenReturn(fechaInicioConverted);
-        when(produccionQueryServiceValidator.convertToEndOfDay(fechaFinDate)).thenReturn(fechaFinConverted);
-        when(produccionRepository.findByAdvancedFilters(
-                codigoVersionReceta, lote, encargado, estado, fechaInicioConverted, fechaFinConverted
-        )).thenReturn(produccionModelList);
-        when(produccionMapper.modelListToResponseDTOList(produccionModelList)).thenReturn(produccionResponseDTOList);
-
-        List<ProduccionResponseDTO> result = produccionManagementService.findAllByFilters(produccionFilterRequestDTO);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(codigoProduccion, result.get(0).codigoProduccion());
-        verify(produccionQueryServiceValidator).convertToStartOfDay(fechaInicioDate);
-        verify(produccionQueryServiceValidator).convertToEndOfDay(fechaFinDate);
-        verify(produccionRepository).findByAdvancedFilters(
-                codigoVersionReceta, lote, encargado, estado, fechaInicioConverted, fechaFinConverted
+    @DisplayName("Test para encontrar producciones usando filtros")
+    void testFindAllByFilters() {
+        // Arrange
+        ProduccionFilterRequestDTO filtros = new ProduccionFilterRequestDTO(
+                "VR-001", "LOTE-001", "Juan Perez",
+                LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 31), "EN_PROCESO"
         );
+        List<ProduccionModel> produccionModelList = Collections.singletonList(produccionModel);
+        List<ProduccionMetadataResponseDTO> produccionMetadataResponseDTOList = Collections.singletonList(produccionMetadataResponseDTO);
+
+        when(produccionQueryServiceValidator.convertToStartOfDay(any())).thenReturn(LocalDateTime.MIN);
+        when(produccionQueryServiceValidator.convertToEndOfDay(any())).thenReturn(LocalDateTime.MAX);
+        when(produccionRepository.findByAdvancedFilters(any(), any(), any(), any(), any(), any()))
+                .thenReturn(produccionModelList);
+        when(produccionMapper.modelListToResponseDTOList(produccionModelList)).thenReturn(produccionMetadataResponseDTOList);
+
+        // Act
+        List<ProduccionMetadataResponseDTO> result = produccionQueryService.getAllProduccionesMetadata(filtros);
+
+        // Assert
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(produccionMetadataResponseDTO.codigoProduccion(), result.get(0).codigoProduccion());
+        verify(produccionRepository).findByAdvancedFilters(any(), any(), any(), any(), any(), any());
         verify(produccionMapper).modelListToResponseDTOList(produccionModelList);
     }
-
-
 }

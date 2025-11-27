@@ -2,66 +2,65 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.RecetaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.RecetaMetadataResponseDTO;
 import com.unlu.alimtrack.services.RecetaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/recetas")
 public class RecetaController {
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RecetaController.class);
     private final RecetaService recetaService;
 
     @GetMapping
-    public ResponseEntity<List<RecetaResponseDTO>> getAllRecetas() {
-        log.debug("Obteniendo todas las recetas");
-        List<RecetaResponseDTO> recetas = recetaService.findAllRecetas();
+    public ResponseEntity<List<RecetaMetadataResponseDTO>> getAllRecetas() {
+        log.info("Solicitud para obtener todas las recetas");
+        List<RecetaMetadataResponseDTO> recetas = recetaService.findAllRecetas();
         log.debug("Retornando {} recetas", recetas.size());
         return ResponseEntity.ok(recetas);
     }
 
     @GetMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> getReceta(@PathVariable String codigoReceta) {
-        log.debug("Buscando receta con código: {}", codigoReceta);
-        RecetaResponseDTO receta = recetaService.findReceta(codigoReceta);
-        log.debug("Receta encontrada: {}", receta != null ? receta.codigoReceta() : "No encontrada");
+    public ResponseEntity<RecetaMetadataResponseDTO> getReceta(@PathVariable String codigoReceta) {
+        log.info("Solicitud para obtener la receta con código: {}", codigoReceta);
+        RecetaMetadataResponseDTO receta = recetaService.findReceta(codigoReceta);
+        log.debug("Retornando receta: {}", receta.codigoReceta());
         return ResponseEntity.ok(receta);
     }
 
     @PutMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaResponseDTO> updateReceta(@PathVariable String codigoReceta,
-                                                          @Valid @RequestBody RecetaModifyDTO receta) {
-        log.debug("Actualizando receta con código: {}", codigoReceta);
-        RecetaResponseDTO updated = recetaService.updateReceta(codigoReceta, receta);
-        log.debug("Receta actualizada exitosamente: {}", updated.codigoReceta());
+    public ResponseEntity<RecetaMetadataResponseDTO> updateReceta(@PathVariable String codigoReceta,
+                                                                  @Valid @RequestBody RecetaModifyDTO receta) {
+        log.info("Solicitud para actualizar la receta con código: {}", codigoReceta);
+        RecetaMetadataResponseDTO updated = recetaService.updateReceta(codigoReceta, receta);
+        log.info("Receta {} actualizada exitosamente", updated.codigoReceta());
         return ResponseEntity.ok(updated);
     }
 
-    @PostMapping()
-    public ResponseEntity<RecetaResponseDTO> addReceta(@PathVariable String codigoReceta,
-                                                       @Valid @RequestBody RecetaCreateDTO receta) {
-        log.debug("Creando nueva receta con código: {}", codigoReceta);
-        RecetaResponseDTO created = recetaService.addReceta(codigoReceta, receta);
-        log.debug("Receta creada exitosamente: {}", created.codigoReceta());
+    @PostMapping("/{codigoReceta}")
+    public ResponseEntity<RecetaMetadataResponseDTO> addReceta(@PathVariable String codigoReceta,
+                                                               @Valid @RequestBody RecetaCreateDTO receta) {
+        log.info("Solicitud para crear una nueva receta con código: {}", codigoReceta);
+        RecetaMetadataResponseDTO created = recetaService.addReceta(codigoReceta, receta);
+        log.info("Receta creada exitosamente: {}", created.codigoReceta());
         return ResponseEntity.created(URI.create("/api/v1/recetas/" + created.codigoReceta()))
                 .body(created);
     }
 
     @DeleteMapping("/{codigoReceta}")
     public ResponseEntity<Void> deleteReceta(@PathVariable String codigoReceta) {
-        log.debug("Eliminando receta con código: {}", codigoReceta);
+        log.info("Solicitud para eliminar la receta con código: {}", codigoReceta);
         recetaService.deleteReceta(codigoReceta);
-        log.debug("Receta eliminada exitosamente: {}", codigoReceta);
+        log.info("Receta {} eliminada exitosamente", codigoReceta);
         return ResponseEntity.noContent().build();
     }
-
-
 }

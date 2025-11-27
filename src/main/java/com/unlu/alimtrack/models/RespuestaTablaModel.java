@@ -25,17 +25,27 @@ public class RespuestaTablaModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_produccion", nullable = false)
-    private ProduccionModel idProduccion;
+    private ProduccionModel produccion;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "id_tabla", nullable = false)
+    private TablaModel idTabla;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_fila", nullable = false)
-    private FilaTablaModel idFila;
+    private FilaTablaModel fila;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_columna", nullable = false)
-    private ColumnaTablaModel idColumna;
+    private ColumnaTablaModel columna;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // Assuming optional = true based on schema
+    @OnDelete(action = OnDeleteAction.RESTRICT) // Consistent with other creado_por FKs
+    @JoinColumn(name = "creado_por", referencedColumnName = "id_usuario")
+    private UsuarioModel creadoPor;
 
     @Lob
     @Column(name = "valor", columnDefinition = "LONGTEXT")
@@ -45,4 +55,20 @@ public class RespuestaTablaModel {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
+    // ✅ Método de validación para garantizar consistencia
+    @PrePersist
+    @PreUpdate
+    private void validarConsistencia() {
+        if (fila != null && columna != null) {
+            Long tablaFila = fila.getTabla().getId();
+            Long tablaColumna = columna.getTabla().getId();
+
+            if (!tablaFila.equals(tablaColumna)) {
+                throw new IllegalStateException(
+                        "La fila y la columna deben pertenecer a la misma tabla. " +
+                                "Fila.Tabla: " + tablaFila + ", Columna.Tabla: " + tablaColumna
+                );
+            }
+        }
+    }
 }

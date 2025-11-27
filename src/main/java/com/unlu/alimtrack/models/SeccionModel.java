@@ -27,7 +27,7 @@ public class SeccionModel {
     @Id
     @Column(name = "id_seccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idSeccion;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -35,8 +35,10 @@ public class SeccionModel {
     @JsonIgnoreProperties("estructura")
     private VersionRecetaModel versionRecetaPadre;
 
-    @Column(name = "creado_por", nullable = false)
-    private String usernameCreador;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT) // Assuming RESTRICT is desired for FK
+    @JoinColumn(name = "creado_por", referencedColumnName = "id_usuario", nullable = false)
+    private UsuarioModel creadoPor;
 
     @Column(name = "titulo", nullable = false)
     @Length(min = 1, max = 255)
@@ -58,19 +60,4 @@ public class SeccionModel {
     @Column(name = "orden")
     private Integer orden;
 
-
-    public void addCampoSimple(CampoSimpleModel campo) {
-        camposSimples.add(campo);
-        campo.setSeccion(this);
-    }
-
-    public void addGrupo(GrupoCamposModel grupo) {
-        gruposCampos.add(grupo);
-        grupo.setSeccion(this);
-    }
-
-    public void addTabla(TablaModel tabla) {
-        tablas.add(tabla);
-        tabla.setSeccion(this);
-    }
 }

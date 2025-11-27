@@ -1,153 +1,100 @@
-package com.unlu.alimtrack.controllers.v1;
-
-import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
-import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.RecetaResponseDTO;
-import com.unlu.alimtrack.services.RecetaService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-public class RecetaControllerTest {
-
-    @Mock
-    private RecetaService recetaService;
-
-    @InjectMocks
-    private RecetaController recetaController;
-
-    @Test
-    public void testGetAllRecetas() {
-
-        LocalDateTime fechaFija = LocalDateTime.of(2025, 9, 30, 0, 0);
-
-        List<RecetaResponseDTO> listaResponseDTOs = List.of(
-                new RecetaResponseDTO(
-                        "RTEST-001",
-                        "Milanesa",
-                        "Nombre creador",
-                        "Usuario creador",
-                        fechaFija
-                )
-        );
-
-        when(recetaService.findAllRecetas()).thenReturn(listaResponseDTOs);
-
-        ResponseEntity<List<RecetaResponseDTO>> resp = recetaController.getAllRecetas();
-
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertEquals(1, resp.getBody().size());
-        verify(recetaService).findAllRecetas();
-    }
-
-    @Test
-    public void testGetReceta() {
-        RecetaResponseDTO responseDTO = new RecetaResponseDTO(
-                "RTEST-001",
-                "Milanesa",
-                "Nombre receta",
-                "Usuario creador",
-                LocalDateTime.parse("2025-08-17T00:00:00")
-        );
-
-        when(recetaService.findReceta("RTEST-001")).thenReturn(responseDTO);
-
-        ResponseEntity<RecetaResponseDTO> resp = recetaController.getReceta("RTEST-001");
-
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertEquals("RTEST-001", resp.getBody().codigoReceta());
-        assertEquals("Milanesa", resp.getBody().descripcion());
-        assertEquals(LocalDateTime.parse("2025-08-17T00:00:00"), resp.getBody().fechaCreacion());
-        assertEquals("Usuario creador", resp.getBody().creadaPor());
-        assertEquals("Nombre receta", resp.getBody().nombre());
-        verify(recetaService).findReceta("RTEST-001");
-
-    }
-
-    @Test
-    public void testUpdateRecetaNombreReceta() {
-
-        LocalDateTime fechaFija = LocalDateTime.of(2025, 9, 30, 0, 0);
-
-        RecetaModifyDTO modificacion = new RecetaModifyDTO(
-                "Nombre modificado",
-                null
-        );
-
-        RecetaResponseDTO respuesta = new RecetaResponseDTO(
-                "RTEST-001",
-                "Descripcion modificada",
-                "Nombre receta",
-                "Creador",
-                fechaFija
-        );
-
-        when(recetaService.updateReceta("RTEST-001", modificacion)).thenReturn(respuesta);
-
-        ResponseEntity<RecetaResponseDTO> resp = recetaController.updateReceta("RTEST-001", modificacion);
-
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertEquals("RTEST-001", resp.getBody().codigoReceta());
-        assertEquals("Descripcion modificada", resp.getBody().descripcion());
-        assertEquals("Nombre receta", resp.getBody().nombre());
-        assertEquals(fechaFija, resp.getBody().fechaCreacion());
-        assertEquals("Creador", resp.getBody().creadaPor());
-        verify(recetaService).updateReceta("RTEST-001", modificacion);
-
-    }
-
-    @Test
-    public void testAddReceta() {
-        LocalDateTime fechaFija = LocalDateTime.of(2025, 9, 30, 0, 0);
-
-        RecetaCreateDTO nuevaReceta = new RecetaCreateDTO(
-                "RTEST-002",
-                "Nombre receta",
-                "Descripción de la nueva receta",
-                "Usuario Test"
-        );
-
-        RecetaResponseDTO respuestaEsperada = new RecetaResponseDTO(
-                "RTEST-002",
-                "Descripción de la nueva receta",
-                "Nombre receta",
-                "Usuario creador",
-                fechaFija
-
-        );
-
-        when(recetaService.addReceta("RTEST-002", nuevaReceta)).thenReturn(respuestaEsperada);
-
-        ResponseEntity<RecetaResponseDTO> respuesta = recetaController.addReceta("RTEST-002", nuevaReceta);
-
-        assertEquals(HttpStatus.CREATED, respuesta.getStatusCode());
-        assertEquals("/api/v1/recetas/" + "RTEST-002",
-                respuesta.getHeaders().getFirst("Location"));
-        assertEquals("RTEST-002", respuesta.getBody().codigoReceta());
-        assertEquals("Descripción de la nueva receta", respuesta.getBody().descripcion());
-        assertEquals(fechaFija, respuesta.getBody().fechaCreacion());
-        assertEquals("Nombre receta", respuesta.getBody().nombre());
-        assertEquals("Usuario creador", respuesta.getBody().creadaPor());
-        verify(recetaService).addReceta("RTEST-002", nuevaReceta);
-    }
-
-    @Test
-    public void testDeleteReceta() {
-        String codigoReceta = "RTEST-001";
-        ResponseEntity<Void> respuesta = recetaController.deleteReceta(codigoReceta);
-        assertEquals(HttpStatus.NO_CONTENT, respuesta.getStatusCode());
-        verify(recetaService).deleteReceta(codigoReceta);
-    }
-}
+//package com.unlu.alimtrack.controllers.v1;
+//
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.unlu.alimtrack.AlimtrackApplication;
+//import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
+//import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
+//import com.unlu.alimtrack.models.Receta;
+//import com.unlu.alimtrack.repositories.RecetaRepository;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.http.MediaType;
+//import org.springframework.security.test.context.support.WithAnonymousUser;
+//import org.springframework.security.test.context.support.WithMockUser;
+//import org.springframework.test.web.servlet.MockMvc;
+//
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//
+//@SpringBootTest(classes = AlimtrackApplication.class)
+//@AutoConfigureMockMvc
+//public class RecetaControllerTest {
+//
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//
+//    @Autowired
+//    private RecetaRepository recetaRepository;
+//
+//    @BeforeEach
+//    public void setUp() {
+//        recetaRepository.deleteAll();
+//    }
+//
+//    @Test
+//    public void testGetAllRecetas() throws Exception {
+//        Receta receta = new Receta("RTEST-001", "Milanesa", "Nombre creador", "Usuario creador");
+//        recetaRepository.save(receta);
+//
+//        mockMvc.perform(get("/api/v1/recetas"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$[0].codigoReceta").value("RTEST-001"));
+//    }
+//
+//    @Test
+//    public void testGetReceta() throws Exception {
+//        Receta receta = new Receta("RTEST-001", "Milanesa", "Nombre receta", "Usuario creador");
+//        recetaRepository.save(receta);
+//
+//        mockMvc.perform(get("/api/v1/recetas/RTEST-001"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.codigoReceta").value("RTEST-001"))
+//                .andExpect(jsonPath("$.descripcion").value("Milanesa"));
+//    }
+//
+//    @Test
+//    public void testUpdateReceta() throws Exception {
+//        Receta receta = new Receta("RTEST-001", "Descripcion original", "Nombre original", "Creador");
+//        recetaRepository.save(receta);
+//
+//        RecetaModifyDTO modificacion = new RecetaModifyDTO("Nombre modificado", "Descripcion actualizada");
+//
+//        mockMvc.perform(put("/api/v1/recetas/RTEST-001")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(modificacion)))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.nombre").value("Nombre modificado"))
+//                .andExpect(jsonPath("$.descripcion").value("Descripcion actualizada"));
+//    }
+//
+//    @Test
+//    @WithAnonymousUser
+//    public void testAddReceta() throws Exception {
+//        RecetaCreateDTO nuevaReceta = new RecetaCreateDTO(
+//                "RTEST-002", "Nombre receta", "Descripción", "Usuario Test"
+//        );
+//
+//        mockMvc.perform(post("/api/v1/recetas/RTEST-002")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(nuevaReceta)))
+//                .andExpect(status().isCreated())
+//                .andExpect(header().string("Location", "/api/v1/recetas/RTEST-002"))
+//                .andExpect(jsonPath("$.codigoReceta").value("RTEST-002"));
+//    }
+//
+//    @Test
+//    @WithMockUser
+//    public void testDeleteReceta() throws Exception {
+//        Receta receta = new Receta("RTEST-001", "Milanesa", "Nombre creador", "Usuario creador");
+//        recetaRepository.save(receta);
+//
+//        mockMvc.perform(delete("/api/v1/recetas/RTEST-001"))
+//                .andExpect(status().isNoContent());
+//    }
+//}

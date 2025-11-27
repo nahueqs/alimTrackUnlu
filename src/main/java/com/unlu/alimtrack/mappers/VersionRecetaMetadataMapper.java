@@ -3,33 +3,42 @@ package com.unlu.alimtrack.mappers;
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface VersionRecetaMetadataMapper {
+public abstract class VersionRecetaMetadataMapper {
 
-    VersionRecetaMetadataMapper mapper = Mappers.getMapper(VersionRecetaMetadataMapper.class);
+    @Lazy
+    @Autowired
+    protected UsuarioServiceImpl usuarioServiceImpl;
 
-    @Mapping(target = "creadoPor.username", source = "usernameCreador")
+    @Mapping(target = "creadoPor", source = "emailCreador", qualifiedByName = "emailToModel")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "fechaCreacion", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "recetaPadre.codigoReceta", source = "codigoRecetaPadre")
-    VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
+    public abstract VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
     @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
-    VersionRecetaMetadataResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
+    public abstract VersionRecetaMetadataResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
 
-    List<VersionRecetaMetadataResponseDTO> toVersionRecetaResponseDTOList(
+    public abstract List<VersionRecetaMetadataResponseDTO> toVersionRecetaResponseDTOList(
             List<VersionRecetaModel> versionRecetaModels);
 
-    void updateModelFromModifyDTO(VersionRecetaModifyDTO modificacion, @MappingTarget VersionRecetaModel model);
+    public abstract void updateModelFromModifyDTO(VersionRecetaModifyDTO modificacion, @MappingTarget VersionRecetaModel model);
+
+
+    @Named("emailToModel")
+    protected UsuarioModel usernameEmailToModel(String email) {
+        return usuarioServiceImpl.getUsuarioModelByEmail(email);
+    }
 }

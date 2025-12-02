@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response.VersionReceta;
+package com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura;
 
 import java.util.List;
 

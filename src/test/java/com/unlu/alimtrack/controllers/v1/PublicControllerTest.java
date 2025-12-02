@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.services.PublicRequestsService;
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,9 @@ public class PublicControllerTest {
     @Test
     void getAllProducciones_shouldReturnPublicDTOListAndOk() throws Exception {
         // Arrange
-        ProduccionMetadataPublicaResponseDTO produccion1 = new ProduccionMetadataPublicaResponseDTO("PROD-001", "LOTE-A", "EN_PROCESO", LocalDateTime.now(), null);
-        ProduccionMetadataPublicaResponseDTO produccion2 = new ProduccionMetadataPublicaResponseDTO("PROD-002", "LOTE-B", "FINALIZADO", LocalDateTime.now().minusDays(1), LocalDateTime.now());
-        List<ProduccionMetadataPublicaResponseDTO> producciones = Arrays.asList(produccion1, produccion2);
+        MetadataProduccionPublicaResponseDTO produccion1 = new MetadataProduccionPublicaResponseDTO("PROD-001", "V1", "LOTE-A", "EN_PROCESO", LocalDateTime.now(), null, null);
+        MetadataProduccionPublicaResponseDTO produccion2 = new MetadataProduccionPublicaResponseDTO("PROD-002", "V1", "LOTE-B", "FINALIZADO", LocalDateTime.now().minusDays(1), LocalDateTime.now(), LocalDateTime.now().minusDays(1));
+        List<MetadataProduccionPublicaResponseDTO> producciones = Arrays.asList(produccion1, produccion2);
 
         given(publicRequestService.getAllProduccionesMetadataPublico()).willReturn(producciones);
 
@@ -98,7 +98,7 @@ public class PublicControllerTest {
         // Arrange
         String codigoProduccion = "PROD-001";
         LocalDateTime now = LocalDateTime.now();
-        ProduccionEstadoPublicaResponseDTO produccionPublicDTO = new ProduccionEstadoPublicaResponseDTO(codigoProduccion, TipoEstadoProduccion.EN_PROCESO, now);
+        EstadoProduccionPublicoResponseDTO produccionPublicDTO = new EstadoProduccionPublicoResponseDTO(codigoProduccion, TipoEstadoProduccion.EN_PROCESO, now);
 
         given(publicRequestService.getProduccionPublic(codigoProduccion)).willReturn(produccionPublicDTO);
 

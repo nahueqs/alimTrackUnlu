@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ColumnaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.ColumnaTablaResponseDTO;
 import com.unlu.alimtrack.models.ColumnaTablaModel;
 import org.springframework.stereotype.Component;
 

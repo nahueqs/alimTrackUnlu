@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response.produccion.protegido;
+package com.unlu.alimtrack.DTOS.response.Produccion.protegido;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -17,6 +17,7 @@ public record ProduccionMetadataResponseDTO(
         @NotNull
         LocalDateTime fechaInicio,
         LocalDateTime fechaFin,
+        LocalDateTime fechaModificacion,
         String observaciones
 ) {
 

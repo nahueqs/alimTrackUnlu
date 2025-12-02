@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services.impl;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
-import com.unlu.alimtrack.mappers.VersionRecetaMetadataMapper;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataResponseDTO;
+import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.ProduccionQueryService;
@@ -19,7 +19,7 @@ import java.util.List;
 public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService {
 
     private final VersionRecetaRepository versionRecetaRepository;
-    private final VersionRecetaMetadataMapper versionRecetaMetadataMapper;
+    private final VersionRecetaMapper versionRecetaMapper;
     private final VersionRecetaValidator versionRecetaValidator;
     private final ProduccionQueryService produccionQueryService;
 
@@ -28,12 +28,13 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
         return versionRecetaRepository.existsByCreadaPorEmail(email);
     }
 
+
     @Override
-    public List<VersionRecetaMetadataResponseDTO> findAllByCreadoPorEmail(String email) {
+    public List<VersionMetadataResponseDTO> findAllByCreadoPorEmail(String email) {
         List<VersionRecetaModel> versiones = versionRecetaRepository.findAllByCreadoPorEmail(
                 email);
         versionRecetaValidator.validarVersionRecetaList(versiones);
-        return versionRecetaMetadataMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
     }
 
     @Override

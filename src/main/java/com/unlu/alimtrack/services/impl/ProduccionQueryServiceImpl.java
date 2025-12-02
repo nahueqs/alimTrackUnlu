@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
@@ -51,7 +51,7 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
 
     @Override
     @Cacheable(value = "produccionPublic", key = "#codigoProduccion")
-    public ProduccionEstadoPublicaResponseDTO getProduccionPublic(String codigoProduccion) {
+    public EstadoProduccionPublicoResponseDTO getEstadoProduccion(String codigoProduccion) {
         log.info("Buscando información pública de la producción con código: {}", codigoProduccion);
         return produccionRepository.findProduccionPublicByCodigoProduccion(codigoProduccion)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producción no encontrada con código: " + codigoProduccion));

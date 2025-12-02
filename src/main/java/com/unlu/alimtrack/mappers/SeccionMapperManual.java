@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.CampoSimpleResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.GrupoCamposResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.TablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.CampoSimpleResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.GrupoCamposResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.TablaResponseDTO;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.models.CampoSimpleModel;
 import com.unlu.alimtrack.models.GrupoCamposModel;

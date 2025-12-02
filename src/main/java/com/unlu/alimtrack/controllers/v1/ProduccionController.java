@@ -4,10 +4,10 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.UltimasRespuestasProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.ProduccionQueryService;
 import jakarta.validation.Valid;
@@ -84,10 +84,10 @@ public class ProduccionController {
     }
 
     @GetMapping("/{codigoProduccion}/public")
-    public ResponseEntity<ProduccionEstadoPublicaResponseDTO> getProduccionPublic(
+    public ResponseEntity<EstadoProduccionPublicoResponseDTO> getEstadoProduccion(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener la información pública de la producción: {}", codigoProduccion);
-        ProduccionEstadoPublicaResponseDTO produccion = produccionQueryService.getProduccionPublic(codigoProduccion);
+        EstadoProduccionPublicoResponseDTO produccion = produccionQueryService.getEstadoProduccion(codigoProduccion);
         log.debug("Retornando información pública para la producción {}", codigoProduccion);
         return ResponseEntity.ok(produccion);
     }

@@ -7,11 +7,13 @@ import com.unlu.alimtrack.models.CampoSimpleModel;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class VersionRecetaValidator {
 
@@ -56,9 +58,11 @@ public class VersionRecetaValidator {
     }
 
     public void validarCampoPerteneceAVersion(ProduccionModel produccion, CampoSimpleModel campo) {
-        if (produccion == null || campo == null) {
-            throw new RecursoNoEncontradoException("Produccion o campo no encontrado");
-        }
+
+        log.debug("produccion codigo: {}", produccion.getCodigoProduccion());
+        log.debug("campo id: {}", campo.getId());
+        log.debug("produccion version: {}", produccion.getVersionReceta().getCodigoVersionReceta());
+        log.debug("campo seccion version {}", campo.getSeccion().getVersionRecetaPadre());
 
         if (!campo.getSeccion().getVersionRecetaPadre().equals(produccion.getVersionReceta())) {
             throw new ModificacionInvalidaException("El campo no pertenece a la version de la produccion");

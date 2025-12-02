@@ -1,14 +1,13 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.UltimasRespuestasProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestasProduccionPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestasProduccionPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 import com.unlu.alimtrack.mappers.PublicMapper;
-import com.unlu.alimtrack.services.ProduccionManagementService;
-import com.unlu.alimtrack.services.ProduccionQueryService;
-import com.unlu.alimtrack.services.PublicRequestsService;
+import com.unlu.alimtrack.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,12 @@ public class PublicRequestsServiceImpl implements PublicRequestsService {
 
     private final ProduccionQueryService produccionQueryService;
     private final ProduccionManagementService produccionManagementService;
+    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
     private final PublicMapper publicMapper;
 
+
     @Override
-    public List<ProduccionMetadataPublicaResponseDTO> getAllProduccionesMetadataPublico() {
+    public List<MetadataProduccionPublicaResponseDTO> getAllProduccionesMetadataPublico() {
         ProduccionFilterRequestDTO filtros = new ProduccionFilterRequestDTO(null, null, null, null, null, null);
         return produccionQueryService.getAllProduccionesMetadata(filtros).stream()
                 .map(publicMapper::metadataProduccionToPublicDTO)
@@ -41,7 +42,12 @@ public class PublicRequestsServiceImpl implements PublicRequestsService {
     }
 
     @Override
-    public ProduccionEstadoPublicaResponseDTO getProduccionPublic(String codigoProduccion) {
-        return produccionQueryService.getProduccionPublic(codigoProduccion);
+    public EstadoProduccionPublicoResponseDTO getProduccionPublic(String codigoProduccion) {
+        return produccionQueryService.getEstadoProduccion(codigoProduccion);
+    }
+
+    @Override
+    public VersionEstructuraPublicResponseDTO getEstructuraVersionPublica(String codigoVersionReceta) {
+        return versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersionReceta);
     }
 }

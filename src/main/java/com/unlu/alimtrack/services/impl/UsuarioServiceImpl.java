@@ -2,7 +2,7 @@ package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
 import com.unlu.alimtrack.exceptions.BorradoFallidoException;
 import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
 import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;

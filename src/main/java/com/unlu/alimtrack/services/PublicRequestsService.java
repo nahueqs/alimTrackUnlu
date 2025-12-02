@@ -1,17 +1,20 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestasProduccionPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestasProduccionPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 
 import java.util.List;
 
 public interface PublicRequestsService {
 
-    List<ProduccionMetadataPublicaResponseDTO> getAllProduccionesMetadataPublico();
+    List<MetadataProduccionPublicaResponseDTO> getAllProduccionesMetadataPublico();
 
     RespuestasProduccionPublicResponseDTO getEstadoActualProduccionPublico(String codigoProduccion);
 
-    ProduccionEstadoPublicaResponseDTO getProduccionPublic(String codigoProduccion);
+    EstadoProduccionPublicoResponseDTO getProduccionPublic(String codigoProduccion);
+
+    VersionEstructuraPublicResponseDTO getEstructuraVersionPublica(String codigoVersionReceta);
 
 }

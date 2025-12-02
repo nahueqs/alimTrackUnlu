@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.UltimasRespuestasProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestasProduccionPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestasProduccionPublicResponseDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -13,7 +13,7 @@ public interface PublicMapper {
 
     // Mapeo de DTO completo a DTO público
     @Named("metadataProduccionToPublicDTO")
-    ProduccionMetadataPublicaResponseDTO metadataProduccionToPublicDTO(ProduccionMetadataResponseDTO produccion);
+    MetadataProduccionPublicaResponseDTO metadataProduccionToPublicDTO(ProduccionMetadataResponseDTO produccion);
 
 
     @Mapping(target = "produccion", source = "produccion", qualifiedByName = "metadataProduccionToPublicDTO")

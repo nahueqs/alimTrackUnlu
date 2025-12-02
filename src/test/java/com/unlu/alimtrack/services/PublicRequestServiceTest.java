@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.mappers.PublicMapper;
 import com.unlu.alimtrack.services.impl.ProduccionManagementServiceImpl;
@@ -40,14 +40,14 @@ public class PublicRequestServiceTest {
     @Test
     void getAllProduccionesPublicas_shouldCallQueryServiceAndMapper() {
         // Arrange
-        ProduccionMetadataResponseDTO fullDto = new ProduccionMetadataResponseDTO("PROD-001", "V1", "encargado", "email", "lote", "ESTADO", LocalDateTime.now(), null, null);
-        ProduccionMetadataPublicaResponseDTO publicDto = new ProduccionMetadataPublicaResponseDTO("PROD-001", "lote", "ESTADO", LocalDateTime.now(), null);
+        ProduccionMetadataResponseDTO fullDto = new ProduccionMetadataResponseDTO("PROD-001", "V1", "encargado", "email", "lote", "ESTADO", LocalDateTime.now(), null, null, null);
+        MetadataProduccionPublicaResponseDTO publicDto = new MetadataProduccionPublicaResponseDTO("PROD-001", "V1", "lote", "ESTADO", LocalDateTime.now(), null, null);
 
         when(produccionQueryService.getAllProduccionesMetadata(any(ProduccionFilterRequestDTO.class))).thenReturn(Collections.singletonList(fullDto));
         when(publicMapper.metadataProduccionToPublicDTO(fullDto)).thenReturn(publicDto);
 
         // Act
-        List<ProduccionMetadataPublicaResponseDTO> result = publicRequestService.getAllProduccionesMetadataPublico();
+        List<MetadataProduccionPublicaResponseDTO> result = publicRequestService.getAllProduccionesMetadataPublico();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -61,16 +61,16 @@ public class PublicRequestServiceTest {
     void getProduccionPublic_shouldCallQueryService() {
         // Arrange
         String codigoProduccion = "PROD-001";
-        ProduccionEstadoPublicaResponseDTO produccionPublicDTO = new ProduccionEstadoPublicaResponseDTO(codigoProduccion, TipoEstadoProduccion.EN_PROCESO, LocalDateTime.now());
+        EstadoProduccionPublicoResponseDTO produccionPublicDTO = new EstadoProduccionPublicoResponseDTO(codigoProduccion, TipoEstadoProduccion.EN_PROCESO, LocalDateTime.now());
 
-        when(produccionQueryService.getProduccionPublic(codigoProduccion)).thenReturn(produccionPublicDTO);
+        when(produccionQueryService.getEstadoProduccion(codigoProduccion)).thenReturn(produccionPublicDTO);
 
         // Act
-        ProduccionEstadoPublicaResponseDTO result = publicRequestService.getProduccionPublic(codigoProduccion);
+        EstadoProduccionPublicoResponseDTO result = publicRequestService.getProduccionPublic(codigoProduccion);
 
         // Assert
         assertThat(result).isEqualTo(produccionPublicDTO);
-        verify(produccionQueryService, times(1)).getProduccionPublic(codigoProduccion);
+        verify(produccionQueryService, times(1)).getEstadoProduccion(codigoProduccion);
         verifyNoInteractions(produccionManagementServiceImpl, publicMapper); // No deben ser llamados
     }
 }

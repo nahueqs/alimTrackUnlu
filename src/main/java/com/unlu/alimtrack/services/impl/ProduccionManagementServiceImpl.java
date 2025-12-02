@@ -3,11 +3,11 @@ package com.unlu.alimtrack.services.impl;
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProgresoProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.UltimasRespuestasProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.ProgresoProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exceptions.CambioEstadoProduccionInvalido;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
@@ -27,8 +27,7 @@ import com.unlu.alimtrack.services.validators.ProductionManagerServiceValidator;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +43,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
     private final ProduccionRepository produccionRepository;
     private final RespuestaCampoRepository respuestaCampoRepository;
     private final RespuestaTablaRepository respuestaTablaRepository;
-    private final TablaRepository tablaRepository;
 
     private final ProductionManagerServiceValidator productionManagerServiceValidator;
     private final VersionRecetaValidator versionRecetaValidator;
@@ -66,6 +64,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         ProduccionModel nuevaProduccion = produccionMapper.createDTOtoModel(createDTO);
         nuevaProduccion.setEstado(TipoEstadoProduccion.EN_PROCESO);
         nuevaProduccion.setFechaInicio(LocalDateTime.now());
+        nuevaProduccion.setFechaModificacion(LocalDateTime.now());
 
         return produccionMapper.modelToResponseDTO(produccionRepository.save(nuevaProduccion));
     }
@@ -93,6 +92,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         // 1. Validar contexto
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
         CampoSimpleModel campo = productionManagerServiceValidator.validarCampoExiste(idCampo);
+
         versionRecetaValidator.validarCampoPerteneceAVersion(produccion, campo);
 
         // 2. Persistir
@@ -116,13 +116,13 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
 
         //1. Recuperar estructura (esqueleto de la receta)
-        VersionRecetaCompletaResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
+        VersionEstructuraPublicResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
         log.debug("estructura obtenida");
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findByIdProduccion(produccion);
         log.debug("respuestasCampos obtenida");
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
         log.debug("respuestasTablas obtenida");
-        ProgresoProduccionResponseDTO progreso = calcularProgresoGeneral2(estructura, respuestasCampos, respuestasTablas);
+        ProgresoProduccionResponseDTO progreso = calcularProgresoGeneral2(estructura.totalCampos(), estructura.totalCeldas(), respuestasCampos, respuestasTablas);
         log.debug("progreso obtenida");
 
         return new UltimasRespuestasProduccionResponseDTO(
@@ -136,46 +136,17 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
     @Override
     public UltimasRespuestasProduccionResponseDTO test() {
-
-
-        ProduccionModel produccion = buscarProduccionPorCodigo("TARTA-25-10-A");
-        log.debug("ProduccionModel obtenida");
-
-        ProduccionMetadataResponseDTO produccionMetadata = produccionMapper.modelToResponseDTO(produccion);
-        log.debug("produccionMetadata obtenida");
-
-        String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
-
-        //1. Recuperar estructura (esqueleto de la receta)
-        VersionRecetaCompletaResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
-        log.debug("estructura obtenida");
-        List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findByIdProduccion(produccion);
-        log.debug("respuestasCampos obtenida");
-        List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
-        log.debug("respuestasTablas obtenida");
-        ProgresoProduccionResponseDTO progreso = calcularProgresoGeneral2(estructura, respuestasCampos, respuestasTablas);
-        log.debug("progreso obtenida");
-
-        return new UltimasRespuestasProduccionResponseDTO(
-                produccionMetadata,
-                respuestaCampoMapper.toResponseDTOList(respuestasCampos),
-                respuestaTablasMapper.toResponseDTOList(respuestasTablas),
-                progreso,
-                LocalDateTime.now()
-        );
-
+        return null;
     }
 
     // ============================================================================================
     // 3. HELPERS Y LÓGICA DE SOPORTE
     // ============================================================================================
     private ProgresoProduccionResponseDTO calcularProgresoGeneral2(
-            VersionRecetaCompletaResponseDTO estructura,
+            Integer totalCampos, Integer totalCeldas,
             List<RespuestaCampoModel> respuestasCampos,
             List<RespuestaTablaModel> respuestasTablas) {
 
-        int totalCampos = estructura.totalCampos();
-        int totalCeldas = estructura.totalCeldasTablas();
 
         int camposRespondidos = respuestasCampos.size();
         int celdasRespondidas = respuestasTablas.size();
@@ -212,6 +183,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
         respuesta.setValor(request.valor());
         respuesta.setTimestamp(LocalDateTime.now());
+        actualizarFechaModificacion(produccion.getCodigoProduccion(), LocalDateTime.now());
 
         return respuestaCampoRepository.save(respuesta);
     }
@@ -238,6 +210,12 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
     private boolean esEstadoFinal(TipoEstadoProduccion estado) {
         return estado == TipoEstadoProduccion.FINALIZADA || estado == TipoEstadoProduccion.CANCELADA;
+    }
+
+    private void actualizarFechaModificacion(String codigoVersion, LocalDateTime fechaModificacion) {
+        ProduccionModel produccion = buscarProduccionPorCodigo(codigoVersion);
+        produccion.setFechaModificacion(fechaModificacion);
+        produccionRepository.save(produccion);
     }
 
 

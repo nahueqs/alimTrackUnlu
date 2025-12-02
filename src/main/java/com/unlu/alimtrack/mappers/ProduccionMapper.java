@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
@@ -39,7 +39,7 @@ public abstract class ProduccionMapper {
     public abstract ProduccionModel createDTOtoModel(ProduccionCreateDTO createDTO);
 
 
-    public abstract ProduccionMetadataPublicaResponseDTO modelToPublicDTO(ProduccionModel model);
+    public abstract MetadataProduccionPublicaResponseDTO modelToPublicDTO(ProduccionModel model);
 
 
     @Named("emailToModel")

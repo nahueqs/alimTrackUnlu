@@ -2,7 +2,7 @@ package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.RecetaMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Receta.RecetaMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.BorradoFallidoException;
 import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;

@@ -1,8 +1,8 @@
-package com.unlu.alimtrack.DTOS.response.produccion.protegido;
+package com.unlu.alimtrack.DTOS.response.Produccion.protegido;
 
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProgresoProduccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCeldaTablaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.ProgresoProduccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCeldaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

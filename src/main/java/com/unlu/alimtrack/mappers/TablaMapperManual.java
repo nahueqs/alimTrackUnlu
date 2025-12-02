@@ -1,9 +1,9 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.secciones.TablaCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.ColumnaTablaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.FilaTablaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.TablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.ColumnaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.FilaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.TablaResponseDTO;
 import com.unlu.alimtrack.models.TablaModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

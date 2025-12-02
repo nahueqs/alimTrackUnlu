@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.DTOS.response.RecetaMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Receta.RecetaMetadataResponseDTO;
 
 import java.util.List;
 

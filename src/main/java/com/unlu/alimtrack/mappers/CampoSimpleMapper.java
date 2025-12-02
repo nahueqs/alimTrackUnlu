@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.secciones.CampoSimpleCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.CampoSimpleResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.CampoSimpleResponseDTO;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.models.CampoSimpleModel;
 import org.mapstruct.Mapper;

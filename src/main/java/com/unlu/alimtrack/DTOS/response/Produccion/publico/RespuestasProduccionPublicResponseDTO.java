@@ -1,10 +1,11 @@
-package com.unlu.alimtrack.DTOS.response.produccion.publico;
+package com.unlu.alimtrack.DTOS.response.Produccion.publico;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public record RespuestasProduccionPublicResponseDTO(
-        ProduccionMetadataPublicaResponseDTO produccion,
+
+        MetadataProduccionPublicaResponseDTO produccion,
 
         List<RespuestaCampoResponseDTO> respuestasCampos,
 

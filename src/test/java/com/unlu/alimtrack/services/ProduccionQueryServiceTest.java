@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.models.ProduccionModel;

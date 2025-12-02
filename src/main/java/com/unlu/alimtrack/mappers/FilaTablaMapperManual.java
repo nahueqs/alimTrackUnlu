@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.FilaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.FilaTablaResponseDTO;
 import com.unlu.alimtrack.models.FilaTablaModel;
 import org.springframework.stereotype.Component;
 

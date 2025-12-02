@@ -1,10 +1,10 @@
-package com.unlu.alimtrack.DTOS.response.VersionReceta;
+package com.unlu.alimtrack.DTOS.response.VersionReceta.protegido;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-public record VersionRecetaMetadataResponseDTO(
+public record VersionMetadataResponseDTO(
         @NotNull
         String codigoVersionReceta,
 

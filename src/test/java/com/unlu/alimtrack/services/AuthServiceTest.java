@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
 import com.unlu.alimtrack.auth.AuthResponse;
 import com.unlu.alimtrack.auth.AuthService;
 import com.unlu.alimtrack.auth.LoginRequestDTO;

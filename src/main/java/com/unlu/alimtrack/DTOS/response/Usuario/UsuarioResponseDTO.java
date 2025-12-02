@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response;
+package com.unlu.alimtrack.DTOS.response.Usuario;
 
 import jakarta.validation.constraints.NotNull;
 

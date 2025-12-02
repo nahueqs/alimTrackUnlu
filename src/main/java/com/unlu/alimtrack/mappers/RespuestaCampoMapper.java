@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.models.RespuestaCampoModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

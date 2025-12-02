@@ -84,7 +84,14 @@ public class ProductionManagerServiceValidator {
 
     public CampoSimpleModel validarCampoExiste(Long idCampo) {
         log.debug("Validando existencia del campo con ID: {}", idCampo);
-        return campoSimpleRepository.findById(idCampo)
+
+        CampoSimpleModel campo = campoSimpleRepository.findById(idCampo)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Campo no encontrado con ID: " + idCampo));
+
+        log.debug("Campo encontrado : {}", campo);
+        log.debug("ID SECCION {}", campo.getSeccion().toString());
+
+
+        return campo;
     }
 }

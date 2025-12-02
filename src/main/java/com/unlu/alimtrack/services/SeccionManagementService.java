@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.secciones.SeccionCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.SeccionResponseDTO;
 import com.unlu.alimtrack.models.SeccionModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 

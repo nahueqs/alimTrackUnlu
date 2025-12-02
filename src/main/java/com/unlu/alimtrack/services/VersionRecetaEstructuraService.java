@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 
 public interface VersionRecetaEstructuraService {
-    VersionRecetaCompletaResponseDTO getVersionRecetaCompletaResponseDTOByCodigo(String codigoVersion);
+    VersionEstructuraPublicResponseDTO getVersionRecetaCompletaResponseDTOByCodigo(String codigoVersion);
 }

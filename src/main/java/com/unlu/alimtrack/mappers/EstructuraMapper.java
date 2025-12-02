@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.*;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.*;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.models.*;
 import org.mapstruct.Mapper;

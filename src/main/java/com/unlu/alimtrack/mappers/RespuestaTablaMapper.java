@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCeldaTablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCeldaTablaResponseDTO;
 import com.unlu.alimtrack.enums.TipoDatoCampo;
 import com.unlu.alimtrack.models.RespuestaTablaModel;
 import com.unlu.alimtrack.models.UsuarioModel;

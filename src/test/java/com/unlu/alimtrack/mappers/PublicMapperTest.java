@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.mappers;
 
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionMetadataPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
@@ -25,11 +25,12 @@ public class PublicMapperTest {
                 "EN_PROCESO",
                 LocalDateTime.now(),
                 null,
+                null,
                 "Observaciones"
         );
 
         // Act
-        ProduccionMetadataPublicaResponseDTO publicDto = publicMapper.metadataProduccionToPublicDTO(fullDto);
+        MetadataProduccionPublicaResponseDTO publicDto = publicMapper.metadataProduccionToPublicDTO(fullDto);
 
         // Assert
         assertThat(publicDto.codigoProduccion()).isEqualTo(fullDto.codigoProduccion());
@@ -41,7 +42,7 @@ public class PublicMapperTest {
         // Esto se comprueba por la ausencia de los getters en el record.
         // Este test sirve como documentación de esa expectativa.
         assertThat(publicDto.getClass().getDeclaredFields()).allSatisfy(field ->
-                assertThat(field.getName()).isNotIn("encargado", "emailCreador", "codigoVersion", "observaciones")
+                assertThat(field.getName()).isNotIn("encargado", "emailCreador", "observaciones")
         );
     }
 

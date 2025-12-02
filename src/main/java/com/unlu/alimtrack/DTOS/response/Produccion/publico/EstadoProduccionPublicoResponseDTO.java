@@ -1,12 +1,12 @@
-package com.unlu.alimtrack.DTOS.response.produccion.publico;
+package com.unlu.alimtrack.DTOS.response.Produccion.publico;
 
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 
 import java.time.LocalDateTime;
 
-public record ProduccionEstadoPublicaResponseDTO(
+public record EstadoProduccionPublicoResponseDTO(
         String codigoProduccion,
         TipoEstadoProduccion estado,
-        LocalDateTime fechaUltimaModificacion
+        LocalDateTime ultimaModificacion
 ) {
 }

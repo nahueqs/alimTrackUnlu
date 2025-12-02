@@ -2,7 +2,8 @@ package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionMetadataPublicResponseDTO;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
@@ -14,7 +15,7 @@ import java.util.List;
 
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public abstract class VersionRecetaMetadataMapper {
+public abstract class VersionRecetaMapper {
 
     @Lazy
     @Autowired
@@ -29,12 +30,17 @@ public abstract class VersionRecetaMetadataMapper {
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
     @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
-    public abstract VersionRecetaMetadataResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
+    public abstract VersionMetadataResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
 
-    public abstract List<VersionRecetaMetadataResponseDTO> toVersionRecetaResponseDTOList(
+    public abstract List<VersionMetadataResponseDTO> toVersionRecetaResponseDTOList(
             List<VersionRecetaModel> versionRecetaModels);
 
     public abstract void updateModelFromModifyDTO(VersionRecetaModifyDTO modificacion, @MappingTarget VersionRecetaModel model);
+
+
+    @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
+    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
+    public abstract VersionMetadataPublicResponseDTO toVersionMetadataPublicResponseDTO(VersionRecetaModel versionModel);
 
 
     @Named("emailToModel")

@@ -3,8 +3,8 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.protegido.ProduccionMetadataResponseDTO;
-import com.unlu.alimtrack.DTOS.response.produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.enums.TipoRolUsuario;
 import com.unlu.alimtrack.exceptions.CambioEstadoProduccionInvalido;
@@ -93,7 +93,7 @@ public class ProduccionManagementServiceImplTest {
         ProduccionCreateDTO createDTO = new ProduccionCreateDTO("V-001", "PROD-001", "creator@test.com", "LOTE-1", "ENCARGADO", "Obs");
         ProduccionModel nuevaProduccion = new ProduccionModel();
         nuevaProduccion.setUsuarioCreador(usuarioCreador); // Ensure the new production has a creator
-        ProduccionMetadataResponseDTO responseDTO = new ProduccionMetadataResponseDTO("PROD-001", "V-001", "ENCARGADO", "creator@test.com", "LOTE-1", "EN_PROCESO", LocalDateTime.now(), null, "Obs");
+        ProduccionMetadataResponseDTO responseDTO = new ProduccionMetadataResponseDTO("PROD-001", "V-001", "ENCARGADO", "creator@test.com", "LOTE-1", "EN_PROCESO", LocalDateTime.now(), null, null, "Obs");
 
         doNothing().when(productionManagerServiceValidator).verificarCreacionProduccion(createDTO);
         when(produccionMapper.createDTOtoModel(createDTO)).thenReturn(nuevaProduccion);

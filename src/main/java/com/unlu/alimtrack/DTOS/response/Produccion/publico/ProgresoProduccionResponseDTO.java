@@ -1,4 +1,4 @@
-package com.unlu.alimtrack.DTOS.response.produccion.publico;
+package com.unlu.alimtrack.DTOS.response.Produccion.publico;
 
 public record ProgresoProduccionResponseDTO(
         int totalCampos,

@@ -2,21 +2,21 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataResponseDTO;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 
 import java.util.List;
 
 public interface VersionRecetaMetadataService {
-    List<VersionRecetaMetadataResponseDTO> findAllVersiones();
+    List<VersionMetadataResponseDTO> findAllVersiones();
 
-    VersionRecetaMetadataResponseDTO findByCodigoVersion(String codigoVersion);
+    VersionMetadataResponseDTO findByCodigoVersion(String codigoVersion);
 
-    List<VersionRecetaMetadataResponseDTO> findAllByCodigoReceta(String codigoRecetaPadre);
+    List<VersionMetadataResponseDTO> findAllByCodigoReceta(String codigoRecetaPadre);
 
-    VersionRecetaMetadataResponseDTO saveVersionReceta(String codigoRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDTO);
+    VersionMetadataResponseDTO saveVersionReceta(String codigoRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDTO);
 
-    VersionRecetaMetadataResponseDTO updateVersionReceta(String codigoVersion, VersionRecetaModifyDTO modificacion);
+    VersionMetadataResponseDTO updateVersionReceta(String codigoVersion, VersionRecetaModifyDTO modificacion);
 
     void deleteVersionReceta(String codigoVersion);
 

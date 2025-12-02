@@ -2,7 +2,7 @@ package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.UsuarioModifyDTO;
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
 import com.unlu.alimtrack.enums.TipoRolUsuario;
 import com.unlu.alimtrack.models.UsuarioModel;
 import org.mapstruct.*;

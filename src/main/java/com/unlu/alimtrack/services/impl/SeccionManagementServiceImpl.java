@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.create.secciones.SeccionCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.SeccionResponseDTO;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.*;
 import com.unlu.alimtrack.models.*;

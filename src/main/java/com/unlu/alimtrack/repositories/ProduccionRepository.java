@@ -1,6 +1,6 @@
 package com.unlu.alimtrack.repositories;
 
-import com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.models.ProduccionModel;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,9 +17,9 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
 
     Optional<ProduccionModel> findByCodigoProduccion(String codigoProduccion);
 
-    @Query("SELECT new com.unlu.alimtrack.DTOS.response.produccion.publico.ProduccionEstadoPublicaResponseDTO(p.codigoProduccion, p.estado, p.fechaModificacion) " +
+    @Query("SELECT new com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO(p.codigoProduccion, p.estado, p.fechaModificacion) " +
             "FROM ProduccionModel p WHERE p.codigoProduccion = :codigoProduccion")
-    Optional<ProduccionEstadoPublicaResponseDTO> findProduccionPublicByCodigoProduccion(@Param("codigoProduccion") String codigoProduccion);
+    Optional<EstadoProduccionPublicoResponseDTO> findProduccionPublicByCodigoProduccion(@Param("codigoProduccion") String codigoProduccion);
 
     @Query("SELECT p FROM ProduccionModel p WHERE "
             + "(:codigoVersionReceta IS NULL OR p.versionReceta.codigoVersionReceta = :codigoVersionReceta) AND "

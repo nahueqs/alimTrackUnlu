@@ -1,10 +1,10 @@
 package com.unlu.alimtrack.services.impl;
 
-import com.unlu.alimtrack.DTOS.response.VersionReceta.SeccionResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.TablaResponseDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.VersionRecetaCompletaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.SeccionResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.TablaResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
-import com.unlu.alimtrack.mappers.VersionRecetaMetadataMapper;
+import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.SeccionManagementService;
@@ -24,12 +24,12 @@ public class VersionRecetaEstructuraServiceImpl implements VersionRecetaEstructu
 
     private final VersionRecetaRepository versionRecetaRepository;
     private final SeccionManagementService seccionManagementService;
-    private final VersionRecetaMetadataMapper versionRecetaMetadataMapper;
+    private final VersionRecetaMapper versionRecetaMapper;
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "versionRecetaEstructura", key = "#codigoVersion")
-    public VersionRecetaCompletaResponseDTO getVersionRecetaCompletaResponseDTOByCodigo(String codigoVersion) {
+    public VersionEstructuraPublicResponseDTO getVersionRecetaCompletaResponseDTOByCodigo(String codigoVersion) {
         log.info("Obteniendo estructura completa para la versión de receta: {}", codigoVersion);
 
         VersionRecetaModel versionReceta = versionRecetaRepository.findByCodigoVersionReceta(codigoVersion)
@@ -48,20 +48,17 @@ public class VersionRecetaEstructuraServiceImpl implements VersionRecetaEstructu
             }
         }
         log.debug("Calculando contadores de estructura para la versión {}", codigoVersion);
-        Integer cantCampos = seccionManagementService.getCantidadCampos(secciones);
-        Integer cantTablas = seccionManagementService.getCantidadTablas(secciones);
-        Integer cantCeldasTablas = seccionManagementService.getCantidadCeldasTablas(secciones);
+        Integer totalCampos = seccionManagementService.getCantidadCampos(secciones);
+        Integer totalCeldas = seccionManagementService.getCantidadTablas(secciones);
 
         log.info("Estructura completa para la versión {} obtenida exitosamente.", codigoVersion);
-        return new VersionRecetaCompletaResponseDTO(
-                true,
-                versionReceta.getCodigoVersionReceta(),
-                versionRecetaMetadataMapper.toVersionRecetaResponseDTO(versionReceta),
+        return new VersionEstructuraPublicResponseDTO(
+                versionRecetaMapper.toVersionMetadataPublicResponseDTO(versionReceta),
                 secciones,
-                secciones.size(),
-                cantCampos,
-                cantTablas,
-                cantCeldasTablas
+                totalCampos,
+                totalCeldas
         );
+
+
     }
 }

@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.auth;
 
 
-import com.unlu.alimtrack.DTOS.response.UsuarioResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
 import lombok.Builder;
 
 @Builder

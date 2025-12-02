@@ -2,7 +2,7 @@ package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
-import com.unlu.alimtrack.DTOS.response.RecetaMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Receta.RecetaMetadataResponseDTO;
 import com.unlu.alimtrack.models.RecetaModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

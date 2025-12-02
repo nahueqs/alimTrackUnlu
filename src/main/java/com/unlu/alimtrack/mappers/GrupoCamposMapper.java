@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.secciones.GrupoCamposCreateDTO;
-import com.unlu.alimtrack.DTOS.response.VersionReceta.GrupoCamposResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.estructura.GrupoCamposResponseDTO;
 import com.unlu.alimtrack.models.GrupoCamposModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

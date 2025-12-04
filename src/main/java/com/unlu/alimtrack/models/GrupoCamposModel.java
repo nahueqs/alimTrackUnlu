@@ -2,20 +2,23 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Table(name = "grupo_campos", uniqueConstraints = @UniqueConstraint(columnNames = {"subtitulo",
         "id_seccion"}))
 public class GrupoCamposModel {
@@ -40,7 +43,8 @@ public class GrupoCamposModel {
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("grupo")
-    private List<CampoSimpleModel> campos = new ArrayList<>();
+    @BatchSize(size = 25)
+    private Set<CampoSimpleModel> campos = new HashSet<>();
 
     public void addCampo(CampoSimpleModel campo) {
         campos.add(campo);

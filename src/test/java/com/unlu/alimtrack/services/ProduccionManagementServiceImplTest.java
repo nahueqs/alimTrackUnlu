@@ -144,7 +144,7 @@ public class ProduccionManagementServiceImplTest {
         // Arrange
         long idCampo = 10L;
         String emailCreador = "test@example.com";
-        RespuestaCampoRequestDTO requestDTO = new RespuestaCampoRequestDTO("valor", emailCreador); // Corrected: Pass String for emailCreador
+        RespuestaCampoRequestDTO requestDTO = new RespuestaCampoRequestDTO("valor", emailCreador);
         CampoSimpleModel campo = new CampoSimpleModel();
         campo.setId(idCampo);
         RespuestaCampoModel respuesta = new RespuestaCampoModel();

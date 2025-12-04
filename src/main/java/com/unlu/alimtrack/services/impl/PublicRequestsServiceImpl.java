@@ -1,12 +1,14 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestasProduccionPublicResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 import com.unlu.alimtrack.mappers.PublicMapper;
+import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +49,10 @@ public class PublicRequestsServiceImpl implements PublicRequestsService {
     }
 
     @Override
-    public VersionEstructuraPublicResponseDTO getEstructuraVersionPublica(String codigoVersionReceta) {
-        return versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersionReceta);
+    public VersionEstructuraPublicResponseDTO getEstructuraProduccion(String codigoProduccion) {
+
+        ProduccionMetadataResponseDTO produccion = produccionQueryService.findByCodigoProduccion(codigoProduccion);
+
+        return versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(produccion.codigoVersion());
     }
 }

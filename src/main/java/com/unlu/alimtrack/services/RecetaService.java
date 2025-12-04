@@ -3,6 +3,7 @@ package com.unlu.alimtrack.services;
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.DTOS.response.Receta.RecetaMetadataResponseDTO;
+import com.unlu.alimtrack.models.RecetaModel;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface RecetaService {
     boolean existsByCodigoReceta(String codigoReceta);
 
     List<RecetaMetadataResponseDTO> findAllByCreadoPorEmail(String email);
+
+    RecetaModel findRecetaModelByCodigo(String codigoRecetaPadre);
 }

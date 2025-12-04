@@ -58,6 +58,12 @@ public class VersionRecetaValidator {
     }
 
     public void validarCampoPerteneceAVersion(ProduccionModel produccion, CampoSimpleModel campo) {
+        if (produccion == null) {
+            throw new RecursoNoEncontradoException("Producción no encontrada.");
+        }
+        if (campo == null) {
+            throw new RecursoNoEncontradoException("Campo no encontrado.");
+        }
 
         log.debug("produccion codigo: {}", produccion.getCodigoProduccion());
         log.debug("campo id: {}", campo.getId());

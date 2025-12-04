@@ -4,10 +4,12 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
+import com.unlu.alimtrack.DTOS.request.RespuestaCeldaTablaResquestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCeldaTablaResponseDTO;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.ProduccionQueryService;
 import jakarta.validation.Valid;
@@ -63,6 +65,18 @@ public class ProduccionController {
         RespuestaCampoResponseDTO respuesta = produccionManagementService.guardarRespuestaCampo(
                 codigoProduccion, idCampo, request);
         log.info("Respuesta guardada exitosamente para el campo {} en la producción {}", idCampo, codigoProduccion);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @PutMapping("/{codigoProduccion}/tablas/{idTabla}/{idFila}/{idColumna}")
+    public ResponseEntity<RespuestaCeldaTablaResponseDTO> guardarRespuestaCeldaTabla(
+            @PathVariable String codigoProduccion,
+            @PathVariable Long idTabla,
+            @PathVariable Long idFila,
+            @PathVariable Long idColumna,
+            @Valid @RequestBody RespuestaCeldaTablaResquestDTO request) {
+        RespuestaCeldaTablaResponseDTO respuesta = produccionManagementService.guardarRespuestaCeldaTabla(
+                codigoProduccion, idTabla, idFila, idColumna, request);
         return ResponseEntity.ok(respuesta);
     }
 

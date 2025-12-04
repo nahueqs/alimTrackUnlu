@@ -2,6 +2,7 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,12 +11,13 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "seccion",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id_version_receta_padre", "orden"}),
@@ -46,15 +48,15 @@ public class SeccionModel {
 
     @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("seccion")
-    private List<GrupoCamposModel> gruposCampos = new ArrayList<>();
+    private Set<GrupoCamposModel> gruposCampos = new HashSet<>();
 
     @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("seccion")
-    private List<TablaModel> tablas = new ArrayList<>();
+    private Set<TablaModel> tablas = new HashSet<>();
 
     @OneToMany(mappedBy = "seccion", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("seccion")
-    private List<CampoSimpleModel> camposSimples = new ArrayList<>();
+    private Set<CampoSimpleModel> camposSimples = new HashSet<>();
 
     @ColumnDefault("0")
     @Column(name = "orden")

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,18 +22,16 @@ public class TablaMapperManual {
     @Autowired
     private FilaTablaMapperManual filaMapperManual;
 
-    // ✅ MÉTODO PARA LECTURA (Model → DTO)
     public TablaResponseDTO toResponseDTO(TablaModel tabla) {
         if (tabla == null) {
             return null;
         }
 
-        // ✅ Obtener id de la relación
         Long idSeccion = tabla.getSeccion() != null ? tabla.getSeccion().getId() : null;
 
-        // ✅ Usar mappers manuales para columnas y filas
-        List<ColumnaTablaResponseDTO> columnasDTO = columnaMapperManual.toResponseDTOList(tabla.getColumnas());
-        List<FilaTablaResponseDTO> filasDTO = filaMapperManual.toResponseDTOList(tabla.getFilas());
+        // Pasamos la instancia de la tabla actual a los mappers de las colecciones
+        List<ColumnaTablaResponseDTO> columnasDTO = columnaMapperManual.toResponseDTOList(tabla.getColumnas(), tabla);
+        List<FilaTablaResponseDTO> filasDTO = filaMapperManual.toResponseDTOList(tabla.getFilas(), tabla);
 
         return new TablaResponseDTO(
                 tabla.getId(),
@@ -45,7 +44,6 @@ public class TablaMapperManual {
         );
     }
 
-    // ✅ MÉTODO PARA CREACIÓN (DTO → Model) - SIMPLIFICADO
     public TablaModel toModel(TablaCreateDTO dto) {
         if (dto == null) {
             return null;
@@ -55,13 +53,11 @@ public class TablaMapperManual {
         tabla.setNombre(dto.nombre());
         tabla.setDescripcion(dto.descripcion());
         tabla.setOrden(dto.orden());
-        // ✅ La relación 'seccion' se asigna en el servicio
-        // ✅ Las 'columnas' y 'filas' se procesan en el servicio
 
         return tabla;
     }
 
-    public List<TablaResponseDTO> toResponseDTOList(List<TablaModel> tablas) {
+    public List<TablaResponseDTO> toResponseDTOList(Set<TablaModel> tablas) {
         if (tablas == null || tablas.isEmpty()) {
             return List.of();
         }

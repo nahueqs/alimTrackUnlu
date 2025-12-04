@@ -34,7 +34,7 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
         List<VersionRecetaModel> versiones = versionRecetaRepository.findAllByCreadoPorEmail(
                 email);
         versionRecetaValidator.validarVersionRecetaList(versiones);
-        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMapper.toMetadataResponseDTOList(versiones);
     }
 
     @Override

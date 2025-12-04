@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,17 +34,12 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     private final SeccionRepository seccionRepository;
     private final SeccionValidator seccionValidator;
     private final UsuarioService usuarioService;
-
-    // Inyectamos el nuevo mapper de MapStruct
     private final SeccionMapperManual seccionMapperManual;
-
-    // Mappers para la creación (pueden mantenerse si son necesarios)
     private final CampoSimpleMapper campoSimpleMapper;
     private final GrupoCamposMapper grupoCamposMapper;
-    private final TablaMapperManual tablaMapper; // Mantener si se usa en crearSeccion
-    private final ColumnaTablaMapper columnaTablaMapper; // Mantener si se usa en crearSeccion
-    private final FilaTablaMapper filaTablaMapper; // Mantener si se usa en crearSeccion
-
+    private final TablaMapperManual tablaMapper;
+    private final ColumnaTablaMapper columnaTablaMapper;
+    private final FilaTablaMapper filaTablaMapper;
 
     @Override
     @Transactional
@@ -53,11 +50,11 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         seccionValidator.validarCreacionSeccion(codigoReceta, seccionDTO);
 
         VersionRecetaModel versionRecetaPadre = versionRecetaMetadataService.findVersionModelByCodigo(codigoReceta);
-        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(seccionDTO.emailCreador().trim()); // Fetch the UsuarioModel
+        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(seccionDTO.emailCreador().trim());
 
         SeccionModel seccion = new SeccionModel();
         seccion.setVersionRecetaPadre(versionRecetaPadre);
-        seccion.setCreadoPor(usuarioCreador); // Set the UsuarioModel object
+        seccion.setCreadoPor(usuarioCreador);
         seccion.setTitulo(seccionDTO.titulo().trim());
         seccion.setOrden(seccionDTO.orden());
 
@@ -70,7 +67,6 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     }
 
     private void validarPrecondicionesCreacion(String codigoReceta, String email) {
-        log.debug("Validando precondiciones para la creación de sección en la versión {}", codigoReceta);
         if (!versionRecetaQueryService.existsByCodigoVersion(codigoReceta)) {
             throw new RecursoNoEncontradoException("Versión de receta no encontrada con código: " + codigoReceta);
         }
@@ -80,7 +76,6 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     }
 
     private void poblarColecciones(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
-        log.debug("Poblando colecciones (campos, grupos, tablas) para la nueva sección");
         llenarCamposSimples(seccion, seccionDTO);
         llenarGrupoCampos(seccion, seccionDTO);
         llenarTablas(seccion, seccionDTO);
@@ -88,110 +83,90 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
 
     private void llenarCamposSimples(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.camposSimples() != null && !seccionDTO.camposSimples().isEmpty()) {
-            List<CampoSimpleModel> camposSimples = seccionDTO.camposSimples().stream().map(dto -> {
+            Set<CampoSimpleModel> camposSimples = seccionDTO.camposSimples().stream().map(dto -> {
                 CampoSimpleModel campo = campoSimpleMapper.toModel(dto);
                 campo.setSeccion(seccion);
                 campo.setGrupo(null);
                 return campo;
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toSet());
             seccion.setCamposSimples(camposSimples);
-        } else {
-            seccion.setCamposSimples(new ArrayList<>());
         }
     }
 
     private void llenarGrupoCampos(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.gruposCampos() != null && !seccionDTO.gruposCampos().isEmpty()) {
-            List<GrupoCamposModel> gruposCampos = seccionDTO.gruposCampos().stream().map(dto -> {
+            Set<GrupoCamposModel> gruposCampos = seccionDTO.gruposCampos().stream().map(dto -> {
                 GrupoCamposModel grupo = grupoCamposMapper.toModel(dto);
                 grupo.setSeccion(seccion);
                 if (dto.camposSimples() != null) {
-                    List<CampoSimpleModel> camposDelGrupo = dto.camposSimples().stream().map(campoDTO -> {
+                    Set<CampoSimpleModel> camposDelGrupo = dto.camposSimples().stream().map(campoDTO -> {
                         CampoSimpleModel campo = campoSimpleMapper.toModel(campoDTO);
                         campo.setSeccion(seccion);
                         campo.setGrupo(grupo);
                         return campo;
-                    }).collect(Collectors.toList());
+                    }).collect(Collectors.toSet());
                     grupo.setCampos(camposDelGrupo);
                 }
                 return grupo;
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toSet());
             seccion.setGruposCampos(gruposCampos);
-        } else {
-            seccion.setGruposCampos(new ArrayList<>());
         }
     }
 
     private void llenarTablas(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.tablas() != null && !seccionDTO.tablas().isEmpty()) {
-            List<TablaModel> tablas = seccionDTO.tablas().stream().map(dto -> {
+            Set<TablaModel> tablas = seccionDTO.tablas().stream().map(dto -> {
                 TablaModel tabla = tablaMapper.toModel(dto);
                 tabla.setSeccion(seccion);
                 if (dto.columnas() != null) {
-                    List<ColumnaTablaModel> columnas = columnaTablaMapper.toModelList(dto.columnas()); // Usar mapper de lista
-                    columnas.forEach(columna -> columna.setTabla(tabla)); // Asignar tabla padre
+                    Set<ColumnaTablaModel> columnas = dto.columnas().stream()
+                            .map(columnaTablaMapper::toModel)
+                            .collect(Collectors.toSet());
+                    columnas.forEach(columna -> columna.setTabla(tabla));
                     tabla.setColumnas(columnas);
                 }
-
                 if (dto.filas() != null) {
-                    List<FilaTablaModel> filas = filaTablaMapper.toModelList(dto.filas()); // Usar mapper de lista
-                    filas.forEach(fila -> fila.setTabla(tabla)); // Asignar tabla padre
+                    Set<FilaTablaModel> filas = dto.filas().stream()
+                            .map(filaTablaMapper::toModel)
+                            .collect(Collectors.toSet());
+                    filas.forEach(fila -> fila.setTabla(tabla));
                     tabla.setFilas(filas);
                 }
                 return tabla;
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toSet());
             seccion.setTablas(tablas);
-        } else {
-            seccion.setTablas(new ArrayList<>());
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SeccionResponseDTO> obtenerSeccionesDTOCompletasPorVersion(String codigoVersion) {
-        log.info("Obteniendo DTOs de sección completos para la versión: {}", codigoVersion);
-        if (codigoVersion == null || codigoVersion.trim().isEmpty()) {
-            throw new IllegalArgumentException("El código de versión no puede ser nulo o vacío");
-        }
-
+        log.info("Iniciando obtención de DTOs de sección completos para la versión: {}", codigoVersion);
         VersionRecetaModel versionReceta = versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
-
-        // La carga de 3 niveles sigue siendo una buena práctica para evitar MultipleBagFetchException
         List<SeccionModel> seccionesCompletas = obtenerSeccionesCompletasPorVersion(versionReceta);
-
-        // Usamos el nuevo mapper de MapStruct, que es seguro y eficiente
-        List<SeccionResponseDTO> seccionesDTO = seccionMapperManual.toResponseDTOList(seccionesCompletas);
-
-        log.info("Mapeo a DTO completado. Retornando {} DTOs de sección para la versión {}", seccionesDTO.size(), codigoVersion);
-        return seccionesDTO;
+        return seccionMapperManual.toResponseDTOList(seccionesCompletas);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SeccionModel> obtenerSeccionesCompletasPorVersion(VersionRecetaModel versionReceta) {
-        log.debug("Iniciando carga optimizada de la estructura para la versión: {}", versionReceta.getCodigoVersionReceta());
+        log.debug("Iniciando carga SECUENCIAL de la estructura para la versión: {}", versionReceta.getCodigoVersionReceta());
 
-        // Nivel 1: Cargar secciones básicas
+        // Paso 1: Cargar las secciones básicas.
         List<SeccionModel> secciones = seccionRepository.findSeccionesBasicas(versionReceta);
         if (secciones.isEmpty()) {
-            log.debug("No se encontraron secciones para la versión {}", versionReceta.getCodigoVersionReceta());
             return new ArrayList<>();
         }
 
-        // Nivel 2: Cargar colecciones directas (campos, grupos, tablas)
-        seccionRepository.findSeccionesConCamposSimples(secciones);
-        seccionRepository.findSeccionesConGrupos(secciones);
-        seccionRepository.findSeccionesConTablas(secciones);
+        // Paso 2: Cargar colecciones de primer nivel en consultas separadas.
+        seccionRepository.fetchCamposSimples(secciones);
+        seccionRepository.fetchGruposCampos(secciones);
+        // NUEVO: Cargar explícitamente los campos dentro de los grupos de campos
+        seccionRepository.fetchCamposInGruposCampos(secciones);
+        seccionRepository.fetchTablas(secciones);
 
-        // Nivel 3: Cargar colecciones anidadas
-        List<Long> seccionIds = secciones.stream().map(SeccionModel::getId).collect(Collectors.toList());
-        if (!seccionIds.isEmpty()) {
-            seccionRepository.findGruposWithCamposBySeccionIds(seccionIds);
-            seccionRepository.findTablasWithColumnasBySeccionIds(seccionIds);
-            seccionRepository.findTablasWithFilasBySeccionIds(seccionIds);
-        }
-
-        log.info("Carga completa de {} secciones para la versión {}", secciones.size(), versionReceta.getCodigoVersionReceta());
+        // Paso 3: Dejar que @BatchSize se encargue del resto al momento del mapeo.
+        log.info("Carga secuencial de {} secciones y sus colecciones de primer nivel completada.", secciones.size());
         return secciones;
     }
 

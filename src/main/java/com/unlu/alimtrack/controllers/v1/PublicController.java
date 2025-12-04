@@ -23,8 +23,8 @@ public class PublicController {
 
     private final PublicRequestsService publicRequestService;
 
-    @GetMapping("/producciones/{codigoProduccion}/estado-actual")
-    public ResponseEntity<RespuestasProduccionPublicResponseDTO> getRespuestasPublico(
+    @GetMapping("/producciones/{codigoProduccion}/ultimas-respuestas")
+    public ResponseEntity<RespuestasProduccionPublicResponseDTO> getUltimasRespuestasProduccion(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud pública para obtener el estado actual de la producción: {}", codigoProduccion);
         RespuestasProduccionPublicResponseDTO estado = publicRequestService.getEstadoActualProduccionPublico(codigoProduccion);
@@ -33,12 +33,12 @@ public class PublicController {
         return ResponseEntity.ok(estado);
     }
 
-    @GetMapping("/recetas/versiones-receta/{codigoVersionReceta}/estructura")
-    public ResponseEntity<VersionEstructuraPublicResponseDTO> getEstructuraVersion(@PathVariable String codigoVersionReceta) {
+    @GetMapping("/producciones/{codigoProduccion}/estructura")
+    public ResponseEntity<VersionEstructuraPublicResponseDTO> getEstructuraProduccion(@PathVariable String codigoProduccion) {
 
-        log.info("Solicitud pública para obtener la estructura completa de la versión de receta: {}", codigoVersionReceta);
-        VersionEstructuraPublicResponseDTO estructura = publicRequestService.getEstructuraVersionPublica(codigoVersionReceta);
-        log.debug("Retornando estructura completa para la versión {}", codigoVersionReceta);
+        log.info("Solicitud pública para obtener la estructura completa de la codigoProduccion: {}", codigoProduccion);
+        VersionEstructuraPublicResponseDTO estructura = publicRequestService.getEstructuraProduccion(codigoProduccion);
+        log.debug("Retornando estructura completa para la codigoProduccion {}", codigoProduccion);
         return ResponseEntity.ok(estructura);
     }
 
@@ -50,8 +50,8 @@ public class PublicController {
         return ResponseEntity.ok(producciones);
     }
 
-    @GetMapping("/producciones/{codigoProduccion}")
-    public ResponseEntity<EstadoProduccionPublicoResponseDTO> getProduccionPublic(
+    @GetMapping("/producciones/{codigoProduccion}/ultima-modificacion")
+    public ResponseEntity<EstadoProduccionPublicoResponseDTO> getUltimaModificacionProduccion(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud pública para obtener la información pública de la producción: {}", codigoProduccion);
         EstadoProduccionPublicoResponseDTO produccion = publicRequestService.getProduccionPublic(codigoProduccion);

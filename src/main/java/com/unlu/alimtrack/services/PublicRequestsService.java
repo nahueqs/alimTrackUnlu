@@ -15,6 +15,6 @@ public interface PublicRequestsService {
 
     EstadoProduccionPublicoResponseDTO getProduccionPublic(String codigoProduccion);
 
-    VersionEstructuraPublicResponseDTO getEstructuraVersionPublica(String codigoVersionReceta);
+    VersionEstructuraPublicResponseDTO getEstructuraProduccion(String codigoProduccion);
 
 }

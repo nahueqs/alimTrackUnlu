@@ -8,6 +8,8 @@ import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
 import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
+import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.ProduccionQueryService;
@@ -44,7 +46,7 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
             throw new RecursoNoEncontradoException("No se encontraron versiones de recetas.");
         }
         log.debug("Retornando {} versiones de recetas", versiones.size());
-        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMapper.toMetadataResponseDTOList(versiones);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
         log.info("Buscando versión de receta con código: {}", codigoVersion);
         VersionRecetaModel model = findVersionModelByCodigo(codigoVersion);
         log.debug("Versión de receta {} encontrada. Mapeando a DTO.", codigoVersion);
-        return versionRecetaMapper.toVersionRecetaResponseDTO(model);
+        return versionRecetaMapper.toMetadataResponseDTO(model);
     }
 
     @Override
@@ -65,25 +67,30 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
             throw new RecursoNoEncontradoException("No se encontraron versiones para la receta con código " + codigoRecetaPadre);
         }
         log.debug("Retornando {} versiones para la receta {}", versiones.size(), codigoRecetaPadre);
-        return versionRecetaMapper.toVersionRecetaResponseDTOList(versiones);
+        return versionRecetaMapper.toMetadataResponseDTOList(versiones);
     }
 
     @Override
     @Transactional
     @CacheEvict(value = "versionRecetaEstructura", key = "#versionRecetaCreateDTO.codigoVersionReceta()")
-    // Invalida la caché de la estructura
     public VersionMetadataResponseDTO saveVersionReceta(String codigoRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDTO) {
         log.info("Creando nueva versión de receta para la receta padre: {}", codigoRecetaPadre);
         verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
-        VersionRecetaModel versionModelFinal = versionRecetaMapper.toVersionRecetaModel(versionRecetaCreateDTO);
-        versionRecetaRepository.save(versionModelFinal);
-        log.info("Versión de receta {} creada y guardada exitosamente", versionModelFinal.getCodigoVersionReceta());
-        return versionRecetaMapper.toVersionRecetaResponseDTO(versionModelFinal);
+
+        VersionRecetaModel versionModel = versionRecetaMapper.toModel(versionRecetaCreateDTO);
+        RecetaModel recetaPadre = recetaService.findRecetaModelByCodigo(codigoRecetaPadre);
+        UsuarioModel creador = usuarioService.getUsuarioModelByEmail(versionRecetaCreateDTO.emailCreador());
+        versionModel.setRecetaPadre(recetaPadre);
+        versionModel.setCreadoPor(creador);
+
+        VersionRecetaModel versionGuardada = versionRecetaRepository.save(versionModel);
+        log.info("Versión de receta {} creada y guardada exitosamente", versionGuardada.getCodigoVersionReceta());
+        return versionRecetaMapper.toMetadataResponseDTO(versionGuardada);
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion") // Invalida la caché de la estructura
+    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion")
     public VersionMetadataResponseDTO updateVersionReceta(String codigoVersion, VersionRecetaModifyDTO modificacion) {
         log.info("Actualizando versión de receta con código: {}", codigoVersion);
         versionRecetaValidator.validateModification(modificacion);
@@ -91,12 +98,12 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
         versionRecetaMapper.updateModelFromModifyDTO(modificacion, model);
         versionRecetaRepository.save(model);
         log.info("Versión de receta {} actualizada exitosamente", model.getCodigoVersionReceta());
-        return versionRecetaMapper.toVersionRecetaResponseDTO(model);
+        return versionRecetaMapper.toMetadataResponseDTO(model);
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion") // Invalida la caché de la estructura
+    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion")
     public void deleteVersionReceta(String codigoVersion) {
         log.info("Intentando eliminar la versión de receta con código: {}", codigoVersion);
         VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);

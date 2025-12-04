@@ -9,8 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -42,7 +42,7 @@ public class VersionRecetaModel {
 
     @OneToMany(mappedBy = "versionRecetaPadre", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("versionRecetaPadre")
-    private List<SeccionModel> secciones = new ArrayList<>();
+    private Set<SeccionModel> secciones = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creado_por", nullable = false)

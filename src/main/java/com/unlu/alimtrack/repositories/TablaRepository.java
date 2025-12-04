@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.repositories;
 
+import com.unlu.alimtrack.models.SeccionModel;
 import com.unlu.alimtrack.models.TablaModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +26,7 @@ public interface TablaRepository extends JpaRepository<TablaModel, Long> {
 
     // Método para encontrar tablas por IDs básico (sin relaciones)
     List<TablaModel> findByIdIn(List<Long> tablaIds);
+
+    List<TablaModel> findAllBySeccion(SeccionModel seccion);
 
 }

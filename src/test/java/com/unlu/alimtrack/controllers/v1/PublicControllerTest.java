@@ -94,7 +94,7 @@ public class PublicControllerTest {
 //    }
 
     @Test
-    void getProduccionPublic_shouldReturnProduccionPublicDTOAndOk() throws Exception {
+    void getProduccionPublic_shouldReturnUltimaModificacionProduccionDTOAndOk() throws Exception {
         // Arrange
         String codigoProduccion = "PROD-001";
         LocalDateTime now = LocalDateTime.now();
@@ -103,11 +103,11 @@ public class PublicControllerTest {
         given(publicRequestService.getProduccionPublic(codigoProduccion)).willReturn(produccionPublicDTO);
 
         // Act & Assert
-        mockMvc.perform(get("/api/v1/public/producciones/{codigoProduccion}", codigoProduccion))
+        mockMvc.perform(get("/api/v1/public/producciones/{codigoProduccion}/ultima-modificacion", codigoProduccion))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.codigoProduccion", is(codigoProduccion)))
                 .andExpect(jsonPath("$.estado", is("EN_PROCESO")))
-                .andExpect(jsonPath("$.fechaUltimaModificacion").exists());
+                .andExpect(jsonPath("$.ultimaModificacion").exists());
     }
 }

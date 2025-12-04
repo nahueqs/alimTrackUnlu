@@ -2,14 +2,12 @@ package com.unlu.alimtrack.services.validators;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
-import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
-import com.unlu.alimtrack.exceptions.RecursoIdentifierConflictException;
-import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
-import com.unlu.alimtrack.models.CampoSimpleModel;
-import com.unlu.alimtrack.models.ProduccionModel;
+import com.unlu.alimtrack.exceptions.*;
+import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.CampoSimpleRepository;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
+import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
+import com.unlu.alimtrack.repositories.TablaRepository;
 import com.unlu.alimtrack.services.ProduccionQueryService;
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
@@ -26,9 +24,11 @@ public class ProductionManagerServiceValidator {
     private final ProduccionQueryService produccionQueryService;
     private final VersionRecetaQueryService versionRecetaQueryService;
     private final CampoSimpleRepository campoSimpleRepository;
+    private final RespuestaTablaRepository respuestaTablaRepository;
     private final ProduccionRepository produccionRepository;
     @Lazy
     private final UsuarioServiceImpl usuarioServiceImpl;
+    private final TablaRepository tablaRepository;
 
     public ProduccionModel validarProduccionParaEdicion(String codigoProduccion) {
         log.debug("Validando si la producción {} es editable", codigoProduccion);
@@ -93,5 +93,55 @@ public class ProductionManagerServiceValidator {
 
 
         return campo;
+    }
+
+    public RespuestaTablaModel validarRespuestaTablaExiste(ProduccionModel produccion, Long idTabla, Long idFila, Long idColumna) {
+        log.debug("Validando existencia de la respuesta tabla para la produccion id {}, idFila {}, idColumna {}", produccion.getProduccion(), idFila, idColumna);
+
+        RespuestaTablaModel respuesta = respuestaTablaRepository.findByProduccionAndIdTablaIdAndFilaIdAndColumnaId(produccion, idTabla, idFila, idColumna)
+                .orElseThrow(() -> new RecursoNoEncontradoException("La respuestaTablaModel no encontrada"));
+
+        log.debug("Campo encontrado : {}", respuesta);
+
+
+        return respuesta;
+    }
+
+    public void combinacionFilaColumnaPerteneceTabla(Long idFila, Long idColumna, Long idTabla) {
+        validarFilaPerteneceATabla(idFila, idTabla);
+        validarColumnaPerteneceATabla(idColumna, idTabla);
+    }
+
+    private TablaModel findTablaModelById(Long idTabla) {
+        return tablaRepository.findById(idTabla).orElseThrow(
+                () -> new RecursoNoEncontradoException("Tabla no encontrada con ID: " + idTabla)
+        );
+    }
+
+    private void validarColumnaPerteneceATabla(Long idColumna, Long idTabla) {
+        TablaModel tablaModel = findTablaModelById(idTabla);
+        if (!tablaModel.getColumnas().stream().anyMatch(columna -> columna.getId().equals(idColumna))) {
+            throw new ModificacionInvalidaException("La columna no pertenece a la tabla");
+        }
+
+    }
+
+    private void validarFilaPerteneceATabla(Long idFila, Long idTabla) {
+        TablaModel tablaModel = findTablaModelById(idTabla);
+        if (!tablaModel.getFilas().stream().anyMatch(fila -> fila.getId().equals(idFila))) {
+            throw new ModificacionInvalidaException("La fila no pertenece a la tabla");
+        }
+
+    }
+
+
+    public void validarTablaPertenceAVersionProduccion(VersionRecetaModel version, Long idTabla) {
+
+        TablaModel tablaModel = findTablaModelById(idTabla);
+
+        if (!tablaModel.getSeccion().getVersionRecetaPadre().equals(version)) {
+            throw new ModificacionInvalidaException("La tabla no pertenece a la version que intenta modificar.");
+        }
+
     }
 }

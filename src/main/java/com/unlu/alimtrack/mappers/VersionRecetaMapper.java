@@ -3,48 +3,61 @@ package com.unlu.alimtrack.mappers;
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionMetadataPublicResponseDTO;
-import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
-import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
+@Mapper(componentModel = "spring", uses = {SeccionMapperManual.class})
+public interface VersionRecetaMapper {
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public abstract class VersionRecetaMapper {
+    // --- Mapeo para Estructura Completa (Público) ---
 
-    @Lazy
-    @Autowired
-    protected UsuarioServiceImpl usuarioServiceImpl;
+    @Mapping(target = "metadata", source = "version")
+    @Mapping(target = "estructura", source = "secciones")
+    @Mapping(target = "totalCampos", expression = "java(version.getSecciones().stream().mapToInt(seccion -> seccion.getCamposSimples().size() + seccion.getGruposCampos().stream().mapToInt(grupo -> grupo.getCampos().size()).sum()).sum())")
+    @Mapping(target = "totalCeldas", expression = "java(version.getSecciones().stream().flatMap(s -> s.getTablas().stream()).mapToInt(t -> t.getFilas().size() * t.getColumnas().size()).sum())")
+    VersionEstructuraPublicResponseDTO toEstructuraDTO(VersionRecetaModel version);
 
-    @Mapping(target = "creadoPor", source = "emailCreador", qualifiedByName = "emailToModel")
+    List<VersionEstructuraPublicResponseDTO> toEstructuraDTOList(List<VersionRecetaModel> versions);
+
+    // --- Mapeo para Metadatos Públicos ---
+
+    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
+    @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
+    VersionMetadataPublicResponseDTO toVersionMetadataPublicResponseDTO(VersionRecetaModel version);
+
+    List<VersionMetadataPublicResponseDTO> toVersionMetadataPublicResponseDTOList(List<VersionRecetaModel> versions);
+
+    // --- Mapeo para Metadatos Protegidos ---
+
+    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
+    @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
+    @Mapping(target = "creadaPor", source = "creadoPor.email")
+    VersionMetadataResponseDTO toMetadataResponseDTO(VersionRecetaModel version);
+
+
+    List<VersionMetadataResponseDTO> toMetadataResponseDTOList(List<VersionRecetaModel> versions);
+
+
+    // --- Mapeo para Creación y Actualización ---
+
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "fechaCreacion", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "recetaPadre.codigoReceta", source = "codigoRecetaPadre")
-    public abstract VersionRecetaModel toVersionRecetaModel(VersionRecetaCreateDTO versionRecetaCreateDto);
+    @Mapping(target = "recetaPadre", ignore = true) // Se asigna en el servicio
+    @Mapping(target = "creadoPor", ignore = true) // Se asigna en el servicio
+    @Mapping(target = "secciones", ignore = true)
+    @Mapping(target = "fechaCreacion", ignore = true)
+    VersionRecetaModel toModel(VersionRecetaCreateDTO dto);
 
-    @Mapping(target = "creadaPor", source = "creadoPor.nombre")
-    @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
-    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
-    public abstract VersionMetadataResponseDTO toVersionRecetaResponseDTO(VersionRecetaModel versionRecetaModel);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "codigoVersionReceta", ignore = true)
+    @Mapping(target = "recetaPadre", ignore = true)
+    @Mapping(target = "secciones", ignore = true)
+    @Mapping(target = "creadoPor", ignore = true)
+    @Mapping(target = "fechaCreacion", ignore = true)
+    void updateModelFromModifyDTO(VersionRecetaModifyDTO dto, @MappingTarget VersionRecetaModel model);
 
-    public abstract List<VersionMetadataResponseDTO> toVersionRecetaResponseDTOList(
-            List<VersionRecetaModel> versionRecetaModels);
-
-    public abstract void updateModelFromModifyDTO(VersionRecetaModifyDTO modificacion, @MappingTarget VersionRecetaModel model);
-
-
-    @Mapping(target = "nombreRecetaPadre", source = "recetaPadre.nombre")
-    @Mapping(target = "codigoRecetaPadre", source = "recetaPadre.codigoReceta")
-    public abstract VersionMetadataPublicResponseDTO toVersionMetadataPublicResponseDTO(VersionRecetaModel versionModel);
-
-
-    @Named("emailToModel")
-    protected UsuarioModel usernameEmailToModel(String email) {
-        return usuarioServiceImpl.getUsuarioModelByEmail(email);
-    }
 }

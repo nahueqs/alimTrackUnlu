@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,7 +50,7 @@ public class SeccionMapperManual {
         );
     }
 
-    private List<CampoSimpleResponseDTO> mapCamposSimples(List<CampoSimpleModel> campos) {
+    private List<CampoSimpleResponseDTO> mapCamposSimples(Set<CampoSimpleModel> campos) {
         if (campos == null || campos.isEmpty()) {
             return List.of();
         }
@@ -77,7 +78,7 @@ public class SeccionMapperManual {
         );
     }
 
-    private List<GrupoCamposResponseDTO> mapGruposCampos(List<GrupoCamposModel> grupos) {
+    private List<GrupoCamposResponseDTO> mapGruposCampos(Set<GrupoCamposModel> grupos) {
         if (grupos == null || grupos.isEmpty()) {
             return List.of();
         }

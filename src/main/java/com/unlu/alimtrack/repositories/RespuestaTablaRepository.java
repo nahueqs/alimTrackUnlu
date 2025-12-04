@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RespuestaTablaRepository extends JpaRepository<RespuestaTablaModel, Long> {
@@ -37,4 +38,6 @@ public interface RespuestaTablaRepository extends JpaRepository<RespuestaTablaMo
 
 
     List<RespuestaTablaModel> findAllByProduccion(@Param("produccion") ProduccionModel produccion);
+
+    Optional<RespuestaTablaModel> findByProduccionAndIdTablaIdAndFilaIdAndColumnaId(ProduccionModel Produccion, Long tablaId, Long filaId, Long columnaId);
 }

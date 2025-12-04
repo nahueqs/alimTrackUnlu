@@ -115,6 +115,11 @@ public class RecetaServiceImpl implements RecetaService {
         return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
     }
 
+    @Override
+    public RecetaModel findRecetaModelByCodigo(String codigoRecetaPadre) {
+        return findRecetaModelByCodigoReceta(codigoRecetaPadre);
+    }
+
     private void verificarCreacionValida(String codigoReceta, RecetaCreateDTO recetaCreateDTO) {
         log.debug("Iniciando validaciones para la creación de la receta {}", codigoReceta);
         verificarConsistenciaCodigoReceta(codigoReceta, recetaCreateDTO.codigoReceta());

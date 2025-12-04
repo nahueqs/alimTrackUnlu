@@ -71,7 +71,7 @@ public class VersionRecetaValidatorTest {
         // Act & Assert
         assertThatThrownBy(() -> versionRecetaValidator.validarCampoPerteneceAVersion(null, campo))
                 .isInstanceOf(RecursoNoEncontradoException.class)
-                .hasMessage("Produccion o campo no encontrado");
+                .hasMessage("Producción no encontrada.");
     }
 
     @Test
@@ -79,6 +79,6 @@ public class VersionRecetaValidatorTest {
         // Act & Assert
         assertThatThrownBy(() -> versionRecetaValidator.validarCampoPerteneceAVersion(produccion, null))
                 .isInstanceOf(RecursoNoEncontradoException.class)
-                .hasMessage("Produccion o campo no encontrado");
+                .hasMessage("Campo no encontrado.");
     }
 }

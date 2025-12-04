@@ -2,20 +2,23 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Table(name = "tabla")
 public class TablaModel {
 
@@ -42,11 +45,13 @@ public class TablaModel {
 
     @OneToMany(mappedBy = "tabla", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("tabla")
-    private List<ColumnaTablaModel> columnas = new ArrayList<>();
+    @BatchSize(size = 100)
+    private Set<ColumnaTablaModel> columnas = new HashSet<>();
 
     @OneToMany(mappedBy = "tabla", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("tabla")
-    private List<FilaTablaModel> filas = new ArrayList<>();
+    @BatchSize(size = 100)
+    private Set<FilaTablaModel> filas = new HashSet<>();
 
 
     public void addColumna(ColumnaTablaModel columna) {

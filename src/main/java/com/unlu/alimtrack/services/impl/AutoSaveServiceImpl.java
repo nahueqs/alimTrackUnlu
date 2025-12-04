@@ -5,9 +5,11 @@ import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.models.AutoSaveProduccionModel;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.RespuestaCampoModel;
+import com.unlu.alimtrack.models.RespuestaTablaModel;
 import com.unlu.alimtrack.repositories.AutoSaveRepository;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaCampoRepository;
+import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.services.AutoSaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ public class AutoSaveServiceImpl implements AutoSaveService {
 
     private final AutoSaveRepository autoSaveRepository;
     private final RespuestaCampoRepository respuestaCampoRepository;
+    private final RespuestaTablaRepository respuestaTablaRepository; // Inyectado
     private final ProduccionRepository produccionRepository;
     private final ObjectMapper objectMapper;
 
@@ -40,7 +43,6 @@ public class AutoSaveServiceImpl implements AutoSaveService {
             log.info("Auto-save para producción ID: {} completado exitosamente", idProduccion);
         } catch (Exception e) {
             log.error("Error durante el auto-save asíncrono para producción ID: {}", idProduccion, e);
-            // No se propaga la excepción para no afectar la operación principal del usuario.
         }
     }
 
@@ -81,13 +83,23 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         estado.put("encargado", produccion.getEncargado());
         estado.put("observaciones", produccion.getObservaciones());
 
-        List<RespuestaCampoModel> respuestas = respuestaCampoRepository.findByIdProduccion(produccion);
-        Map<String, String> respuestasMap = respuestas.stream()
+        // Respuestas de campos simples
+        List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
+        Map<String, String> respuestasCamposMap = respuestasCampos.stream()
                 .collect(Collectors.toMap(
-                        respuesta -> "respuesta_id_" + respuesta.getIdCampo().getId(),
+                        respuesta -> "campo_" + respuesta.getIdCampo().getId(),
                         RespuestaCampoModel::getValor
                 ));
-        estado.put("respuestas_campos", respuestasMap);
+        estado.put("respuestas_campos", respuestasCamposMap);
+
+        // Respuestas de tablas
+        List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
+        Map<String, String> respuestasTablasMap = respuestasTablas.stream()
+                .collect(Collectors.toMap(
+                        respuesta -> "celda_" + respuesta.getFila().getId() + "_" + respuesta.getColumna().getId(),
+                        RespuestaTablaModel::getValor
+                ));
+        estado.put("respuestas_tablas", respuestasTablasMap);
 
         return estado;
     }

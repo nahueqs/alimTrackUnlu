@@ -8,10 +8,5 @@ public interface RecetaQueryService {
 
     boolean recetaTieneVersiones(String codigoReceta);
 
-
-    boolean recetaPerteneceAUsuario(String codigoReceta, String email);
-
-    List<RecetaMetadataResponseDTO> findAllByCreadoPorEmail(String email);
-
     boolean existsByCreadoPorEmail(String email);
 }

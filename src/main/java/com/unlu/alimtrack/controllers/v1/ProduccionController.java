@@ -2,6 +2,7 @@ package com.unlu.alimtrack.controllers.v1;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCeldaTablaResquestDTO;
@@ -97,6 +98,14 @@ public class ProduccionController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{codigoProduccion}/metadata")
+    public ResponseEntity<Void> updateMetadata(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionMetadataModifyRequestDTO request) {
+        log.info("Solicitud para cambiar la metadata de la producción {}", codigoProduccion);
+        produccionManagementService.updateMetadata(codigoProduccion, request);
+        log.info("Estado de la producción {} metadata cambiado exitosamente", codigoProduccion);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{codigoProduccion}/estado-actual")
     public ResponseEntity<EstadoProduccionPublicoResponseDTO> getEstadoProduccion(
             @PathVariable String codigoProduccion) {
@@ -105,6 +114,7 @@ public class ProduccionController {
         log.debug("Retornando información pública para la producción {}", codigoProduccion);
         return ResponseEntity.ok(produccion);
     }
+
 
     @GetMapping("/test")
     public UltimasRespuestasProduccionResponseDTO test() {

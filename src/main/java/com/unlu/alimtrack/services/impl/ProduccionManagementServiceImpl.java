@@ -2,6 +2,7 @@ package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCeldaTablaResquestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCeldaTablaResponseDTO;
@@ -10,13 +11,8 @@ import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataR
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.ProgresoProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
-import com.unlu.alimtrack.DTOS.websocket.FieldUpdatePayload;
-import com.unlu.alimtrack.DTOS.websocket.ProductionMetadataUpdatePayload;
-import com.unlu.alimtrack.DTOS.websocket.ProductionStateUpdatePayload;
-import com.unlu.alimtrack.DTOS.websocket.ProductionUpdateMessage;
-import com.unlu.alimtrack.DTOS.websocket.TableCellUpdatePayload;
+import com.unlu.alimtrack.DTOS.websocket.*;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-import com.unlu.alimtrack.enums.TipoRolUsuario;
 import com.unlu.alimtrack.exceptions.CambioEstadoProduccionInvalido;
 import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
@@ -25,7 +21,6 @@ import com.unlu.alimtrack.mappers.RespuestaCampoMapper;
 import com.unlu.alimtrack.mappers.RespuestaTablaMapper;
 import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.*;
-// Removed import com.unlu.alimtrack.services.AutoSaveService;
 import com.unlu.alimtrack.services.NotificationService;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.UsuarioService;
@@ -81,13 +76,11 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
         ProduccionModel produccionGuardada = produccionRepository.save(nuevaProduccion);
 
-        // Notify about new production metadata
-        ProductionUpdateMessage metadataUpdateMessage = ProductionUpdateMessage.metadataUpdated(
+        ProductionUpdateMessage metadataUpdateMessage = ProductionUpdateMessage.metadataCreated(
                 produccionGuardada.getCodigoProduccion(),
-                new ProductionMetadataUpdatePayload(
+                new ProductionCreationPayload(
                         produccionGuardada.getVersionReceta().getCodigoVersionReceta(),
                         produccionGuardada.getLote(),
-                        // Removed encargado, observaciones as they are not in public metadata
                         produccionGuardada.getFechaInicio(),
                         produccionGuardada.getFechaFin()
                 )
@@ -95,7 +88,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Sending WebSocket message: {}", metadataUpdateMessage);
         notificationService.notifyProductionUpdate(metadataUpdateMessage);
 
-        // Also notify about state change
         ProductionUpdateMessage stateUpdateMessage = ProductionUpdateMessage.stateChanged(
                 produccionGuardada.getCodigoProduccion(),
                 new ProductionStateUpdatePayload(
@@ -106,10 +98,9 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Sending WebSocket message: {}", stateUpdateMessage);
         notificationService.notifyProductionUpdate(stateUpdateMessage);
 
-        // Notify that a new production has been created (for list updates)
-        notificationService.notifyProductionCreated(ProductionUpdateMessage.metadataUpdated( // Using metadataUpdated type for creation
+        notificationService.notifyProductionCreated(ProductionUpdateMessage.metadataCreated(
                 produccionGuardada.getCodigoProduccion(),
-                new ProductionMetadataUpdatePayload(
+                new ProductionCreationPayload(
                         produccionGuardada.getVersionReceta().getCodigoVersionReceta(),
                         produccionGuardada.getLote(),
                         produccionGuardada.getFechaInicio(),
@@ -145,7 +136,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
         ProduccionModel produccionGuardada = produccionRepository.save(produccion);
 
-        // Notify about state change (for specific production detail page)
         ProductionUpdateMessage stateUpdateMessage = ProductionUpdateMessage.stateChanged(
                 produccionGuardada.getCodigoProduccion(),
                 new ProductionStateUpdatePayload(
@@ -156,8 +146,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Sending WebSocket message to specific topic: {}", stateUpdateMessage);
         notificationService.notifyProductionUpdate(stateUpdateMessage);
 
-        // Notify about state change globally (for production list pages)
-        notificationService.notifyProductionStateChangedGlobal(stateUpdateMessage); // Send the same message to the global topic
+        notificationService.notifyProductionStateChangedGlobal(stateUpdateMessage);
         log.debug("Sending WebSocket message to global state change topic: {}", stateUpdateMessage);
 
 
@@ -194,7 +183,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         RespuestaCampoModel respuesta = guardarOActualizarRespuestaCampo(produccion, campo, request, usuario);
         log.debug("Persistencia de respuesta de campo OK. ID Respuesta: {}", respuesta.getId());
 
-        // Notify about field update
         ProductionUpdateMessage fieldUpdateMessage = ProductionUpdateMessage.fieldUpdated(
                 produccion.getCodigoProduccion(),
                 new FieldUpdatePayload(
@@ -232,7 +220,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         RespuestaTablaModel respuesta = guardarOActualizarRespuestaTabla(produccion, idTabla, idFila, idColumna, request, usuario);
         log.debug("Persistencia de respuesta de tabla OK. ID Respuesta: {}", respuesta.getId());
 
-        // Notify about table cell update
         ProductionUpdateMessage tableCellUpdateMessage = ProductionUpdateMessage.tableCellUpdated(
                 produccion.getCodigoProduccion(),
                 new TableCellUpdatePayload(
@@ -260,7 +247,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
 
-        //1. Recuperar estructura (esqueleto de la receta)
         VersionEstructuraPublicResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
         log.debug("estructura obtenida");
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
@@ -284,9 +270,45 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         return null;
     }
 
-    // ============================================================================================
-    // 3. HELPERS Y LÓGICA DE SOPORTE
-    // ============================================================================================
+    @Override
+    public void updateMetadata(String codigoProduccion, ProduccionMetadataModifyRequestDTO request) {
+        ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
+        log.debug("ProduccionModel obtenida");
+        productionManagerServiceValidator.validarUpdateMetadata(codigoProduccion, request);
+        log.debug("update de metadata es valido");
+
+        if (request.encargado() != null) {
+            produccion.setEncargado(request.encargado());
+        }
+
+        if (request.lote() != null) {
+            produccion.setLote(request.lote());
+        }
+
+        if (request.observaciones() != null) {
+            produccion.setObservaciones(request.observaciones());
+        }
+
+        produccionRepository.save(produccion);
+
+        ProductionUpdateMessage metadataUpdateMessage = ProductionUpdateMessage.metadataUpdated(
+                produccion.getCodigoProduccion(),
+                new ProductionMetadataUpdatePayload(
+                        produccion.getCodigoProduccion(),
+                        produccion.getLote(),
+                        produccion.getEncargado(),
+                        produccion.getObservaciones()
+                ));
+
+
+        log.debug("Sending WebSocket message: {}", metadataUpdateMessage);
+        notificationService.notifyProductionUpdate(metadataUpdateMessage);
+
+        log.debug("Metadata actualizada para la produccion {} y notificación enviada.", codigoProduccion);
+
+
+    }
+
     private ProgresoProduccionResponseDTO calcularProgresoGeneral(
             Integer totalCampos, Integer totalCeldas,
             List<RespuestaCampoModel> respuestasCampos,
@@ -301,6 +323,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 .count();
 
         long celdasRespondidas = respuestasTablas.stream()
+                .filter(rt -> rt.getValor() != null && !rt.getValor().trim().isEmpty())
                 .map(respuesta -> new CeldaKey(
                         respuesta.getIdTabla() != null ? respuesta.getIdTabla().getId() : null,
                         respuesta.getFila() != null ? respuesta.getFila().getId() : null,
@@ -384,11 +407,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         return respuestaTablaRepository.save(respuesta);
     }
 
-
-    // ============================================================================================
-    // 4. ESTADOS Y PROGRESO
-    // ============================================================================================
-
     private void validarTransicionDeEstado(ProduccionModel produccion, ProduccionCambioEstadoRequestDTO nuevoEstado) {
         TipoEstadoProduccion actual = produccion.getEstado();
         TipoEstadoProduccion destino = TipoEstadoProduccion.valueOf(nuevoEstado.valor());
@@ -413,7 +431,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         produccionRepository.save(produccion);
     }
 
-    // Record para usar en el cálculo de progreso de celdas de tabla
     private record CeldaKey(Long idTabla, Long idFila, Long idColumna) {
     }
 

@@ -2,12 +2,14 @@ package com.unlu.alimtrack.services;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.RespuestaCeldaTablaResquestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCeldaTablaResponseDTO;
+import jakarta.validation.Valid;
 
 public interface ProduccionManagementService {
 
@@ -22,4 +24,6 @@ public interface ProduccionManagementService {
     UltimasRespuestasProduccionResponseDTO getUltimasRespuestas(String codigoProduccion);
 
     UltimasRespuestasProduccionResponseDTO test();
+
+    void updateMetadata(String codigoProduccion, @Valid ProduccionMetadataModifyRequestDTO request);
 }

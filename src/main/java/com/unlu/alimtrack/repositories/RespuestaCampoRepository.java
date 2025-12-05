@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RespuestaCampoRepository extends JpaRepository<RespuestaCampoModel, Long> {
@@ -30,4 +31,7 @@ public interface RespuestaCampoRepository extends JpaRepository<RespuestaCampoMo
             ORDER BY rc1.id_campo
             """, nativeQuery = true)
     List<RespuestaCampoModel> findAllUltimasRespuestasByProduccion(@Param("produccionId") Long produccionId);
+
+
+    Optional<RespuestaCampoModel> findTopByIdProduccionAndIdCampoOrderByTimestampDesc(ProduccionModel idProduccion, CampoSimpleModel idCampo);
 }

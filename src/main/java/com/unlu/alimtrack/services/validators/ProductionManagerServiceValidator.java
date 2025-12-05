@@ -9,11 +9,10 @@ import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.repositories.TablaRepository;
 import com.unlu.alimtrack.services.ProduccionQueryService;
+import com.unlu.alimtrack.services.UsuarioService; // Changed to interface
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
-import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -26,8 +25,7 @@ public class ProductionManagerServiceValidator {
     private final CampoSimpleRepository campoSimpleRepository;
     private final RespuestaTablaRepository respuestaTablaRepository;
     private final ProduccionRepository produccionRepository;
-    @Lazy
-    private final UsuarioServiceImpl usuarioServiceImpl;
+    private final UsuarioService usuarioService;
     private final TablaRepository tablaRepository;
 
     public ProduccionModel validarProduccionParaEdicion(String codigoProduccion) {
@@ -72,11 +70,11 @@ public class ProductionManagerServiceValidator {
     }
 
     private void verificarUsuarioExisteYEstaActivoByEmail(String email) {
-        if (!usuarioServiceImpl.existsByEmail(email)) {
+        if (!usuarioService.existsByEmail(email)) { // Changed to usuarioService
             log.warn("Intento de crear producción con un usuario no existente: {}", email);
             throw new RecursoNoEncontradoException("El usuario creador especificado no existe: " + email);
         }
-        if (!usuarioServiceImpl.estaActivoByEmail(email)) {
+        if (!usuarioService.estaActivoByEmail(email)) { // Changed to usuarioService
             log.warn("Intento de crear producción con un usuario inactivo: {}", email);
             throw new OperacionNoPermitida("El usuario creador especificado se encuentra inactivo: " + email);
         }

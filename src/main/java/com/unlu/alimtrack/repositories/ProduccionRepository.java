@@ -32,7 +32,7 @@ public interface ProduccionRepository extends JpaRepository<ProduccionModel, Lon
     List<ProduccionModel> findByAdvancedFilters(@Param("codigoVersionReceta") String codigoVersionReceta,
                                                 @Param("lote") String lote, @Param("encargado") String encargado, @Param("estado") TipoEstadoProduccion estado,
                                                 @Param("fechaInicio") LocalDateTime fechaInicio,
-                                                @Param("fechaFin") LocalDateTime fechaFin);
+                                                @Param("fechaFin") LocalDateTime fechaFin); // Removed Sort parameter
 
     boolean existsByLote(String lote);
 

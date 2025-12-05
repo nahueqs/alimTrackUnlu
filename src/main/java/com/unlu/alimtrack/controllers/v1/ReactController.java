@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class ReactController {
 
-    @RequestMapping(value = {"/", "/{path:[^\\.]*}"})
+    // Exclude /ws from the catch-all mapping
+    @RequestMapping(value = {"/", "/{path:^(?!ws$).*[^\\.]*}"})
     public String redirect() {
         log.trace("Redirigiendo al frontend de React (index.html)");
         return "forward:/index.html";

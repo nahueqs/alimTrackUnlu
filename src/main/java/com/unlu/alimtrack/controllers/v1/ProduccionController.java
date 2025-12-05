@@ -80,7 +80,7 @@ public class ProduccionController {
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/{codigoProduccion}/estado-actual")
+    @GetMapping("/{codigoProduccion}/ultimas-respuestas")
     public ResponseEntity<UltimasRespuestasProduccionResponseDTO> getUltimasRespuestas(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener el estado actual completo de la producción: {}", codigoProduccion);
@@ -97,7 +97,7 @@ public class ProduccionController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{codigoProduccion}/public")
+    @GetMapping("/{codigoProduccion}/estado-actual")
     public ResponseEntity<EstadoProduccionPublicoResponseDTO> getEstadoProduccion(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener la información pública de la producción: {}", codigoProduccion);

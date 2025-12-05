@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll() // Permit WebSocket endpoint
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

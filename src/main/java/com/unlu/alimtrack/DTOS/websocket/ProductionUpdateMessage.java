@@ -1,7 +1,5 @@
 package com.unlu.alimtrack.DTOS.websocket;
 
-import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-
 import java.time.LocalDateTime;
 
 // Main wrapper message for all production updates
@@ -22,6 +20,10 @@ public record ProductionUpdateMessage(
 
     public static ProductionUpdateMessage stateChanged(String codigoProduccion, ProductionStateUpdatePayload payload) {
         return new ProductionUpdateMessage("STATE_CHANGED", codigoProduccion, LocalDateTime.now(), payload);
+    }
+
+    public static ProductionUpdateMessage metadataCreated(String codigoProduccion, ProductionCreationPayload payload) {
+        return new ProductionUpdateMessage("PRODUCTION_METADATA_CREATED", codigoProduccion, LocalDateTime.now(), payload);
     }
 
     public static ProductionUpdateMessage metadataUpdated(String codigoProduccion, ProductionMetadataUpdatePayload payload) {

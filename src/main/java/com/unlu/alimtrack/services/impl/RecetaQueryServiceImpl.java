@@ -29,22 +29,6 @@ public class RecetaQueryServiceImpl implements RecetaQueryService {
     }
 
     @Override
-    public boolean recetaPerteneceAUsuario(String codigoReceta, String email) {
-        return recetaRepository.existsByCodigoRecetaAndCreadoPorEmail(codigoReceta, email);
-    }
-
-    @Override
-    public List<RecetaMetadataResponseDTO> findAllByCreadoPorEmail(String email) {
-        List<RecetaModel> recetas = recetaRepository.findAllByCreadoPor_Email(email);
-        if (recetas == null) {
-            throw new RecursoNoEncontradoException(
-                    "No existen el receta creadas por el email " + email);
-        }
-
-        return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
-    }
-
-    @Override
     public boolean existsByCreadoPorEmail(String email) {
         return recetaRepository.existsByCreadoPor_Email(email);
     }

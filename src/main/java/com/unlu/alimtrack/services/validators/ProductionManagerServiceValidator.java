@@ -1,6 +1,7 @@
 package com.unlu.alimtrack.services.validators;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
+import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exceptions.*;
 import com.unlu.alimtrack.models.*;
@@ -23,7 +24,6 @@ public class ProductionManagerServiceValidator {
     private final ProduccionQueryService produccionQueryService;
     private final VersionRecetaQueryService versionRecetaQueryService;
     private final CampoSimpleRepository campoSimpleRepository;
-    private final RespuestaTablaRepository respuestaTablaRepository;
     private final ProduccionRepository produccionRepository;
     private final UsuarioService usuarioService;
     private final TablaRepository tablaRepository;
@@ -49,13 +49,6 @@ public class ProductionManagerServiceValidator {
         log.debug("Validaciones para la creación de la producción {} superadas", createDTO.codigoProduccion());
     }
 
-    public void verificarIntegridadDatosCreacion(String codigoProduccion, ProduccionCreateDTO createDTO) {
-        if (!codigoProduccion.equals(createDTO.codigoProduccion())) {
-            throw new RecursoIdentifierConflictException(
-                    "El código de la URL no coincide con el del cuerpo de la petición. URL: " + codigoProduccion
-                            + ", Cuerpo: " + createDTO.codigoProduccion());
-        }
-    }
 
     private void verificarCodigoProduccionNoExiste(String codigoProduccion) {
         if (produccionQueryService.existsByCodigoProduccion(codigoProduccion)) {
@@ -93,18 +86,6 @@ public class ProductionManagerServiceValidator {
         return campo;
     }
 
-    public RespuestaTablaModel validarRespuestaTablaExiste(ProduccionModel produccion, Long idTabla, Long idFila, Long idColumna) {
-        log.debug("Validando existencia de la respuesta tabla para la produccion id {}, idFila {}, idColumna {}", produccion.getProduccion(), idFila, idColumna);
-
-        RespuestaTablaModel respuesta = respuestaTablaRepository.findByProduccionAndIdTablaIdAndFilaIdAndColumnaId(produccion, idTabla, idFila, idColumna)
-                .orElseThrow(() -> new RecursoNoEncontradoException("La respuestaTablaModel no encontrada"));
-
-        log.debug("Campo encontrado : {}", respuesta);
-
-
-        return respuesta;
-    }
-
     public void combinacionFilaColumnaPerteneceTabla(Long idFila, Long idColumna, Long idTabla) {
         validarFilaPerteneceATabla(idFila, idTabla);
         validarColumnaPerteneceATabla(idColumna, idTabla);
@@ -140,6 +121,12 @@ public class ProductionManagerServiceValidator {
         if (!tablaModel.getSeccion().getVersionRecetaPadre().equals(version)) {
             throw new ModificacionInvalidaException("La tabla no pertenece a la version que intenta modificar.");
         }
+
+    }
+
+    public void validarUpdateMetadata(String codigoProduccion, ProduccionMetadataModifyRequestDTO request) {
+        ProduccionModel produccion = validarProduccionParaEdicion(codigoProduccion);
+
 
     }
 }

@@ -28,7 +28,6 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Cacheable(value = "usuario", key = "#email")
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
@@ -123,7 +122,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "usuario", key = "#email")
+    @Cacheable(value = "usuario", key = "#email", condition = "#email != null")
     public UsuarioResponseDTO getUsuarioByEmail(String email) {
         log.info("Buscando usuario con email: {}", email);
         usuarioValidator.validateEmail(email);

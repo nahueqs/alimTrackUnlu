@@ -21,7 +21,6 @@ public class VersionRecetaQueryServiceImpl implements VersionRecetaQueryService 
     private final VersionRecetaRepository versionRecetaRepository;
     private final VersionRecetaMapper versionRecetaMapper;
     private final VersionRecetaValidator versionRecetaValidator;
-    private final ProduccionQueryService produccionQueryService;
 
     @Override
     public boolean existsByCreadaPorEmail(String email) {

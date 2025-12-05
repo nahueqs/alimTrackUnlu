@@ -41,7 +41,7 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
     }
 
     @Override
-    @Cacheable(value = "produccionesList", key = "#filtros.hashCode()") // Cachea la lista de producciones por filtros
+    // REMOVED @Cacheable(value = "produccionesList", key = "#filtros.hashCode()") // Cachea la lista de producciones por filtros
     public List<ProduccionMetadataResponseDTO> getAllProduccionesMetadata(@Valid ProduccionFilterRequestDTO filtros) {
         log.info("Buscando producciones con los filtros: {}", filtros);
         List<ProduccionModel> producciones = buscarProduccionesPorFiltros(filtros);

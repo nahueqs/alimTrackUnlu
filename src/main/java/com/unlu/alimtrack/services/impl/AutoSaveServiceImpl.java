@@ -11,6 +11,7 @@ import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaCampoRepository;
 import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.services.AutoSaveService;
+// Removed import com.unlu.alimtrack.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -33,25 +34,27 @@ public class AutoSaveServiceImpl implements AutoSaveService {
     private final RespuestaTablaRepository respuestaTablaRepository; // Inyectado
     private final ProduccionRepository produccionRepository;
     private final ObjectMapper objectMapper;
+    // Removed private final NotificationService notificationService;
 
     @Override
     @Async
-    public void ejecutarAutoSaveInmediato(Long idProduccion) {
+    public void ejecutarAutoSaveInmediato(ProduccionModel produccion) {
         try {
-            log.info("Iniciando auto-save asíncrono para producción ID: {}", idProduccion);
-            guardarAutoSave(idProduccion);
-            log.info("Auto-save para producción ID: {} completado exitosamente", idProduccion);
+            log.debug("Buscando producción con ID: {} para guardar su estado", produccion);
+
+
+            log.info("Iniciando auto-save asíncrono para producción codigo: {}", produccion.getCodigoProduccion());
+            guardarAutoSave(produccion);
+            // Removed notificationService.notifyAutoSave(produccion.getCodigoProduccion());
+            log.info("Auto-save para producción codigo: {} completado exitosamente.", produccion.getCodigoProduccion());
         } catch (Exception e) {
-            log.error("Error durante el auto-save asíncrono para producción ID: {}", idProduccion, e);
+            log.error("Error durante el auto-save asíncrono para producción codigo: {}", produccion, e);
         }
     }
 
     @Override
     @Transactional
-    public void guardarAutoSave(Long idProduccion) {
-        log.debug("Buscando producción con ID: {} para guardar su estado", idProduccion);
-        ProduccionModel produccion = produccionRepository.findById(idProduccion)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producción no encontrada para auto-save: " + idProduccion));
+    public void guardarAutoSave(ProduccionModel produccion) {
 
         log.debug("Obteniendo estado actual de la producción {}", produccion.getCodigoProduccion());
         Map<String, Object> estadoActual = obtenerEstadoActualProduccion(produccion);
@@ -96,7 +99,7 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
         Map<String, String> respuestasTablasMap = respuestasTablas.stream()
                 .collect(Collectors.toMap(
-                        respuesta -> "celda_" + respuesta.getFila().getId() + "_" + respuesta.getColumna().getId(),
+                        respuesta -> "celda_" + respuesta.getIdTabla().getId() + "_" + respuesta.getFila().getId() + "_" + respuesta.getColumna().getId(),
                         RespuestaTablaModel::getValor
                 ));
         estado.put("respuestas_tablas", respuestasTablasMap);

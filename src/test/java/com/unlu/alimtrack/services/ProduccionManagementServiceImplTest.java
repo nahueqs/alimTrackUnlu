@@ -113,7 +113,7 @@ public class ProduccionManagementServiceImplTest {
     @Test
     void updateEstado_shouldChangeStateAndSetFechaFinWhenFinal() {
         // Arrange
-        ProduccionCambioEstadoRequestDTO cambioDTO = new ProduccionCambioEstadoRequestDTO(TipoEstadoProduccion.FINALIZADA.name());
+        ProduccionCambioEstadoRequestDTO cambioDTO = new ProduccionCambioEstadoRequestDTO(TipoEstadoProduccion.FINALIZADA.name(), "email");
         when(produccionRepository.findByCodigoProduccion("PROD-001")).thenReturn(Optional.of(produccionEnProceso));
 
         // Act
@@ -122,7 +122,7 @@ public class ProduccionManagementServiceImplTest {
         // Assert
         assertThat(produccionEnProceso.getEstado()).isEqualTo(TipoEstadoProduccion.FINALIZADA);
         assertThat(produccionEnProceso.getFechaFin()).isNotNull();
-        verify(autoSaveServiceImpl, times(1)).ejecutarAutoSaveInmediato(1L);
+        verify(autoSaveServiceImpl, times(1)).ejecutarAutoSaveInmediato(produccionEnProceso);
         verify(produccionRepository, times(1)).save(produccionEnProceso);
     }
 
@@ -130,7 +130,7 @@ public class ProduccionManagementServiceImplTest {
     void updateEstado_shouldThrowExceptionForInvalidTransition() {
         // Arrange
         produccionEnProceso.setEstado(TipoEstadoProduccion.FINALIZADA);
-        ProduccionCambioEstadoRequestDTO cambioDTO = new ProduccionCambioEstadoRequestDTO(TipoEstadoProduccion.EN_PROCESO.name());
+        ProduccionCambioEstadoRequestDTO cambioDTO = new ProduccionCambioEstadoRequestDTO(TipoEstadoProduccion.EN_PROCESO.name(), usuarioCreador.getEmail());
         when(produccionRepository.findByCodigoProduccion("PROD-001")).thenReturn(Optional.of(produccionEnProceso));
 
         // Act & Assert
@@ -164,7 +164,7 @@ public class ProduccionManagementServiceImplTest {
 
         // Assert
         assertThat(result).isEqualTo(responseDTO);
-        verify(autoSaveServiceImpl, times(1)).ejecutarAutoSaveInmediato(1L);
+        verify(autoSaveServiceImpl, times(1)).ejecutarAutoSaveInmediato(produccionEnProceso);
         verify(respuestaCampoRepository, times(1)).save(any(RespuestaCampoModel.class));
         verify(usuarioServiceImpl, times(1)).getUsuarioModelByEmail(emailCreador); // Verify user service was called
     }

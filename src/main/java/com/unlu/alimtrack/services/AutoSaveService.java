@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public interface AutoSaveService {
-    void ejecutarAutoSaveInmediato(Long idProduccion);
+    void ejecutarAutoSaveInmediato(ProduccionModel produccion);
 
-    void guardarAutoSave(Long idProduccion);
+    void guardarAutoSave(ProduccionModel produccion);
 
     Map<String, Object> recuperarUltimoAutoSave(ProduccionModel produccion);
 

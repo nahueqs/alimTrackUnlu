@@ -10,15 +10,23 @@ import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataR
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.ProgresoProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
+import com.unlu.alimtrack.DTOS.websocket.FieldUpdatePayload;
+import com.unlu.alimtrack.DTOS.websocket.ProductionMetadataUpdatePayload;
+import com.unlu.alimtrack.DTOS.websocket.ProductionStateUpdatePayload;
+import com.unlu.alimtrack.DTOS.websocket.ProductionUpdateMessage;
+import com.unlu.alimtrack.DTOS.websocket.TableCellUpdatePayload;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
+import com.unlu.alimtrack.enums.TipoRolUsuario;
 import com.unlu.alimtrack.exceptions.CambioEstadoProduccionInvalido;
+import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
 import com.unlu.alimtrack.mappers.RespuestaCampoMapper;
 import com.unlu.alimtrack.mappers.RespuestaTablaMapper;
 import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.*;
-import com.unlu.alimtrack.services.AutoSaveService;
+// Removed import com.unlu.alimtrack.services.AutoSaveService;
+import com.unlu.alimtrack.services.NotificationService;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.UsuarioService;
 import com.unlu.alimtrack.services.VersionRecetaEstructuraService;
@@ -26,12 +34,15 @@ import com.unlu.alimtrack.services.validators.ProductionManagerServiceValidator;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,19 +54,19 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
     private final RespuestaCampoRepository respuestaCampoRepository;
     private final RespuestaTablaRepository respuestaTablaRepository;
 
+    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
+    private final NotificationService notificationService;
+    private final UsuarioService usuarioService;
+
     private final ProductionManagerServiceValidator productionManagerServiceValidator;
     private final VersionRecetaValidator versionRecetaValidator;
-    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
-    private final AutoSaveService autoSaveService;
 
     private final ProduccionMapper produccionMapper;
     private final RespuestaCampoMapper respuestaCampoMapper;
-    private final UsuarioService usuarioService;
     private final RespuestaTablaMapper respuestaTablasMapper;
     private final TablaRepository tablaRepository;
     private final FilaTablaRepository filaTablaRepository;
     private final ColumnaTablaRepository columnaTablaRepository;
-
 
     @Override
     public ProduccionMetadataResponseDTO iniciarProduccion(ProduccionCreateDTO createDTO) {
@@ -68,30 +79,106 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         nuevaProduccion.setFechaInicio(LocalDateTime.now());
         nuevaProduccion.setFechaModificacion(LocalDateTime.now());
 
-        return produccionMapper.modelToResponseDTO(produccionRepository.save(nuevaProduccion));
+        ProduccionModel produccionGuardada = produccionRepository.save(nuevaProduccion);
+
+        // Notify about new production metadata
+        ProductionUpdateMessage metadataUpdateMessage = ProductionUpdateMessage.metadataUpdated(
+                produccionGuardada.getCodigoProduccion(),
+                new ProductionMetadataUpdatePayload(
+                        produccionGuardada.getVersionReceta().getCodigoVersionReceta(),
+                        produccionGuardada.getLote(),
+                        // Removed encargado, observaciones as they are not in public metadata
+                        produccionGuardada.getFechaInicio(),
+                        produccionGuardada.getFechaFin()
+                )
+        );
+        log.debug("Sending WebSocket message: {}", metadataUpdateMessage);
+        notificationService.notifyProductionUpdate(metadataUpdateMessage);
+
+        // Also notify about state change
+        ProductionUpdateMessage stateUpdateMessage = ProductionUpdateMessage.stateChanged(
+                produccionGuardada.getCodigoProduccion(),
+                new ProductionStateUpdatePayload(
+                        produccionGuardada.getEstado(),
+                        produccionGuardada.getFechaFin()
+                )
+        );
+        log.debug("Sending WebSocket message: {}", stateUpdateMessage);
+        notificationService.notifyProductionUpdate(stateUpdateMessage);
+
+        // Notify that a new production has been created (for list updates)
+        notificationService.notifyProductionCreated(ProductionUpdateMessage.metadataUpdated( // Using metadataUpdated type for creation
+                produccionGuardada.getCodigoProduccion(),
+                new ProductionMetadataUpdatePayload(
+                        produccionGuardada.getVersionReceta().getCodigoVersionReceta(),
+                        produccionGuardada.getLote(),
+                        produccionGuardada.getFechaInicio(),
+                        produccionGuardada.getFechaFin()
+                )
+        ));
+
+
+        log.info("Producción {} iniciada exitosamente y notificaciones enviadas.", produccionGuardada.getCodigoProduccion());
+
+        return produccionMapper.modelToResponseDTO(produccionGuardada);
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "produccionByCodigo", key = "#codigoProduccion"),
+            @CacheEvict(value = "produccionPublic", key = "#codigoProduccion"),
+            @CacheEvict(value = "produccionesList", allEntries = true)
+    })
     public void updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO) {
         log.info("Actualizando estado producción {} a {}", codigoProduccion, nuevoEstadoDTO.valor());
-
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
+        UsuarioModel usuario = validarUsuarioAutorizado(nuevoEstadoDTO.emailCreador());
         validarTransicionDeEstado(produccion, nuevoEstadoDTO);
 
         TipoEstadoProduccion nuevoEstado = TipoEstadoProduccion.valueOf(nuevoEstadoDTO.valor());
+
         produccion.setEstado(nuevoEstado);
 
         if (esEstadoFinal(nuevoEstado)) {
             produccion.setFechaFin(LocalDateTime.now());
         }
 
-        autoSaveService.ejecutarAutoSaveInmediato(produccion.getProduccion());
-        produccionRepository.save(produccion);
+        ProduccionModel produccionGuardada = produccionRepository.save(produccion);
+
+        // Notify about state change (for specific production detail page)
+        ProductionUpdateMessage stateUpdateMessage = ProductionUpdateMessage.stateChanged(
+                produccionGuardada.getCodigoProduccion(),
+                new ProductionStateUpdatePayload(
+                        produccionGuardada.getEstado(),
+                        produccionGuardada.getFechaFin()
+                )
+        );
+        log.debug("Sending WebSocket message to specific topic: {}", stateUpdateMessage);
+        notificationService.notifyProductionUpdate(stateUpdateMessage);
+
+        // Notify about state change globally (for production list pages)
+        notificationService.notifyProductionStateChangedGlobal(stateUpdateMessage); // Send the same message to the global topic
+        log.debug("Sending WebSocket message to global state change topic: {}", stateUpdateMessage);
+
+
+        log.info("Estado de producción {} actualizado a {} y notificación enviada.", codigoProduccion, nuevoEstado);
+    }
+
+    private UsuarioModel validarUsuarioAutorizado(String email) {
+
+        UsuarioModel usuario = usuarioService.getUsuarioModelByEmail(email);
+
+        if (!usuario.getEstaActivo()) {
+            throw new OperacionNoPermitida("El usuario no está activo");
+        }
+
+        return usuario;
     }
 
     @Override
     public RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo, RespuestaCampoRequestDTO request) {
         log.debug("Iniciando guardado de respuesta para campo. Producción: {}, Campo ID: {}", codigoProduccion, idCampo);
+        UsuarioModel usuario = validarUsuarioAutorizado(request.emailCreador());
 
         log.debug("Paso 1: Validando contexto...");
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
@@ -104,21 +191,32 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Validación de pertenencia de campo a versión OK.");
 
         log.debug("Paso 2: Persistiendo respuesta...");
-        RespuestaCampoModel respuesta = guardarOActualizarRespuestaCampo(produccion, campo, request);
+        RespuestaCampoModel respuesta = guardarOActualizarRespuestaCampo(produccion, campo, request, usuario);
         log.debug("Persistencia de respuesta de campo OK. ID Respuesta: {}", respuesta.getId());
 
-        log.debug("Paso 3: Iniciando efectos secundarios (Auto-Save)...");
-        autoSaveService.ejecutarAutoSaveInmediato(produccion.getProduccion());
-        log.debug("Auto-Save para producción {} iniciado asíncronamente.", produccion.getCodigoProduccion());
+        // Notify about field update
+        ProductionUpdateMessage fieldUpdateMessage = ProductionUpdateMessage.fieldUpdated(
+                produccion.getCodigoProduccion(),
+                new FieldUpdatePayload(
+                        campo.getId(),
+                        respuesta.getValor()
+                )
+        );
+        log.debug("Sending WebSocket message: {}", fieldUpdateMessage);
+        notificationService.notifyProductionUpdate(fieldUpdateMessage);
 
-        log.debug("Finalizado guardado de respuesta para campo. Producción: {}, Campo ID: {}", codigoProduccion, idCampo);
+        log.debug("Finalizado guardado de respuesta para campo. Producción: {}, Campo ID: {} y notificación enviada.", codigoProduccion, idCampo);
         return respuestaCampoMapper.toResponseDTO(respuesta);
     }
 
 
     @Override
     public RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idTabla, Long idFila, Long idColumna, RespuestaCeldaTablaResquestDTO request) {
+
         log.debug("Iniciando guardado de respuesta para celda. Producción: {}, Tabla: {}, Fila: {}, Columna: {}", codigoProduccion, idTabla, idFila, idColumna);
+
+
+        UsuarioModel usuario = validarUsuarioAutorizado(request.emailCreador());
 
         log.debug("Paso 1: Validando contexto...");
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
@@ -131,14 +229,23 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Validación de combinación fila-columna OK.");
 
         log.debug("Paso 2: Persistiendo respuesta...");
-        RespuestaTablaModel respuesta = guardarOActualizarRespuestaTabla(produccion, idTabla, idFila, idColumna, request);
+        RespuestaTablaModel respuesta = guardarOActualizarRespuestaTabla(produccion, idTabla, idFila, idColumna, request, usuario);
         log.debug("Persistencia de respuesta de tabla OK. ID Respuesta: {}", respuesta.getId());
 
-        log.debug("Paso 3: Iniciando efectos secundarios (Auto-Save)...");
-        autoSaveService.ejecutarAutoSaveInmediato(produccion.getProduccion());
-        log.debug("Auto-Save para producción {} iniciado asíncronamente.", produccion.getCodigoProduccion());
+        // Notify about table cell update
+        ProductionUpdateMessage tableCellUpdateMessage = ProductionUpdateMessage.tableCellUpdated(
+                produccion.getCodigoProduccion(),
+                new TableCellUpdatePayload(
+                        idTabla,
+                        idFila,
+                        idColumna,
+                        respuesta.getValor()
+                )
+        );
+        log.debug("Sending WebSocket message: {}", tableCellUpdateMessage);
+        notificationService.notifyProductionUpdate(tableCellUpdateMessage);
 
-        log.debug("Finalizado guardado de respuesta para celda. Producción: {}, Tabla: {}, Fila: {}, Columna: {}", codigoProduccion, idTabla, idFila, idColumna);
+        log.debug("Finalizado guardado de respuesta para celda. Producción: {}, Tabla: {}, Fila: {}, Columna: {} y notificación enviada.", codigoProduccion, idTabla, idFila, idColumna);
         return respuestaTablasMapper.toResponseDTO(respuesta);
     }
 
@@ -187,8 +294,8 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
 
         long camposRespondidos = respuestasCampos.stream()
-                .filter(rc -> rc.getValor() != null && !rc.getValor().trim().isEmpty()) // <-- AÑADIR ESTA LÍNEA
-                .map(RespuestaCampoModel::getIdCampo)
+                .filter(rc -> rc.getValor() != null && !rc.getValor().trim().isEmpty())
+                .map(rc -> rc.getIdCampo().getId())
                 .filter(Objects::nonNull)
                 .distinct()
                 .count();
@@ -221,18 +328,20 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producción no encontrada: " + codigo));
     }
 
-    private RespuestaCampoModel guardarOActualizarRespuestaCampo(ProduccionModel produccion, CampoSimpleModel campo, RespuestaCampoRequestDTO request) {
+    private RespuestaCampoModel guardarOActualizarRespuestaCampo(ProduccionModel produccion, CampoSimpleModel campo, RespuestaCampoRequestDTO request, UsuarioModel usuario) {
         log.debug("Buscando respuesta existente para Producción ID {} y Campo ID {}", produccion.getProduccion(), campo.getId());
-        RespuestaCampoModel respuesta = respuestaCampoRepository.findByIdProduccionAndIdCampo(produccion, campo);
-        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(request.emailCreador());
+        Optional<RespuestaCampoModel> respuestaExistente = respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(produccion, campo);
 
-        if (respuesta == null) {
+        RespuestaCampoModel respuesta;
+
+        if (respuestaExistente.isEmpty()) {
             log.debug("No se encontró respuesta existente. Creando una nueva.");
             respuesta = new RespuestaCampoModel();
             respuesta.setIdProduccion(produccion);
             respuesta.setIdCampo(campo);
-            respuesta.setCreadoPor(usuarioCreador);
+            respuesta.setCreadoPor(usuario);
         } else {
+            respuesta = respuestaExistente.get();
             log.debug("Respuesta existente encontrada. ID: {}. Se actualizará.", respuesta.getId());
         }
 
@@ -246,11 +355,10 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
     private RespuestaTablaModel guardarOActualizarRespuestaTabla(
             ProduccionModel produccion, Long idTabla, Long idFila, Long idColumna,
-            RespuestaCeldaTablaResquestDTO request) {
+            RespuestaCeldaTablaResquestDTO request, UsuarioModel usuario) {
 
         log.debug("Buscando respuesta de tabla existente para Producción ID {}, Tabla ID {}, Fila ID {}, Columna ID {}", produccion.getProduccion(), idTabla, idFila, idColumna);
         RespuestaTablaModel respuesta = respuestaTablaRepository.findByProduccionAndIdTablaIdAndFilaIdAndColumnaId(produccion, idTabla, idFila, idColumna).orElse(null);
-        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(request.emailCreador());
 
         if (respuesta == null) {
             log.debug("No se encontró respuesta de tabla existente. Creando una nueva.");
@@ -261,7 +369,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
             respuesta = new RespuestaTablaModel();
             respuesta.setProduccion(produccion);
             respuesta.setIdTabla(tabla);
-            respuesta.setCreadoPor(usuarioCreador);
+            respuesta.setCreadoPor(usuario);
             respuesta.setFila(fila);
             respuesta.setColumna(columna);
         } else {
@@ -289,7 +397,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
             throw new CambioEstadoProduccionInvalido("La producción ya está en estado " + actual);
         }
         if (esEstadoFinal(actual)) {
-            throw new CambioEstadoProduccionInvalido("No se puede modificar una producción " + actual);
+            throw new OperacionNoPermitida("No se puede modificar una producción " + actual);
         }
         if (actual == TipoEstadoProduccion.EN_PROCESO && !esEstadoFinal(destino)) {
             throw new CambioEstadoProduccionInvalido("Desde EN_PROCESO solo se puede FINALIZAR o CANCELAR");

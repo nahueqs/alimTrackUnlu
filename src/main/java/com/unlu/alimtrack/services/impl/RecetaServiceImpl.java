@@ -4,8 +4,8 @@ import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
 import com.unlu.alimtrack.DTOS.response.Receta.RecetaMetadataResponseDTO;
 import com.unlu.alimtrack.exceptions.BorradoFallidoException;
+import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
 import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
-import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
@@ -60,9 +60,9 @@ public class RecetaServiceImpl implements RecetaService {
 
     @Override
     @Transactional
-    public RecetaMetadataResponseDTO addReceta(String codigoReceta, RecetaCreateDTO receta) {
-        log.info("Creando nueva receta con código: {}", codigoReceta);
-        verificarCreacionValida(codigoReceta, receta);
+    public RecetaMetadataResponseDTO addReceta(RecetaCreateDTO receta) {
+        log.info("Creando nueva receta con código: {}", receta.codigoReceta());
+        verificarCreacionValida(receta.codigoReceta(), receta);
         RecetaModel model = crearModelByCreateDTO(receta);
         recetaRepository.save(model);
         log.info("Receta {} creada y guardada exitosamente", model.getCodigoReceta());
@@ -142,8 +142,14 @@ public class RecetaServiceImpl implements RecetaService {
 
     private void verificarUsuarioExiste(String email) {
         if (!usuarioService.existsByEmail(email)) {
-            throw new RecursoNoEncontradoException("El usuario creador especificado no existe: " + email);
+            throw new OperacionNoPermitida("El usuario creador especificado no existe: " + email);
         }
+
+        if (!usuarioService.estaActivoByEmail(email)) {
+            throw new OperacionNoPermitida("El usuario creador especificado no está activo: " + email);
+        }
+
+
     }
 
     private RecetaModel crearModelByCreateDTO(RecetaCreateDTO recetaCreateDTO) {

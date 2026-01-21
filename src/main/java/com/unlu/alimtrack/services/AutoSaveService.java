@@ -14,5 +14,4 @@ public interface AutoSaveService {
 
     LocalDateTime obtenerUltimoAutoSaveTimestamp(ProduccionModel produccion);
 
-    boolean existeAutoSave(ProduccionModel produccion);
 }

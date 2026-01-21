@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.mappers;
 
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
-import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.MetadataProduccionPublicaResponseDTO;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
@@ -11,8 +11,8 @@ import com.unlu.alimtrack.services.impl.VersionRecetaMetadataServiceImpl;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired; // Import Autowired
-import org.springframework.context.annotation.Lazy; // Keep Lazy for VersionRecetaMetadataServiceImpl if needed elsewhere
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 

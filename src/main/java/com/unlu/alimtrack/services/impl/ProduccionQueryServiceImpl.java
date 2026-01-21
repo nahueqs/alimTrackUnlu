@@ -1,8 +1,8 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
-import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
+import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.ProduccionMapper;
@@ -13,7 +13,6 @@ import com.unlu.alimtrack.services.validators.ProduccionQueryServiceValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,6 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
     private final ProduccionQueryServiceValidator produccionQueryServiceValidator;
 
     @Override
-    @Cacheable(value = "produccionByCodigo", key = "#codigo")
     public ProduccionMetadataResponseDTO findByCodigoProduccion(String codigo) {
         log.info("Buscando producción con código: {}", codigo);
         ProduccionModel model = produccionRepository.findByCodigoProduccion(codigo)
@@ -41,7 +39,6 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
     }
 
     @Override
-    // REMOVED @Cacheable(value = "produccionesList", key = "#filtros.hashCode()") // Cachea la lista de producciones por filtros
     public List<ProduccionMetadataResponseDTO> getAllProduccionesMetadata(@Valid ProduccionFilterRequestDTO filtros) {
         log.info("Buscando producciones con los filtros: {}", filtros);
         List<ProduccionModel> producciones = buscarProduccionesPorFiltros(filtros);
@@ -50,7 +47,6 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
     }
 
     @Override
-    @Cacheable(value = "produccionPublic", key = "#codigoProduccion")
     public EstadoProduccionPublicoResponseDTO getEstadoProduccion(String codigoProduccion) {
         log.info("Buscando información pública de la producción con código: {}", codigoProduccion);
         return produccionRepository.findProduccionPublicByCodigoProduccion(codigoProduccion)
@@ -77,14 +73,12 @@ public class ProduccionQueryServiceImpl implements ProduccionQueryService {
     }
 
     @Override
-    @Cacheable(value = "produccionExistsByVersion", key = "#codigoReceta")
     public boolean existsByVersionRecetaPadre(String codigoReceta) {
         log.debug("Verificando si existen producciones para la versión de receta: {}", codigoReceta);
         return produccionRepository.existsByVersionReceta_CodigoVersionReceta(codigoReceta);
     }
 
     @Override
-    @Cacheable(value = "produccionExistsByCodigo", key = "#codigoProduccion")
     public boolean existsByCodigoProduccion(String codigoProduccion) {
         log.debug("Verificando si existe una producción con el código: {}", codigoProduccion);
         return produccionRepository.existsByCodigoProduccion(codigoProduccion);

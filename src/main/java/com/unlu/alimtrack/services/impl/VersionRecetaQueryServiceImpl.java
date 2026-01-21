@@ -4,7 +4,6 @@ import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataR
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
-import com.unlu.alimtrack.services.ProduccionQueryService;
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import lombok.RequiredArgsConstructor;

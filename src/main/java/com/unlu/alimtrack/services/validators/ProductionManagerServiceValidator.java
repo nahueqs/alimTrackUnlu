@@ -3,14 +3,19 @@ package com.unlu.alimtrack.services.validators;
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
-import com.unlu.alimtrack.exceptions.*;
-import com.unlu.alimtrack.models.*;
+import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
+import com.unlu.alimtrack.exceptions.OperacionNoPermitida;
+import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
+import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
+import com.unlu.alimtrack.models.CampoSimpleModel;
+import com.unlu.alimtrack.models.ProduccionModel;
+import com.unlu.alimtrack.models.TablaModel;
+import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.CampoSimpleRepository;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
-import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.repositories.TablaRepository;
 import com.unlu.alimtrack.services.ProduccionQueryService;
-import com.unlu.alimtrack.services.UsuarioService; // Changed to interface
+import com.unlu.alimtrack.services.UsuarioService;
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +48,9 @@ public class ProductionManagerServiceValidator {
 
     public void verificarCreacionProduccion(ProduccionCreateDTO createDTO) {
         log.debug("Iniciando validaciones para la creación de la producción {}", createDTO.codigoProduccion());
+        verificarUsuarioExisteYEstaActivoByEmail(createDTO.emailCreador());
         verificarCodigoProduccionNoExiste(createDTO.codigoProduccion());
         verificarVersionExiste(createDTO.codigoVersionReceta());
-        verificarUsuarioExisteYEstaActivoByEmail(createDTO.emailCreador());
         log.debug("Validaciones para la creación de la producción {} superadas", createDTO.codigoProduccion());
     }
 
@@ -65,7 +70,7 @@ public class ProductionManagerServiceValidator {
     private void verificarUsuarioExisteYEstaActivoByEmail(String email) {
         if (!usuarioService.existsByEmail(email)) { // Changed to usuarioService
             log.warn("Intento de crear producción con un usuario no existente: {}", email);
-            throw new RecursoNoEncontradoException("El usuario creador especificado no existe: " + email);
+            throw new OperacionNoPermitida("El usuario creador especificado no existe: " + email);
         }
         if (!usuarioService.estaActivoByEmail(email)) { // Changed to usuarioService
             log.warn("Intento de crear producción con un usuario inactivo: {}", email);

@@ -3,10 +3,7 @@ package com.unlu.alimtrack.services.impl;
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.VersionRecetaModifyDTO;
 import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataResponseDTO;
-import com.unlu.alimtrack.exceptions.BorradoFallidoException;
-import com.unlu.alimtrack.exceptions.ModificacionInvalidaException;
-import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
-import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
+import com.unlu.alimtrack.exceptions.*;
 import com.unlu.alimtrack.mappers.VersionRecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
 import com.unlu.alimtrack.models.UsuarioModel;
@@ -19,7 +16,6 @@ import com.unlu.alimtrack.services.VersionRecetaMetadataService;
 import com.unlu.alimtrack.services.validators.VersionRecetaValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +68,6 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
 
     @Override
     @Transactional
-    @CacheEvict(value = "versionRecetaEstructura", key = "#versionRecetaCreateDTO.codigoVersionReceta()")
     public VersionMetadataResponseDTO saveVersionReceta(String codigoRecetaPadre, VersionRecetaCreateDTO versionRecetaCreateDTO) {
         log.info("Creando nueva versión de receta para la receta padre: {}", codigoRecetaPadre);
         verificarCreacionVersionReceta(codigoRecetaPadre, versionRecetaCreateDTO);
@@ -90,7 +85,6 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
 
     @Override
     @Transactional
-    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion")
     public VersionMetadataResponseDTO updateVersionReceta(String codigoVersion, VersionRecetaModifyDTO modificacion) {
         log.info("Actualizando versión de receta con código: {}", codigoVersion);
         versionRecetaValidator.validateModification(modificacion);
@@ -103,7 +97,6 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
 
     @Override
     @Transactional
-    @CacheEvict(value = "versionRecetaEstructura", key = "#codigoVersion")
     public void deleteVersionReceta(String codigoVersion) {
         log.info("Intentando eliminar la versión de receta con código: {}", codigoVersion);
         VersionRecetaModel receta = findVersionModelByCodigo(codigoVersion);
@@ -144,8 +137,12 @@ public class VersionRecetaMetadataServiceImpl implements VersionRecetaMetadataSe
 
     private void verificarUsuarioExiste(String email) {
         if (!usuarioService.existsByEmail(email)) {
-            throw new RecursoNoEncontradoException("El usuario creador especificado no existe: " + email);
+            throw new OperacionNoPermitida("El usuario creador especificado no existe: " + email);
         }
+        if (!usuarioService.estaActivoByEmail(email)) {
+            throw new OperacionNoPermitida("El usuario creador especificado no está activo: " + email);
+        }
+
     }
 
     private void verificarVersionRepetida(String codigoVersion) {

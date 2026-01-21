@@ -1,7 +1,6 @@
 package com.unlu.alimtrack.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.models.AutoSaveProduccionModel;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.RespuestaCampoModel;
@@ -11,7 +10,6 @@ import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaCampoRepository;
 import com.unlu.alimtrack.repositories.RespuestaTablaRepository;
 import com.unlu.alimtrack.services.AutoSaveService;
-// Removed import com.unlu.alimtrack.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -91,7 +89,7 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         Map<String, String> respuestasCamposMap = respuestasCampos.stream()
                 .collect(Collectors.toMap(
                         respuesta -> "campo_" + respuesta.getIdCampo().getId(),
-                        RespuestaCampoModel::getValor
+                        RespuestaCampoModel::getValorTexto
                 ));
         estado.put("respuestas_campos", respuestasCamposMap);
 
@@ -99,8 +97,13 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
         Map<String, String> respuestasTablasMap = respuestasTablas.stream()
                 .collect(Collectors.toMap(
-                        respuesta -> "celda_" + respuesta.getIdTabla().getId() + "_" + respuesta.getFila().getId() + "_" + respuesta.getColumna().getId(),
-                        RespuestaTablaModel::getValor
+                        respuesta -> respuesta.getId().toString(),  // Asegúrate que getIdTabla() exista
+                        respuesta -> {
+                            if (respuesta.getColumna() != null && respuesta.getColumna().getTipoDato() != null) {
+                                return respuesta.getValor(respuesta.getColumna().getTipoDato()).toString();
+                            }
+                            return null;
+                        }
                 ));
         estado.put("respuestas_tablas", respuestasTablasMap);
 
@@ -125,10 +128,4 @@ public class AutoSaveServiceImpl implements AutoSaveService {
                 .orElse(null);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existeAutoSave(ProduccionModel produccion) {
-        log.debug("Verificando si existe auto-save para la producción: {}", produccion.getCodigoProduccion());
-        return autoSaveRepository.existsByProduccion(produccion);
-    }
 }

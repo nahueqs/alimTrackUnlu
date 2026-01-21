@@ -1,3 +1,4 @@
+// TipoDatoCampo.java (agregar estos métodos)
 package com.unlu.alimtrack.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -6,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum TipoDatoCampo {
     DECIMAL("decimal"),
     ENTERO("entero"),
+    FECHA("fecha"),
+    HORA("hora"),
+    BOOLEANO("booleano"),
     TEXTO("texto");
 
     private final String value;
@@ -46,5 +50,34 @@ public enum TipoDatoCampo {
     @Override
     public String toString() {
         return this.value;
+    }
+
+    // ===== MÉTODOS NUEVOS =====
+
+    public boolean esNumerico() {
+        return this == DECIMAL || this == ENTERO;
+    }
+
+    public boolean esFechaOHora() {
+        return this == FECHA || this == HORA;
+    }
+
+    public boolean esTexto() {
+        return this == TEXTO;
+    }
+
+    public boolean esBooleano() {
+        return this == BOOLEANO;
+    }
+
+    // Para determinar qué tipo de valor esperar
+    public Class<?> getTipoJavaEsperado() {
+        return switch (this) {
+            case DECIMAL -> java.math.BigDecimal.class;
+            case ENTERO -> Integer.class;
+            case FECHA, HORA, TEXTO -> String.class;
+            case BOOLEANO -> Boolean.class;
+            default -> Object.class;
+        };
     }
 }

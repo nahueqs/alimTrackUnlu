@@ -16,7 +16,6 @@ import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.UsuarioValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -122,7 +121,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "usuario", key = "#email", condition = "#email != null")
     public UsuarioResponseDTO getUsuarioByEmail(String email) {
         log.info("Buscando usuario con email: {}", email);
         usuarioValidator.validateEmail(email);

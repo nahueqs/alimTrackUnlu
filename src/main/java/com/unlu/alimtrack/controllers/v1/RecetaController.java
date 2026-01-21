@@ -46,11 +46,11 @@ public class RecetaController {
         return ResponseEntity.ok(updated);
     }
 
-    @PostMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaMetadataResponseDTO> addReceta(@PathVariable String codigoReceta,
-                                                               @Valid @RequestBody RecetaCreateDTO receta) {
-        log.info("Solicitud para crear una nueva receta con código: {}", codigoReceta);
-        RecetaMetadataResponseDTO created = recetaService.addReceta(codigoReceta, receta);
+    @PostMapping()
+    public ResponseEntity<RecetaMetadataResponseDTO> addReceta(
+            @Valid @RequestBody RecetaCreateDTO receta) {
+        log.info("Solicitud para crear una nueva receta con código: {}");
+        RecetaMetadataResponseDTO created = recetaService.addReceta(receta);
         log.info("Receta creada exitosamente: {}", created.codigoReceta());
         return ResponseEntity.created(URI.create("/api/v1/recetas/" + created.codigoReceta()))
                 .body(created);

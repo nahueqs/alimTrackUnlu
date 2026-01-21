@@ -37,7 +37,7 @@ public interface RespuestaTablaRepository extends JpaRepository<RespuestaTablaMo
             @Param("produccionId") Long produccionId);
 
 
-    List<RespuestaTablaModel> findAllByProduccion(@Param("produccion") ProduccionModel produccion);
+    Optional<RespuestaTablaModel> findByProduccionAndTablaIdAndFilaIdAndColumnaId(ProduccionModel Produccion, Long tablaId, Long filaId, Long columnaId);
 
-    Optional<RespuestaTablaModel> findByProduccionAndIdTablaIdAndFilaIdAndColumnaId(ProduccionModel Produccion, Long tablaId, Long filaId, Long columnaId);
+    List<RespuestaTablaModel> findByProduccionAndTablaId(ProduccionModel produccion, Long idTabla);
 }

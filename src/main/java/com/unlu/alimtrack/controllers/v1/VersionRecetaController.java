@@ -50,12 +50,11 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versiones);
     }
 
-    @PostMapping("/recetas/{codigoReceta}/versiones-receta")
-    public ResponseEntity<VersionMetadataResponseDTO> saveVersionReceta(
-            @PathVariable String codigoReceta, @Valid @RequestBody VersionRecetaCreateDTO dto) {
-        log.info("Solicitud para crear una nueva versión para la receta con código: {}", codigoReceta);
-        VersionMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(codigoReceta, dto);
-        log.info("Versión creada exitosamente: {} para la receta: {}", created.codigoVersionReceta(), codigoReceta);
+    @PostMapping("/recetas/versiones-receta")
+    public ResponseEntity<VersionMetadataResponseDTO> saveVersionReceta(@Valid @RequestBody VersionRecetaCreateDTO dto) {
+        log.info("Solicitud para crear una nueva versión para la receta con código: {}", dto.codigoVersionReceta());
+        VersionMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(dto.codigoVersionReceta(), dto);
+        log.info("Versión creada exitosamente: {} para la receta: {}", created.codigoVersionReceta(), dto.codigoVersionReceta());
         return ResponseEntity.created(
                         URI.create("/api/v1/versiones-receta/" + created.codigoVersionReceta()))
                 .body(created);

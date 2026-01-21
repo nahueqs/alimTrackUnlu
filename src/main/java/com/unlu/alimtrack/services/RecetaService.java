@@ -12,7 +12,7 @@ public interface RecetaService {
 
     RecetaMetadataResponseDTO findReceta(String codigoReceta);
 
-    RecetaMetadataResponseDTO addReceta(String codigoReceta, RecetaCreateDTO receta);
+    RecetaMetadataResponseDTO addReceta(RecetaCreateDTO receta);
 
     RecetaMetadataResponseDTO updateReceta(String codigoReceta, RecetaModifyDTO recetaDTO);
 

@@ -4,7 +4,6 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCeldaTablaResquestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaTablaRequestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
@@ -142,12 +141,12 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
     }
 
     @Override
-    public RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idTabla, Long idFila, Long idColumna, RespuestaCeldaTablaResquestDTO request) {
+    public RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idTabla, Long idFila, Long idColumna, RespuestaTablaRequestDTO request) {
 
         log.debug("Iniciando guardado de respuesta para celda. Producción: {}, Tabla: {}, Fila: {}, Columna: {}", codigoProduccion, idTabla, idFila, idColumna);
 
 
-        usuarioValidationService.validarUsuarioAutorizado(request.emailCreador());
+        usuarioValidationService.validarUsuarioAutorizado(request.getEmailCreador());
 
         log.debug("Paso 1: Validando contexto...");
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
@@ -160,9 +159,8 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Validación de combinación fila-columna OK.");
 
         log.debug("Paso 2: Usando servicio especializado...");
-        RespuestaTablaRequestDTO requestTabla = convertirARespuestaTablaRequestDTO(request);
 
-        RespuestaCeldaTablaResponseDTO respuesta = respuestaTablaService.guardarRespuestaTabla(codigoProduccion, idTabla, idFila, idColumna, requestTabla);
+        RespuestaCeldaTablaResponseDTO respuesta = respuestaTablaService.guardarRespuestaTabla(codigoProduccion, idTabla, idFila, idColumna, request);
 
 
         log.debug("Persistencia de respuesta de tabla OK.");
@@ -173,7 +171,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 idTabla,
                 idFila,
                 idColumna,
-                request.valor()
+                respuesta.valor()
         );
 
         log.debug("Finalizado guardado de respuesta para celda. Evento publicado.");
@@ -181,16 +179,6 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         return respuesta;
     }
 
-    private RespuestaTablaRequestDTO convertirARespuestaTablaRequestDTO(RespuestaCeldaTablaResquestDTO oldRequest) {
-        RespuestaTablaRequestDTO newRequest = new RespuestaTablaRequestDTO();
-        newRequest.setEmailCreador(oldRequest.emailCreador());
-
-        // Solo asignar valorTexto (para compatibilidad)
-        newRequest.setValorTexto(oldRequest.valor());
-        // Los otros campos (valorNumerico, valorFecha, valorBooleano) quedan null
-
-        return newRequest;
-    }
 
     @Override
     @Transactional(readOnly = true)

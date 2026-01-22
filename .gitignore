@@ -18,6 +18,8 @@ env.properties
 *.p12
 /secrets/
 logs/
+*.env
+.env
 .mvn/
 mvnw
 mvnw.cmd

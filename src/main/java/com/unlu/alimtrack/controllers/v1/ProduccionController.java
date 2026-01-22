@@ -5,7 +5,7 @@ import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCeldaTablaResquestDTO;
+import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaTablaRequestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.EstadoProduccionPublicoResponseDTO;
@@ -75,7 +75,7 @@ public class ProduccionController {
             @PathVariable Long idTabla,
             @PathVariable Long idFila,
             @PathVariable Long idColumna,
-            @Valid @RequestBody RespuestaCeldaTablaResquestDTO request) {
+            @Valid @RequestBody RespuestaTablaRequestDTO request) {
         RespuestaCeldaTablaResponseDTO respuesta = produccionManagementService.guardarRespuestaCeldaTabla(
                 codigoProduccion, idTabla, idFila, idColumna, request);
         return ResponseEntity.ok(respuesta);

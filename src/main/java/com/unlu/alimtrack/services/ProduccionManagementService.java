@@ -4,7 +4,7 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCampoRequestDTO;
-import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCeldaTablaResquestDTO;
+import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaTablaRequestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.UltimasRespuestasProduccionResponseDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.publico.RespuestaCampoResponseDTO;
@@ -19,7 +19,7 @@ public interface ProduccionManagementService {
 
     RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo, RespuestaCampoRequestDTO request);
 
-    RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idFila, Long idColumna, Long idTabla, RespuestaCeldaTablaResquestDTO request);
+    RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idFila, Long idColumna, Long idTabla, RespuestaTablaRequestDTO request);
 
     UltimasRespuestasProduccionResponseDTO getUltimasRespuestas(String codigoProduccion);
 

@@ -54,14 +54,11 @@ services:
         generateValue: true
     
     healthCheckPath: /actuator/health
-    initialDelaySec: 180
+    healthCheckInitialDelay: 180
 
 databases:
   - name: mi-mysql-db
     databaseName: mi_app_db
     plan: free
     # CORRECCIÓN: ipAllowList debe tener esta estructura
-    ipAllowList:
-      - source: 0.0.0.0/0  # O usa: source: render (si Render lo acepta)
-      # O simplemente ELIMINA ipAllowList completamente
-    initSQLPath: ./init.sql
+    initializationScript: ./init.sql

@@ -1,4 +1,3 @@
-# render.yaml CORREGIDO Y VALIDADO
 version: "1"
 
 services:
@@ -8,47 +7,73 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
+    autoDeploy: true
     envVars:
+      # Perfil activo
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-
+      
+      # URL COMPLETA DE CONEXIÓN (Render la genera automáticamente)
       - key: SPRING_DATASOURCE_URL
-        value: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-
+        fromService:
+          type: pserv  # ¡IMPORTANTE! Para MySQL usamos "pserv", no "mysql" o "database"
+          name: mi-mysql-db
+          property: connectionString
+      
+      # Usuario y contraseña (también desde la conexión)
       - key: SPRING_DATASOURCE_USERNAME
-        value: ${MYSQL_USERNAME}
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: username
+
       - key: SPRING_DATASOURCE_PASSWORD
-        value: ${MYSQL_PASSWORD}
-      - key: JWT_SECRET
-        generateValue: true
-      - key: MYSQL_HOST
         fromService:
-          type: database
-          name: mi-mysql-db
-          property: host
-      - key: MYSQL_PORT
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: port
-      - key: MYSQL_DATABASE
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: database
-      - key: MYSQL_USERNAME
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: user
-      - key: MYSQL_PASSWORD
-        fromService:
-          type: database
+          type: pserv
           name: mi-mysql-db
           property: password
+      
+      # JWT
+      - key: JWT_SECRET
+        generateValue: true
+      
+      # Variables adicionales si las necesitas (opcional)
+      - key: MYSQL_HOST
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: host
+
+      - key: MYSQL_PORT
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: port
+
+      - key: MYSQL_DATABASE
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: database
+
+      - key: MYSQL_USER
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: username
+
+      - key: MYSQL_PASSWORD
+        fromService:
+          type: pserv
+          name: mi-mysql-db
+          property: password
+    
     healthCheckPath: /actuator/health
+    initialDelay: 180
 
 databases:
   - name: mi-mysql-db
-    plan: free
     databaseName: mi_app_db
+    plan: free
+    ipAllowList:
+      - source: render

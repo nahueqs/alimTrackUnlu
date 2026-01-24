@@ -1,4 +1,4 @@
-# render.yaml (versión corregida)
+# render.yaml CORREGIDO Y VALIDADO
 version: 0.1
 
 services:
@@ -9,23 +9,16 @@ services:
     dockerContext: .
     plan: free
     envVars:
-      # 1. Forzar el perfil de Spring a 'prod'
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-
-      # 2. Estas son las 3 variables CLAVE que Spring buscará
       - key: SPRING_DATASOURCE_URL
         value: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - key: SPRING_DATASOURCE_USERNAME
         value: ${MYSQL_USERNAME}
       - key: SPRING_DATASOURCE_PASSWORD
         value: ${MYSQL_PASSWORD}
-
-      # 3. Variables para JWT (usa una generada por Render o define una segura)
       - key: JWT_SECRET
         generateValue: true
-
-      # 4. Variables que Render conecta automáticamente desde la BD
       - key: MYSQL_HOST
         fromService:
           type: database
@@ -52,11 +45,12 @@ services:
           name: mi-mysql-db
           property: password
     healthCheckPath: /actuator/health
-    initialDelaySec: 180  # Dar más tiempo para que MySQL arranque
+    initialDelaySec: 180
 
 databases:
   - name: mi-mysql-db
     plan: free
-    databaseName: mi_app_db  # Render creará una DB con este nombre
-    ipAllowList: []
+    databaseName: mi_app_db
+    ipAllowList:
+      - source: render
     initSQLPath: ./init.sql

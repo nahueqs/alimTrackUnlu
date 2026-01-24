@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `db_alimtrack_dev` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `db_alimtrack_dev`;
+CREATE DATABASE  IF NOT EXISTS `db_alimtrack_prod` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `db_alimtrack_prod`;
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
--- Host: localhost    Database: db_alimtrack_dev
+-- Host: localhost    Database: db_alimtrack_prod
 -- ------------------------------------------------------
 -- Server version	9.5.0
 
@@ -19,13 +19,6 @@ USE `db_alimtrack_dev`;
 SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
 SET @@SESSION.SQL_LOG_BIN= 0;
 
---
--- GTID state at the beginning of the backup
---
-
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '3a67e75e-b18b-11f0-b3a9-183d2dedb872:1-2482';
-
---
 -- Table structure for table `autosave_produccion`
 --
 
@@ -445,11 +438,11 @@ INSERT INTO `version_receta` VALUES (1,1,'VV-YOG-001-1.0',1,'Versión 1.0','Vers
 UNLOCK TABLES;
 
 --
--- Dumping events for database 'db_alimtrack_dev'
+-- Dumping events for database 'db_alimtrack_prod'
 --
 
 --
--- Dumping routines for database 'db_alimtrack_dev'
+-- Dumping routines for database 'db_alimtrack_prod'
 --
 SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

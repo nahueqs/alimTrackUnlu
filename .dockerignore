@@ -1,0 +1,22 @@
+# .dockerignore
+# Ignorar todo
+*
+
+# Pero permitir estos archivos y directorios específicos
+!src/
+!pom.xml
+!Dockerfile
+!render.yaml
+!init.sql
+
+# Excluir específicamente archivos de configuración local y sensibles
+.env
+*.properties
+!src/main/resources/application-prod.properties  # Permitir solo el de prod
+.git
+.gitignore
+target/
+*.log
+.idea
+.vscode
+*.iml

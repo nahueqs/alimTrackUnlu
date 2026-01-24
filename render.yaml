@@ -1,0 +1,64 @@
+# render.yaml - Debe estar en la raíz del repositorio backend
+version: 0.1
+
+services:
+  - type: web
+    name: mi-backend-spring
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: JAVA_OPTS
+        value: -Xmx512m -Xms256m -Dspring.profiles.active=production
+      - key: SERVER_PORT
+        value: 8080
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - key: SPRING_DATASOURCE_USERNAME
+        value: ${MYSQL_USERNAME}
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: ${MYSQL_PASSWORD}
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: validate
+      - key: MYSQL_HOST
+        fromService:
+          type: database
+          name: mi-mysql-db
+          property: host
+      - key: MYSQL_PORT
+        fromService:
+          type: database
+          name: mi-mysql-db
+          property: port
+      - key: MYSQL_DATABASE
+        fromService:
+          type: database
+          name: mi-mysql-db
+          property: database
+      - key: MYSQL_USERNAME
+        fromService:
+          type: database
+          name: mi-mysql-db
+          property: user
+      - key: MYSQL_PASSWORD
+        fromService:
+          type: database
+          name: mi-mysql-db
+          property: password
+    healthCheckPath: /actuator/health
+    initialDelaySec: 120  # Dar tiempo a que MySQL se inicialice
+    autoDeploy: true
+    plan: free
+    # Opcional: configurar region
+    # region: ohio  # o frankfurt, oregon, singapore
+
+databases:
+  - name: mi-mysql-db
+    plan: free
+    databaseName: mi_app_db
+    ipAllowList: []  # Solo conexiones internas
+    # IMPORTANTE: init.sql debe estar en la raíz del repositorio
+    initSQLPath: ./init.sql
+    initSQLEnabled: true

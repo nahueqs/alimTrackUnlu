@@ -69,7 +69,6 @@ services:
           property: password
     
     healthCheckPath: /actuator/health
-    initialDelay: 180
 
 databases:
   - name: mi-mysql-db

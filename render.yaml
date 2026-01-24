@@ -52,5 +52,3 @@ databases:
   - name: mi-mysql-db
     plan: free
     databaseName: mi_app_db
-    ipAllowList:
-      - source: render

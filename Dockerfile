@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Crea un usuario no-root por seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/logs && chown -R spring:spring /app/logs
 
 USER spring:spring
 

@@ -2,7 +2,6 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 
 WORKDIR /app
-RUN mkdir -p /app/logs
 
 # Copia solo los archivos de dependencias primero (mejor cache)
 COPY pom.xml .
@@ -22,6 +21,8 @@ WORKDIR /app
 
 # Crea un usuario no-root por seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
+RUN mkdir -p /app/logs
+
 USER spring:spring
 
 # Copia el JAR desde la etapa de build

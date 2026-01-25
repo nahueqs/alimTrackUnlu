@@ -13,52 +13,7 @@ services:
       # Perfil Spring
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      
-      # MySQL NO tiene connectionString, construimos la URL manualmente
-      - key: MYSQL_HOST
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: host
 
-      - key: MYSQL_PORT
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: port
-
-      - key: MYSQL_DATABASE
-        value: mi_app_db  # Usamos el mismo nombre que en databases
-
-      - key: MYSQL_USERNAME
-        value: root  # MySQL en Render usa 'root' por defecto
-
-      - key: MYSQL_PASSWORD
-        fromService:
-          type: database
-          name: mi-mysql-db
-          property: password
-      
-      # URL COMPLETA para Spring Boot (construida con las variables anteriores)
-      - key: SPRING_DATASOURCE_URL
-        value: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-
-      - key: SPRING_DATASOURCE_USERNAME
-        value: ${MYSQL_USERNAME}
-
-      - key: SPRING_DATASOURCE_PASSWORD
-        value: ${MYSQL_PASSWORD}
-      
       # JWT
       - key: JWT_SECRET
         generateValue: true
-    
-    healthCheckPath: /actuator/health
-    healthCheckInitialDelay: 180
-
-databases:
-  - name: mi-mysql-db
-    databaseName: mi_app_db
-    plan: free
-    # CORRECCIÓN: ipAllowList debe tener esta estructura
-    initializationScript: ./init.sql

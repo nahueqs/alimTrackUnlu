@@ -2,12 +2,16 @@ package com.unlu.alimtrack.auth;
 
 import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
 import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -32,6 +36,14 @@ public class AuthController {
         AuthResponse response = authService.register(request);
         log.info("Registro exitoso para el usuario: {}. Token generado.", request.email());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        authService.refreshToken(request, response);
     }
 
     @GetMapping("/me")

@@ -52,7 +52,8 @@ public class AuthServiceTest {
     private LoginRequestDTO loginRequest;
     private UsuarioModel usuarioModel;
     private UsuarioResponseDTO usuarioResponseDTO;
-    private String jwtToken;
+    private String accessToken;
+    private String refreshToken;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +71,8 @@ public class AuthServiceTest {
 
 
         usuarioResponseDTO = new UsuarioResponseDTO("test@example.com", "Test User", TipoRolUsuario.OPERADOR.name());
-        jwtToken = "mockedJwtToken";
+        accessToken = "mockedAccessToken";
+        refreshToken = "mockedRefreshToken";
     }
 
     @Test
@@ -79,7 +81,8 @@ public class AuthServiceTest {
         when(usuarioRepository.existsByEmail(registerRequest.email())).thenReturn(false);
         when(passwordEncoder.encode(registerRequest.password())).thenReturn("encodedPassword");
         when(usuarioRepository.save(any(UsuarioModel.class))).thenReturn(usuarioModel);
-        when(jwtService.getToken(any(UsuarioModel.class))).thenReturn(jwtToken);
+        when(jwtService.getToken(any(UsuarioModel.class))).thenReturn(accessToken);
+        when(jwtService.getRefreshToken(any(UsuarioModel.class))).thenReturn(refreshToken);
         when(usuarioMapper.toResponseDTO(any(UsuarioModel.class))).thenReturn(usuarioResponseDTO);
 
         // Act
@@ -87,12 +90,14 @@ public class AuthServiceTest {
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.token()).isEqualTo(jwtToken);
+        assertThat(response.accessToken()).isEqualTo(accessToken);
+        assertThat(response.refreshToken()).isEqualTo(refreshToken);
         assertThat(response.user()).isEqualTo(usuarioResponseDTO);
         verify(usuarioRepository, times(1)).existsByEmail(registerRequest.email());
         verify(passwordEncoder, times(1)).encode(registerRequest.password());
         verify(usuarioRepository, times(1)).save(any(UsuarioModel.class));
         verify(jwtService, times(1)).getToken(any(UsuarioModel.class));
+        verify(jwtService, times(1)).getRefreshToken(any(UsuarioModel.class));
         verify(usuarioMapper, times(1)).toResponseDTO(any(UsuarioModel.class));
     }
 
@@ -138,7 +143,8 @@ public class AuthServiceTest {
     void login_shouldAuthenticateUserAndReturnAuthResponse() {
         // Arrange
         when(usuarioRepository.findByEmail(loginRequest.email())).thenReturn(Optional.of(usuarioModel));
-        when(jwtService.getToken(usuarioModel)).thenReturn(jwtToken);
+        when(jwtService.getToken(usuarioModel)).thenReturn(accessToken);
+        when(jwtService.getRefreshToken(usuarioModel)).thenReturn(refreshToken);
         when(usuarioMapper.toResponseDTO(usuarioModel)).thenReturn(usuarioResponseDTO);
 
         // Act
@@ -146,11 +152,13 @@ public class AuthServiceTest {
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.token()).isEqualTo(jwtToken);
+        assertThat(response.accessToken()).isEqualTo(accessToken);
+        assertThat(response.refreshToken()).isEqualTo(refreshToken);
         assertThat(response.user()).isEqualTo(usuarioResponseDTO);
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(usuarioRepository, times(1)).findByEmail(loginRequest.email());
         verify(jwtService, times(1)).getToken(usuarioModel);
+        verify(jwtService, times(1)).getRefreshToken(usuarioModel);
         verify(usuarioMapper, times(1)).toResponseDTO(usuarioModel);
     }
 

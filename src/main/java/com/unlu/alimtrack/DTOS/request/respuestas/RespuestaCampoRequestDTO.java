@@ -19,4 +19,7 @@ public class RespuestaCampoRequestDTO extends BaseRespuestaRequestDTO {
 
     @NotNull(message = "El email del creador es obligatorio")
     private String emailCreador;
+
+
+
 }

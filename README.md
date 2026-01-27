@@ -45,5 +45,7 @@ Desarrollado como una **Single Page Application (SPA)** enfocada en la experienc
 * **UI/UX:** Componentes modulares reutilizables con UI de Ant design
 * **Herramienta de Construcción:** **Vite** para un entorno de desarrollo rápido y builds optimizados.
 * 
+
 Desarrollador: Nahuel Quiñones https://www.linkedin.com/in/nahueqs/
+
 Sitio Web CIDETA: https://www.cideta.unlu.edu.ar/

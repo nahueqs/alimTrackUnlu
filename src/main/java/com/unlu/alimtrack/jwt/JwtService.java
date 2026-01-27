@@ -27,12 +27,20 @@ public class JwtService {
     }
 
     public String getToken(Map<String, Object> extraClaims, UsuarioModel usuario) {
+        return buildToken(extraClaims, usuario, 1000 * 60 * 24);
+    }
+
+    public String getRefreshToken(UsuarioModel usuario) {
+        return buildToken(new HashMap<>(), usuario, 604800000);
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, UsuarioModel usuario, long expiration) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(usuario.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

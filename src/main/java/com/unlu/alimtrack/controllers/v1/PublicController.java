@@ -23,15 +23,7 @@ public class PublicController {
 
     private final PublicRequestsService publicRequestService;
 
-    @GetMapping("/producciones/{codigoProduccion}/ultimas-respuestas")
-    public ResponseEntity<RespuestasProduccionPublicResponseDTO> getUltimasRespuestasProduccion(
-            @PathVariable String codigoProduccion) {
-        log.info("Solicitud pública para obtener el estado actual de la producción: {}", codigoProduccion);
-        RespuestasProduccionPublicResponseDTO estado = publicRequestService.getEstadoActualProduccionPublico(codigoProduccion);
 
-        log.debug("Retornando estado actual público para la producción {}", codigoProduccion);
-        return ResponseEntity.ok(estado);
-    }
 
     @GetMapping("/producciones/{codigoProduccion}/estructura")
     public ResponseEntity<VersionEstructuraPublicResponseDTO> getEstructuraProduccion(@PathVariable String codigoProduccion) {
@@ -50,6 +42,15 @@ public class PublicController {
         return ResponseEntity.ok(producciones);
     }
 
+    @GetMapping("/producciones/{codigoProduccion}/ultimas-respuestas")
+    public ResponseEntity<RespuestasProduccionPublicResponseDTO> getUltimasRespuestasProduccion(
+            @PathVariable String codigoProduccion) {
+        log.info("Solicitud pública para obtener el estado actual de la producción: {}", codigoProduccion);
+        RespuestasProduccionPublicResponseDTO estado = publicRequestService.getEstadoActualProduccionPublico(codigoProduccion);
+
+        log.debug("Retornando estado actual público para la producción {}", codigoProduccion);
+        return ResponseEntity.ok(estado);
+    }
     @GetMapping("/producciones/{codigoProduccion}/ultima-modificacion")
     public ResponseEntity<EstadoProduccionPublicoResponseDTO> getUltimaModificacionProduccion(
             @PathVariable String codigoProduccion) {

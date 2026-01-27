@@ -1,30 +1,49 @@
-# 📡 AlimTrack – Sistema de Monitoreo en Tiempo Real  | PROYECTO EN CURSO
-**Planta Piloto – Universidad Nacional de Luján (CIDETA https://www.cideta.unlu.edu.ar/)**  
+# 📡 AlimTrack – Sistema de Monitoreo en Tiempo Real
+> **Planta Piloto – Universidad Nacional de Luján (CIDETA)**
+> [www.cideta.unlu.edu.ar](https://www.cideta.unlu.edu.ar/)
 
-AlimTrack es un sistema de **monitoreo en tiempo real** desarrollado con **Spring Boot** y **MySQL**, que permite la gestión, seguimiento y visualización de producciones en curso en la planta piloto de la UNLu.  
+AlimTrack es una plataforma integral para la gestión, seguimiento y visualización de producciones alimenticias en tiempo real. Desarrollado para el **CIDETA-UNLu**, el sistema digitaliza la captura de datos en planta, permitiendo una trazabilidad total y eliminando la dependencia de registros físicos mediante una arquitectura moderna y robusta.
 
-El proyecto sigue una **arquitectura en capas**, utilizando **DTOs específicos para cada tipo de petición**.
-En proceso: Autenticación con Spring Security, monitoreo en tiempo real con Websockets, Front-End a definir.
+## 🎯 Objetivo del Proyecto
+Modernizar el ecosistema productivo de la planta piloto, permitiendo:
+* **Monitoreo Live:** Seguimiento continuo de producciones activas desde múltiples dispositivos, en tiempo real.
+* **Estandarización:** Registro basado en recetas con control de versiones dinámicas.
+* **Auditoría:** Logs detallados de cada cambio y generación automática de reportes PDF.
 
----
+## ⚙️ Estado del Desarrollo
+### ✅ Versión 1.0 (En Producción)
+* **Seguridad Avanzada:** Autenticación y autorización mediante Spring Security 6 y JWT.
+* **Comunicación Real-Time:** Sincronización de datos entre planta y oficina vía WebSockets (STOMP).
+* **Sistema de Notificaciones:** Alertas push integradas para el flujo de trabajo.
+* **Auditoría y Trazabilidad:** Registro histórico de cambios.
+* **Gestión de Recetas:** Estructura jerárquica de Secciones, Tablas y Campos configurables.
 
-## 🏗️ Arquitectura
+### 🟠 En Desarrollo 
+* **Dashboard de Gestión de Stock:** Control de insumos y materias primas vinculadas a producción.
+* **Módulo de KPIs:** Visualización de indicadores clave de rendimiento y eficiencia de planta.
 
-- **Capa de Controladores (API REST):** Endpoints RESTful.  
-- **Capa de Servicios:** Lógica de negocio y validaciones.  
-- **Capa de DTOs:** Objetos de transferencia de datos dedicados.  
-- **Capa de Repositorios:** Persistencia con Spring Data JPA / Hibernate.  
-- **Capa de Seguridad:** En proceso, implementada con Spring Security.  
+Stack tecnológico utilizado:
+### 💻 Backend (Java Stack)
+Construido bajo un patrón de **Arquitectura en Capas (Layered Architecture)** para garantizar mantenibilidad y escalabilidad.
 
----
+* **Core:** Java 17 con **Spring Boot 3.x**.
+* **Seguridad:** **Spring Security 6** con JWT.
+* **Persistencia:** **Spring Data JPA** con **Hibernate** como ORM, gestionando una base de datos **MySQL 8.0**.
+* **Mensajería Real-Time:** **Spring WebSocket** con protocolo **STOMP** sobre **SockJS** para garantizar compatibilidad.
+* **Validación:** JSR-303 (Hibernate Validator) para integridad de datos en el ingreso de producciones.
+* **Documentación:** **OpenAPI 3 / Swagger UI** para la exposición y prueba de endpoints REST.
+* **Logging:** SLF4J con Logback para el rastreo de eventos de auditoría.
 
-## ⚙️ Funcionalidades principales
+### 🎨 Frontend (React Stack) Respositorio: https://github.com/nahueqs/alimtrack-front
+Desarrollado como una **Single Page Application (SPA)** enfocada en la experiencia de usuario en entornos industriales.
 
-✅ Ingreso y gestión de producciones en curso.  
-✅ Modificación de datos durante la producción.  
-✅ Administración de recetas, versiones, secciones, tablas y campos.  
-✅ Exportación de producciones a PDF.  
-✅ Gestión de usuarios (altas, bajas, permisos).  
-✅ Compartir enlace público de producción en curso.  
----
-
+* **Core:** **React 18** utilizando **TypeScript** para un desarrollo robusto y tipado.
+* **Gestión de Estado:** Arquitectura basada en **Hooks** y **Context API** para el manejo global de la sesión y estados de producción.
+* **Routing:** **React Router Dom 6** para la navegación protegida por roles.
+* **Comunicación:** * **Axios** para el consumo de la API REST con interceptores para el token JWT.
+    * **StompJS** y **SockJS-client** para la escucha activa de sockets.
+* **UI/UX:** Componentes modulares reutilizables con UI de Ant design
+* **Herramienta de Construcción:** **Vite** para un entorno de desarrollo rápido y builds optimizados.
+* 
+Desarrollador: Nahuel Quiñones https://www.linkedin.com/in/nahueqs/
+Sitio Web CIDETA: https://www.cideta.unlu.edu.ar/

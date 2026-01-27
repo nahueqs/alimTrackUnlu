@@ -6,18 +6,18 @@ AlimTrack es una plataforma integral para la gestión, seguimiento y visualizaci
 
 ## 🎯 Objetivo del Proyecto
 Modernizar el ecosistema productivo de la planta piloto, permitiendo:
-* **Monitoreo Live:** Seguimiento continuo de producciones activas desde múltiples dispositivos, en tiempo real.
 * **Estandarización:** Registro basado en recetas con control de versiones dinámicas.
+* **Monitoreo Live:** Seguimiento continuo de producciones activas desde múltiples dispositivos, en tiempo real.
 * **Auditoría:** Logs detallados de cada cambio y generación automática de reportes PDF.
 
 ## ⚙️ Estado del Desarrollo
 ### ✅ Versión 1.0 (En Producción)
+* **Gestión de Recetas:** Estructura flexible para registrar cualquier tipo de receta deseada por la planta, con estructuras anidadas de secciones, campos agrupados, tablas y campos simples.
 * **Seguridad Avanzada:** Autenticación y autorización mediante Spring Security 6 y JWT.
 * **Comunicación Real-Time:** Sincronización de datos entre planta y oficina vía WebSockets (STOMP).
-* **Sistema de Notificaciones:** Alertas push integradas para el flujo de trabajo.
+* **Sistema de Notificaciones:** Alertas push integradas para notificar cambios en las producciones en curso.
 * **Auditoría y Trazabilidad:** Registro histórico de cambios.
-* **Gestión de Recetas:** Estructura jerárquica de Secciones, Tablas y Campos configurables.
-
+  
 ### 🟠 En Desarrollo 
 * **Dashboard de Gestión de Stock:** Control de insumos y materias primas vinculadas a producción.
 * **Módulo de KPIs:** Visualización de indicadores clave de rendimiento y eficiencia de planta.

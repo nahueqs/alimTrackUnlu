@@ -43,6 +43,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
+        log.info("token refreshed");
         authService.refreshToken(request, response);
     }
 

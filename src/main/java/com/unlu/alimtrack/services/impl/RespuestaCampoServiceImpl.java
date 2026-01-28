@@ -25,6 +25,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación del servicio para gestionar respuestas a campos simples.
+ * Extiende de BaseRespuestaService para reutilizar lógica común de validación y procesamiento.
+ */
 @Slf4j
 @Service
 @Transactional
@@ -56,14 +60,21 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         this.respuestaCampoMapper = respuestaCampoMapper;
     }
 
+    /**
+     * Guarda o actualiza una respuesta para un campo específico en una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idCampo ID del campo al que se responde.
+     * @param request DTO con los datos de la respuesta.
+     * @return DTO con la respuesta guardada.
+     */
     @Override
     public RespuestaCampoResponseDTO guardarRespuestaCampo(
             String codigoProduccion,
             Long idCampo,
             RespuestaCampoRequestDTO request) {
 
-        log.info("Guardando respuesta para campo. Producción: {}, Campo: {}",
-                codigoProduccion, idCampo);
+        log.info("Iniciando guardado de respuesta para campo ID: {} en producción: {}", idCampo, codigoProduccion);
 
         // 1. Validar request básico
         validarRequestBasico(request, idCampo);
@@ -82,40 +93,45 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         RespuestaCampoModel respuesta = obtenerOCrearRespuesta(produccion, campo, usuario);
 
         // 6. Procesar respuesta (validar y asignar valores) - USANDO MÉTODO DEL PADRE
+        log.debug("Procesando y validando valor de respuesta para tipo: {}", tipoCampo);
         procesarRespuesta(respuesta, request, tipoCampo);
 
         // 7. Guardar y actualizar timestamps
         RespuestaCampoModel respuestaGuardada = respuestaCampoRepository.save(respuesta);
         actualizarFechaModificacionProduccion(produccion);
 
-        log.debug("Respuesta de campo guardada exitosamente. ID: {}, Tipo: {}, Valor: {}",
-                respuestaGuardada.getId(),
-                tipoCampo,
-                obtenerValorRespuesta(respuestaGuardada, tipoCampo));
+        log.info("Respuesta de campo guardada exitosamente. ID: {}", respuestaGuardada.getId());
+        log.debug("Detalle respuesta: Tipo={}, Valor={}", tipoCampo, obtenerValorRespuesta(respuestaGuardada, tipoCampo));
 
         // 8. Retornar DTO
         return respuestaCampoMapper.toResponseDTO(respuestaGuardada);
     }
 
+    /**
+     * Vacía (elimina lógicamente) la respuesta de un campo.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idCampo ID del campo.
+     * @param emailUsuario Email del usuario que realiza la acción.
+     * @return DTO con la respuesta vaciada, o null si no existía.
+     */
     @Override
     public RespuestaCampoResponseDTO vaciarRespuestaCampo(
             String codigoProduccion,
             Long idCampo,
             String emailUsuario) {
 
-        log.info("Vaciando respuesta para campo. Producción: {}, Campo: {}",
-                codigoProduccion, idCampo);
+        log.info("Iniciando vaciado de respuesta para campo ID: {} en producción: {}", idCampo, codigoProduccion);
 
         try {
-            // 1. Obtener usuario
-            UsuarioModel usuario = obtenerUsuario(emailUsuario);
+            // 1. Obtener usuario (para validar existencia)
+            obtenerUsuario(emailUsuario);
 
             // 2. Buscar producción
             ProduccionModel produccion = buscarProduccion(codigoProduccion);
 
             // 3. Obtener campo
             CampoSimpleModel campo = obtenerCampo(idCampo);
-            TipoDatoCampo tipoCampo = campo.getTipoDato();
 
             // 4. Buscar respuesta existente
             Optional<RespuestaCampoModel> respuestaOpt = respuestaCampoRepository
@@ -130,15 +146,15 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
                 RespuestaCampoModel respuestaActualizada = respuestaCampoRepository.save(respuesta);
                 actualizarFechaModificacionProduccion(produccion);
 
-                log.debug("Respuesta de campo vaciada exitosamente. ID: {}", respuestaActualizada.getId());
+                log.info("Respuesta de campo vaciada exitosamente. ID: {}", respuestaActualizada.getId());
                 return respuestaCampoMapper.toResponseDTO(respuestaActualizada);
             } else {
                 // Si no existe, no hay nada que vaciar
-                log.debug("No existe respuesta de campo para vaciar");
+                log.warn("Intento de vaciar respuesta inexistente para campo ID: {} en producción: {}", idCampo, codigoProduccion);
                 return null;
             }
         } catch (Exception e) {
-            log.error("Error al vaciar respuesta de campo", e);
+            log.error("Error al vaciar respuesta de campo ID: {} en producción: {}: {}", idCampo, codigoProduccion, e.getMessage());
             throw new ValidationException("Error al vaciar respuesta: " + e.getMessage());
         }
     }
@@ -147,7 +163,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
     public Optional<RespuestaCampoModel> buscarRespuestaExistente(
             ProduccionModel produccion,
             CampoSimpleModel campo) {
-
+        log.debug("Buscando respuesta existente para campo ID: {} en producción ID: {}", campo.getId(), produccion.getProduccion());
         return respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(
                 produccion, campo);
     }
@@ -157,7 +173,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
             ProduccionModel produccion,
             CampoSimpleModel campo,
             UsuarioModel usuario) {
-
+        log.debug("Instanciando nueva respuesta para campo ID: {} en producción ID: {}", campo.getId(), produccion.getProduccion());
         RespuestaCampoModel respuesta = new RespuestaCampoModel();
         respuesta.setIdProduccion(produccion);
         respuesta.setIdCampo(campo);
@@ -169,17 +185,20 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
 
     @Override
     public void actualizarFechaModificacionProduccion(ProduccionModel produccion) {
+        log.debug("Actualizando fecha de modificación de la producción: {}", produccion.getCodigoProduccion());
         produccion.setFechaModificacion(LocalDateTime.now());
         produccionRepository.save(produccion);
     }
 
     @Override
     public List<RespuestaCampoModel> buscarTodasRespuestasPorProduccion(ProduccionModel produccion) {
+        log.debug("Buscando todas las últimas respuestas para producción: {}", produccion.getCodigoProduccion());
         return respuestaCampoRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
     }
 
     @Override
     public boolean validarRespuestaSinGuardar(Long idCampo, RespuestaCampoRequestDTO request) {
+        log.debug("Validando respuesta sin guardar para campo ID: {}", idCampo);
         try {
             // 1. Obtener campo y su tipo
             CampoSimpleModel campo = obtenerCampo(idCampo);
@@ -196,7 +215,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
 
             return true;
         } catch (Exception e) {
-            log.debug("Validación fallida para campo {}: {}", idCampo, e.getMessage());
+            log.warn("Validación fallida para campo {}: {}", idCampo, e.getMessage());
             return false;
         }
     }
@@ -217,14 +236,16 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         }
 
         if (!request.getIdCampo().equals(idCampo)) {
-            throw new ValidationException("ID de campo inconsistente");
+            throw new ValidationException("ID de campo inconsistente entre URL y Body");
         }
     }
 
     private CampoSimpleModel obtenerCampo(Long idCampo) {
         return campoSimpleRepository.findById(idCampo)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Campo no encontrado con ID: " + idCampo));
+                .orElseThrow(() -> {
+                    log.error("Campo no encontrado con ID: {}", idCampo);
+                    return new RecursoNoEncontradoException("Campo no encontrado con ID: " + idCampo);
+                });
     }
 
     private UsuarioModel obtenerUsuario(String email) {
@@ -233,8 +254,10 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
 
     private ProduccionModel buscarProduccion(String codigoProduccion) {
         return produccionRepository.findByCodigoProduccion(codigoProduccion)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Producción no encontrada: " + codigoProduccion));
+                .orElseThrow(() -> {
+                    log.error("Producción no encontrada con código: {}", codigoProduccion);
+                    return new RecursoNoEncontradoException("Producción no encontrada: " + codigoProduccion);
+                });
     }
 
     private RespuestaCampoModel obtenerOCrearRespuesta(
@@ -246,13 +269,13 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
                 .findTopByIdProduccionAndIdCampoOrderByTimestampDesc(produccion, campo);
 
         if (existente.isPresent()) {
-            log.debug("Respuesta existente encontrada. ID: {}", existente.get().getId());
+            log.debug("Respuesta existente encontrada (ID: {}). Actualizando creador.", existente.get().getId());
             RespuestaCampoModel respuesta = existente.get();
             respuesta.setCreadoPor(usuario);
             return respuesta;
         }
 
-        log.debug("Creando nueva respuesta de campo");
+        log.debug("No existe respuesta previa. Creando nueva.");
         return crearNuevaRespuesta(produccion, campo, usuario);
     }
 
@@ -264,7 +287,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
     public Optional<RespuestaCampoResponseDTO> obtenerRespuestaCampo(
             String codigoProduccion,
             Long idCampo) {
-
+        log.debug("Obteniendo respuesta específica para campo ID: {} en producción: {}", idCampo, codigoProduccion);
         try {
             ProduccionModel produccion = buscarProduccion(codigoProduccion);
             CampoSimpleModel campo = obtenerCampo(idCampo);
@@ -273,7 +296,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
 
             return respuestaOpt.map(respuestaCampoMapper::toResponseDTO);
         } catch (Exception e) {
-            log.error("Error al obtener respuesta de campo", e);
+            log.error("Error al obtener respuesta de campo ID: {} en producción: {}: {}", idCampo, codigoProduccion, e.getMessage());
             return Optional.empty();
         }
     }
@@ -283,7 +306,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
      */
     public List<RespuestaCampoResponseDTO> obtenerTodasRespuestasConDetalles(
             String codigoProduccion) {
-
+        log.debug("Obteniendo todas las respuestas con detalles para producción: {}", codigoProduccion);
         ProduccionModel produccion = buscarProduccion(codigoProduccion);
         List<RespuestaCampoModel> respuestas = buscarTodasRespuestasPorProduccion(produccion);
 
@@ -301,8 +324,11 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
             CampoSimpleModel campo = obtenerCampo(idCampo);
 
             Optional<RespuestaCampoModel> respuesta = buscarRespuestaExistente(produccion, campo);
-            return respuesta.isPresent() && !respuesta.get().esRespuestaVacia();
+            boolean tiene = respuesta.isPresent() && !respuesta.get().esRespuestaVacia();
+            log.debug("Campo ID: {} en producción: {} tiene respuesta: {}", idCampo, codigoProduccion, tiene);
+            return tiene;
         } catch (Exception e) {
+            log.warn("Error al verificar si tiene respuesta campo ID: {} en producción: {}", idCampo, codigoProduccion);
             return false;
         }
     }
@@ -326,7 +352,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
 
             return null;
         } catch (Exception e) {
-            log.error("Error al obtener valor como string", e);
+            log.error("Error al obtener valor como string para campo ID: {} en producción: {}", idCampo, codigoProduccion, e);
             return null;
         }
     }

@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación del servicio para gestionar respuestas en celdas de tablas.
+ * Extiende de BaseRespuestaService para reutilizar lógica común de validación y procesamiento.
+ */
 @Slf4j
 @Service
 @Transactional
@@ -57,6 +61,16 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
         this.respuestaTablaMapper = respuestaTablaMapper;
     }
 
+    /**
+     * Guarda o actualiza una respuesta para una celda específica de una tabla en una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idTabla ID de la tabla.
+     * @param idFila ID de la fila.
+     * @param idColumna ID de la columna.
+     * @param request DTO con los datos de la respuesta.
+     * @return DTO con la respuesta guardada.
+     */
     @Override
     public RespuestaCeldaTablaResponseDTO guardarRespuestaTabla(
             String codigoProduccion,
@@ -65,8 +79,8 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
             Long idColumna,
             RespuestaTablaRequestDTO request) {
 
-        log.info("Guardando respuesta para tabla. Producción: {}, Tabla: {}, Fila: {}, Columna: {}",
-                codigoProduccion, idTabla, idFila, idColumna);
+        log.info("Iniciando guardado de respuesta para tabla ID: {}, Fila: {}, Columna: {} en producción: {}",
+                idTabla, idFila, idColumna, codigoProduccion);
 
         // 1. Validar request básico
         validarRequestBasico(request);
@@ -91,16 +105,15 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
                 produccion, tabla, fila, columna, usuario);
 
         // 7. Procesar respuesta (validar y asignar valores) - USANDO MÉTODO DEL PADRE
+        log.debug("Procesando y validando valor de respuesta para tipo: {}", tipoColumna);
         procesarRespuesta(respuesta, request, tipoColumna);
 
         // 8. Guardar y actualizar timestamps
         RespuestaTablaModel respuestaGuardada = respuestaTablaRepository.save(respuesta);
         actualizarFechaModificacionProduccion(produccion);
 
-        log.debug("Respuesta de tabla guardada exitosamente. ID: {}, Tipo: {}, Valor: {}",
-                respuestaGuardada.getId(),
-                tipoColumna,
-                obtenerValorRespuesta(respuestaGuardada, tipoColumna));
+        log.info("Respuesta de tabla guardada exitosamente. ID: {}", respuestaGuardada.getId());
+        log.debug("Detalle respuesta: Tipo={}, Valor={}", tipoColumna, obtenerValorRespuesta(respuestaGuardada, tipoColumna));
 
         // 9. Retornar DTO con todos los datos
         return construirResponseDTO(respuestaGuardada, tabla, fila, columna);
@@ -121,8 +134,16 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
     private void validarRelaciones(TablaModel tabla, FilaTablaModel fila, ColumnaTablaModel columna) {
         // Validar que columna pertenece a tabla
         if (!columna.getTabla().getId().equals(tabla.getId())) {
+            log.error("Inconsistencia: Columna {} no pertenece a Tabla {}", columna.getId(), tabla.getId());
             throw new ValidationException(
                     "La columna " + columna.getId() + " no pertenece a la tabla " + tabla.getId()
+            );
+        }
+        // Validar que fila pertenece a tabla (si aplica en tu modelo, asumiendo que sí por lógica)
+        if (!fila.getTabla().getId().equals(tabla.getId())) {
+             log.error("Inconsistencia: Fila {} no pertenece a Tabla {}", fila.getId(), tabla.getId());
+             throw new ValidationException(
+                    "La fila " + fila.getId() + " no pertenece a la tabla " + tabla.getId()
             );
         }
     }
@@ -133,23 +154,34 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
 
     private ProduccionModel buscarProduccion(String codigoProduccion) {
         return produccionRepository.findByCodigoProduccion(codigoProduccion)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Producción no encontrada: " + codigoProduccion));
+                .orElseThrow(() -> {
+                    log.error("Producción no encontrada: {}", codigoProduccion);
+                    return new RecursoNoEncontradoException("Producción no encontrada: " + codigoProduccion);
+                });
     }
 
     private TablaModel obtenerTabla(Long idTabla) {
         return tablaRepository.findById(idTabla)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Tabla no encontrada: " + idTabla));
+                .orElseThrow(() -> {
+                    log.error("Tabla no encontrada: {}", idTabla);
+                    return new RecursoNoEncontradoException("Tabla no encontrada: " + idTabla);
+                });
     }
 
     private FilaTablaModel obtenerFila(Long idFila) {
         return filaTablaRepository.findById(idFila)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Fila no encontrada: " + idFila));
+                .orElseThrow(() -> {
+                    log.error("Fila no encontrada: {}", idFila);
+                    return new RecursoNoEncontradoException("Fila no encontrada: " + idFila);
+                });
     }
 
     private ColumnaTablaModel obtenerColumna(Long idColumna) {
         return columnaTablaRepository.findById(idColumna)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Columna no encontrada: " + idColumna));
+                .orElseThrow(() -> {
+                    log.error("Columna no encontrada: {}", idColumna);
+                    return new RecursoNoEncontradoException("Columna no encontrada: " + idColumna);
+                });
     }
 
     private RespuestaTablaModel obtenerOCrearRespuesta(
@@ -164,14 +196,13 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
                         produccion, tabla.getId(), fila.getId(), columna.getId());
 
         if (existente.isPresent()) {
-            log.debug("Respuesta existente encontrada. ID: {}", existente.get().getId());
+            log.debug("Respuesta existente encontrada (ID: {}). Actualizando creador.", existente.get().getId());
             RespuestaTablaModel respuesta = existente.get();
             respuesta.setCreadoPor(usuario);
             return respuesta;
         }
 
-        log.debug("Creando nueva respuesta de tabla");
-        // Crear nueva respuesta - asegúrate de que este constructor exista
+        log.debug("No existe respuesta previa. Creando nueva.");
         RespuestaTablaModel nuevaRespuesta = new RespuestaTablaModel();
         nuevaRespuesta.setProduccion(produccion);
         nuevaRespuesta.setFila(fila);
@@ -183,6 +214,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
     }
 
     private void actualizarFechaModificacionProduccion(ProduccionModel produccion) {
+        log.debug("Actualizando fecha de modificación de la producción: {}", produccion.getCodigoProduccion());
         produccion.setFechaModificacion(LocalDateTime.now());
         produccionRepository.save(produccion);
     }
@@ -212,17 +244,20 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
 
     @Override
     public List<RespuestaTablaModel> buscarTodasRespuestasPorProduccion(ProduccionModel produccion) {
+        log.debug("Buscando todas las respuestas de tabla para producción: {}", produccion.getCodigoProduccion());
         return respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
     }
 
     @Override
     public List<RespuestaTablaModel> buscarRespuestasPorTabla(
             ProduccionModel produccion, Long idTabla) {
+        log.debug("Buscando respuestas para tabla ID: {} en producción: {}", idTabla, produccion.getCodigoProduccion());
         return respuestaTablaRepository.findByProduccionAndTablaId(produccion, idTabla);
     }
 
     @Override
     public boolean validarValorParaColumna(Long idColumna, String valor) {
+        log.debug("Validando valor '{}' para columna ID: {}", valor, idColumna);
         try {
             ColumnaTablaModel columna = obtenerColumna(idColumna);
             TipoDatoCampo tipoColumna = columna.getTipoDato();
@@ -260,10 +295,21 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
                     return true;
             }
         } catch (Exception e) {
+            log.warn("Error validando valor para columna {}: {}", idColumna, e.getMessage());
             return false;
         }
     }
 
+    /**
+     * Vacía (elimina lógicamente) la respuesta de una celda de tabla.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idTabla ID de la tabla.
+     * @param idFila ID de la fila.
+     * @param idColumna ID de la columna.
+     * @param emailUsuario Email del usuario que realiza la acción.
+     * @return DTO con la respuesta vaciada, o null si no existía.
+     */
     @Override
     public RespuestaCeldaTablaResponseDTO vaciarRespuestaTabla(
             String codigoProduccion,
@@ -272,8 +318,8 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
             Long idColumna,
             String emailUsuario) {
 
-        log.info("Vaciando respuesta para tabla. Producción: {}, Tabla: {}, Fila: {}, Columna: {}",
-                codigoProduccion, idTabla, idFila, idColumna);
+        log.info("Iniciando vaciado de respuesta para tabla ID: {}, Fila: {}, Columna: {} en producción: {}",
+                idTabla, idFila, idColumna, codigoProduccion);
 
         try {
             // Obtener datos necesarios
@@ -297,15 +343,15 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
                 RespuestaTablaModel respuestaActualizada = respuestaTablaRepository.save(respuesta);
                 actualizarFechaModificacionProduccion(produccion);
 
-                log.debug("Respuesta de tabla vaciada exitosamente. ID: {}", respuestaActualizada.getId());
+                log.info("Respuesta de tabla vaciada exitosamente. ID: {}", respuestaActualizada.getId());
                 return construirResponseDTO(respuestaActualizada, tabla, fila, columna);
             } else {
                 // Si no existe, no hay nada que vaciar
-                log.debug("No existe respuesta de tabla para vaciar");
+                log.warn("Intento de vaciar respuesta inexistente para tabla ID: {}, Fila: {}, Columna: {}", idTabla, idFila, idColumna);
                 return null;
             }
         } catch (Exception e) {
-            log.error("Error al vaciar respuesta de tabla", e);
+            log.error("Error al vaciar respuesta de tabla: {}", e.getMessage());
             throw new ValidationException("Error al vaciar respuesta: " + e.getMessage());
         }
     }

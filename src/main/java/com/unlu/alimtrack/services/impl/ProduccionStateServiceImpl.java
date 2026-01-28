@@ -1,5 +1,4 @@
-// ProduccionStateServiceImpl.java
-package com.unlu.alimtrack.services;
+package com.unlu.alimtrack.services.impl;
 
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.enums.TipoEstadoProduccion;
@@ -9,6 +8,9 @@ import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.models.ProduccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.ProduccionRepository;
+import com.unlu.alimtrack.services.ProduccionStateService;
+import com.unlu.alimtrack.services.UsuarioService;
+import com.unlu.alimtrack.services.UsuarioValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,10 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Implementación del servicio para gestionar el estado de las producciones.
+ * Controla las transiciones de estado permitidas y las reglas de negocio asociadas.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,9 +49,17 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
             // Agregar más reglas según necesites
     );
 
+    /**
+     * Cambia el estado de una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param request DTO con el nuevo estado y el usuario que realiza la acción.
+     * @throws CambioEstadoProduccionInvalido Si la transición de estado no es válida.
+     * @throws OperacionNoPermitida Si el usuario no está autorizado o la producción está en un estado final.
+     */
     @Override
     public void cambiarEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO request) {
-        log.info("Cambiando estado de producción {} a {}", codigoProduccion, request.valor());
+        log.info("Iniciando cambio de estado para producción: {} a estado: {}", codigoProduccion, request.valor());
 
         // 1. Validar y obtener usuario
         UsuarioModel usuario = usuarioValidationService.validarUsuarioAutorizado(request.emailCreador());
@@ -66,6 +80,14 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
         log.info("Estado de producción {} cambiado exitosamente a {}", codigoProduccion, nuevoEstado);
     }
 
+    /**
+     * Valida si una transición de estado es permitida para una producción específica.
+     *
+     * @param produccion La producción a validar.
+     * @param nuevoEstado El estado al que se desea cambiar.
+     * @throws CambioEstadoProduccionInvalido Si la transición no es válida.
+     * @throws OperacionNoPermitida Si la producción ya está en un estado final.
+     */
     @Override
     public void validarTransicionEstado(ProduccionModel produccion, TipoEstadoProduccion nuevoEstado) {
         TipoEstadoProduccion estadoActual = produccion.getEstado();
@@ -74,12 +96,14 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
 
         // 1. Validar que no sea el mismo estado
         if (estadoActual == nuevoEstado) {
+            log.warn("Intento de cambio de estado al mismo estado actual: {}", estadoActual);
             throw new CambioEstadoProduccionInvalido(
                     "La producción ya está en estado " + estadoActual);
         }
 
         // 2. Validar que no esté en estado final
         if (esEstadoFinal(estadoActual)) {
+            log.warn("Intento de modificar producción en estado final: {}", estadoActual);
             throw new OperacionNoPermitida(
                     "No se puede modificar una producción en estado " + estadoActual);
         }
@@ -90,13 +114,27 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
         log.debug("Transición de estado válida");
     }
 
+    /**
+     * Verifica si un estado es considerado final (no permite más cambios).
+     *
+     * @param estado El estado a verificar.
+     * @return true si es un estado final, false en caso contrario.
+     */
     @Override
     public boolean esEstadoFinal(TipoEstadoProduccion estado) {
         return ESTADOS_FINALES.contains(estado);
     }
 
+    /**
+     * Obtiene el estado actual de una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @return El estado actual.
+     * @throws RecursoNoEncontradoException Si la producción no existe.
+     */
     @Override
     public TipoEstadoProduccion obtenerEstadoActual(String codigoProduccion) {
+        log.debug("Consultando estado actual de producción: {}", codigoProduccion);
         ProduccionModel produccion = buscarProduccion(codigoProduccion);
         return produccion.getEstado();
     }
@@ -106,6 +144,7 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
         UsuarioModel usuario = usuarioService.getUsuarioModelByEmail(email);
 
         if (!usuario.getEstaActivo()) {
+            log.warn("Usuario inactivo intentando cambiar estado: {}", email);
             throw new OperacionNoPermitida("El usuario no está activo");
         }
 
@@ -114,14 +153,17 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
 
     private ProduccionModel buscarProduccion(String codigoProduccion) {
         return produccionRepository.findByCodigoProduccion(codigoProduccion)
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Producción no encontrada: " + codigoProduccion));
+                .orElseThrow(() -> {
+                    log.error("Producción no encontrada: {}", codigoProduccion);
+                    return new RecursoNoEncontradoException("Producción no encontrada: " + codigoProduccion);
+                });
     }
 
     private TipoEstadoProduccion convertirAEstado(String valorEstado) {
         try {
             return TipoEstadoProduccion.valueOf(valorEstado);
         } catch (IllegalArgumentException e) {
+            log.error("Valor de estado inválido: {}", valorEstado);
             throw new CambioEstadoProduccionInvalido(
                     "Estado no válido: " + valorEstado);
         }
@@ -131,6 +173,7 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
         Set<TipoEstadoProduccion> estadosPermitidos = REGLAS_TRANSICION.get(actual);
 
         if (estadosPermitidos != null && !estadosPermitidos.contains(destino)) {
+            log.warn("Transición no permitida: {} -> {}", actual, destino);
             throw new CambioEstadoProduccionInvalido(
                     String.format("Transición no permitida: %s -> %s. Transiciones permitidas desde %s: %s",
                             actual, destino, actual, String.join(", ", estadosPermitidos.stream()
@@ -140,12 +183,14 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
 
         // Validación específica para EN_PROCESO
         if (actual == TipoEstadoProduccion.EN_PROCESO && !esEstadoFinal(destino)) {
+            log.warn("Intento de transición inválida desde EN_PROCESO a {}", destino);
             throw new CambioEstadoProduccionInvalido(
                     "Desde EN_PROCESO solo se puede cambiar a FINALIZADA o CANCELADA");
         }
     }
 
     private void aplicarCambioEstado(ProduccionModel produccion, TipoEstadoProduccion nuevoEstado) {
+        log.debug("Aplicando nuevo estado {} a producción {}", nuevoEstado, produccion.getCodigoProduccion());
         // Cambiar estado
         produccion.setEstado(nuevoEstado);
 
@@ -158,5 +203,4 @@ public class ProduccionStateServiceImpl implements ProduccionStateService {
         // Actualizar fecha de modificación
         produccion.setFechaModificacion(LocalDateTime.now());
     }
-
 }

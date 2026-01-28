@@ -13,6 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación del servicio para calcular el progreso de una producción.
+ * Determina el porcentaje de completitud basándose en los campos y celdas respondidos.
+ */
 @Slf4j
 @Service
 public class ProduccionProgressServiceImpl implements ProduccionProgressService {
@@ -31,12 +35,22 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
         }
     }
 
+    /**
+     * Calcula el progreso general de una producción.
+     *
+     * @param totalCampos Total de campos simples esperados.
+     * @param totalCeldas Total de celdas de tabla esperadas.
+     * @param respuestasCampos Lista de respuestas a campos simples.
+     * @param respuestasTablas Lista de respuestas a celdas de tabla.
+     * @return DTO con el detalle del progreso calculado.
+     */
     @Override
     public ProgresoProduccionResponseDTO calcularProgreso(
             Integer totalCampos, Integer totalCeldas,
             List<RespuestaCampoModel> respuestasCampos,
             List<RespuestaTablaModel> respuestasTablas) {
 
+        log.debug("Calculando progreso. Total campos: {}, Total celdas: {}", totalCampos, totalCeldas);
         validarParametros(totalCampos, totalCeldas);
 
         long camposRespondidos = calcularCamposRespondidos(respuestasCampos);
@@ -96,19 +110,21 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
 
     private void validarParametros(Integer totalCampos, Integer totalCeldas) {
         if (totalCampos == null || totalCampos < 0) {
+            log.error("Parámetro totalCampos inválido: {}", totalCampos);
             throw new IllegalArgumentException("totalCampos no puede ser nulo o negativo");
         }
 
         if (totalCeldas == null || totalCeldas < 0) {
+            log.error("Parámetro totalCeldas inválido: {}", totalCeldas);
             throw new IllegalArgumentException("totalCeldas no puede ser nulo o negativo");
         }
 
         // Log de advertencia si hay valores cero
         if (totalCampos == 0) {
-            log.warn("totalCampos es 0 - verificar configuración de campos");
+            log.warn("totalCampos es 0 - verificar configuración de campos en la receta");
         }
         if (totalCeldas == 0) {
-            log.warn("totalCeldas es 0 - verificar configuración de tablas");
+            log.warn("totalCeldas es 0 - verificar configuración de tablas en la receta");
         }
     }
 
@@ -125,7 +141,7 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
         // Validar que el valor corresponda al tipo esperado
         boolean valorCoherente = validarValorSegunTipoCampo(respuesta);
         if (!valorCoherente) {
-            log.debug("Respuesta de campo {} tiene valor incoherente con tipo {}",
+            log.debug("Respuesta de campo {} descartada por valor incoherente con tipo {}",
                     respuesta.getIdCampo().getId(),
                     respuesta.getIdCampo().getTipoDato());
             return false;
@@ -139,14 +155,8 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
             return false;
         }
 
-        // Usar método del modelo (lo moviste a RespuestaTablaModel)
+        // Usar método del modelo
         return respuesta.esRespuestaValida();
-
-        // O si necesitas validación más específica:
-        // return respuesta.esRespuestaValida() &&
-        //        respuesta.getColumna() != null &&
-        //        respuesta.getFila() != null &&
-        //        respuesta.getIdTabla() != null;
     }
 
     private boolean validarValorSegunTipoCampo(RespuestaCampoModel respuesta) {
@@ -169,18 +179,13 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
                 // Para booleanos, aceptar cualquier valor (true/false representado como BigDecimal)
                 return respuesta.getValorNumerico() != null;
             default:
-                log.warn("Tipo de campo no reconocido: {}", tipo);
+                log.warn("Tipo de campo no reconocido durante validación de progreso: {}", tipo);
                 return false;
         }
     }
 
     private double calcularPorcentaje(int total, long respondido) {
         if (total <= 0) {
-            return 0.0;
-        }
-
-        // Evitar división por cero
-        if (total == 0) {
             return 0.0;
         }
 
@@ -194,7 +199,7 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
     // ========== MÉTODOS ADICIONALES UTILES ==========
 
     /**
-     * Calcula el progreso por sección o grupo
+     * Calcula el progreso filtrado por una sección específica.
      */
     public ProgresoProduccionResponseDTO calcularProgresoPorSeccion(
             Integer totalCampos, Integer totalCeldas,
@@ -202,6 +207,7 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
             List<RespuestaTablaModel> respuestasTablas,
             Long idSeccion) {
 
+        log.debug("Calculando progreso para sección ID: {}", idSeccion);
         // Filtrar respuestas por sección
         List<RespuestaCampoModel> camposFiltrados = respuestasCampos.stream()
                 .filter(respuesta -> respuesta.getIdCampo() != null &&
@@ -209,10 +215,12 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
                         Objects.equals(respuesta.getIdCampo().getSeccion().getId(), idSeccion))
                 .toList();
 
+        // Nota: La lógica de filtrado de tablas por sección debe implementarse según el modelo de datos
+        // Asumiendo que las tablas también tienen referencia a sección o se puede inferir
         List<RespuestaTablaModel> tablasFiltradas = respuestasTablas.stream()
                 .filter(respuesta -> {
-                    // Filtrar por sección de la tabla (ajustar según tu modelo)
-                    return true; // Implementar lógica específica
+                    // Implementar lógica específica si es necesario
+                    return true; 
                 })
                 .toList();
 
@@ -220,7 +228,7 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
     }
 
     /**
-     * Verifica si una producción está completa (100%)
+     * Verifica si una producción está completa (100%).
      */
     public boolean estaProduccionCompleta(
             Integer totalCampos, Integer totalCeldas,
@@ -230,11 +238,13 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
         ProgresoProduccionResponseDTO progreso = calcularProgreso(
                 totalCampos, totalCeldas, respuestasCampos, respuestasTablas);
 
-        return Math.abs(progreso.porcentajeCompletado() - 100.0) < 0.01;
+        boolean completa = Math.abs(progreso.porcentajeCompletado() - 100.0) < 0.01;
+        log.debug("Verificación de completitud: {} ({}%)", completa, progreso.porcentajeCompletado());
+        return completa;
     }
 
     /**
-     * Obtiene lista de campos no respondidos
+     * Obtiene lista de IDs de campos que aún no han sido respondidos.
      */
     public List<Long> obtenerCamposNoRespondidos(
             List<Long> todosLosCamposIds,
@@ -252,7 +262,7 @@ public class ProduccionProgressServiceImpl implements ProduccionProgressService 
     }
 
     /**
-     * Calcula tendencia de progreso (comparando con progreso anterior)
+     * Calcula la tendencia de progreso comparando con un estado anterior.
      */
     public double calcularTendenciaProgreso(
             ProgresoProduccionResponseDTO progresoActual,

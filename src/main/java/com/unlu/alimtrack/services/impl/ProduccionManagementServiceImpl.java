@@ -33,46 +33,50 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
+/**
+ * Implementación del servicio de gestión de producciones.
+ * Orquesta las operaciones principales de una producción: inicio, cambio de estado,
+ * registro de respuestas y actualización de metadatos.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProduccionManagementServiceImpl implements ProduccionManagementService {
 
-
     private final ProduccionEventPublisher produccionEventPublisher;
-
     private final ProduccionRepository produccionRepository;
-
     private final VersionRecetaEstructuraService versionRecetaEstructuraService;
     private final UsuarioValidationService usuarioValidationService;
-
     private final ProductionManagerServiceValidator productionManagerServiceValidator;
     private final VersionRecetaValidator versionRecetaValidator;
-
     private final ProduccionMapper produccionMapper;
     private final RespuestaCampoMapper respuestaCampoMapper;
     private final RespuestaTablaMapper respuestaTablasMapper;
-
     private final RespuestaCampoService respuestaCampoService;
     private final RespuestaTablaService respuestaTablaService;
     private final ProduccionStateService produccionStateService;
     private final ProduccionProgressService produccionProgressService;
 
+    /**
+     * Inicia una nueva producción basada en una versión de receta.
+     *
+     * @param createDTO DTO con los datos para crear la producción.
+     * @return DTO con la metadata de la producción creada.
+     */
     @Override
     public ProduccionMetadataResponseDTO iniciarProduccion(ProduccionCreateDTO createDTO) {
-        log.info("Iniciando nueva producción: {}", createDTO.codigoProduccion());
+        log.info("Iniciando nueva producción con código: {}", createDTO.codigoProduccion());
 
         productionManagerServiceValidator.verificarCreacionProduccion(createDTO);
 
         ProduccionModel nuevaProduccion = produccionMapper.createDTOtoModel(createDTO);
-
         nuevaProduccion.setEstado(TipoEstadoProduccion.EN_PROCESO);
         nuevaProduccion.setFechaInicio(LocalDateTime.now());
         nuevaProduccion.setFechaModificacion(LocalDateTime.now());
 
         ProduccionModel produccionGuardada = produccionRepository.save(nuevaProduccion);
+        log.info("Producción {} guardada en base de datos.", produccionGuardada.getCodigoProduccion());
 
         produccionEventPublisher.publicarProduccionCreada(
                 this,
@@ -82,17 +86,24 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 produccionGuardada.getFechaInicio(),
                 produccionGuardada.getFechaFin()
         );
-        log.info("Producción {} iniciada exitosamente. Eventos publicados.", produccionGuardada.getCodigoProduccion());
+        log.debug("Evento de producción creada publicado para: {}", produccionGuardada.getCodigoProduccion());
 
         return produccionMapper.modelToResponseDTO(produccionGuardada);
     }
 
+    /**
+     * Actualiza el estado de una producción existente.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param nuevoEstadoDTO DTO con el nuevo estado y usuario responsable.
+     */
     @Override
     public void updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO) {
-        log.info("Actualizando estado producción {} a {}", codigoProduccion, nuevoEstadoDTO.valor());
+        log.info("Solicitud de cambio de estado para producción {} a {}", codigoProduccion, nuevoEstadoDTO.valor());
 
         usuarioValidationService.validarUsuarioAutorizado(nuevoEstadoDTO.emailCreador());
         produccionStateService.cambiarEstado(codigoProduccion, nuevoEstadoDTO);
+        
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
 
         produccionEventPublisher.publicarEstadoCambiado(
@@ -102,32 +113,39 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 produccion.getFechaFin()
         );
 
-        log.info("Estado de producción {} actualizado a {}. Evento publicado.",
+        log.info("Estado de producción {} actualizado exitosamente a {}. Evento publicado.",
                 codigoProduccion, nuevoEstadoDTO.valor());
-
     }
 
+    /**
+     * Guarda la respuesta a un campo simple en una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idCampo ID del campo.
+     * @param request DTO con el valor de la respuesta.
+     * @return DTO con la respuesta guardada.
+     */
     @Override
     public RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo, RespuestaCampoRequestDTO request) {
-        log.debug("Iniciando guardado de respuesta para campo. Producción: {}, Campo ID: {}", codigoProduccion, idCampo);
+        log.debug("Iniciando guardado de respuesta para campo ID: {} en producción: {}", idCampo, codigoProduccion);
 
-        // 1. Validar usuario (mantener tu lógica actual)
+        // 1. Validar usuario
         usuarioValidationService.validarUsuarioAutorizado(request.getEmailCreador());
 
+        // 2. Validar contexto
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
-        log.debug("Validación de producción OK. Producción encontrada: {}", produccion.getCodigoProduccion());
-
         CampoSimpleModel campo = productionManagerServiceValidator.validarCampoExiste(idCampo);
-        log.debug("Validación de campo OK. Campo encontrada: {}", campo.getId());
-
         versionRecetaValidator.validarCampoPerteneceAVersion(produccion, campo);
-        log.debug("Validación de pertenencia de campo a versión OK.");
+        
+        log.debug("Validaciones de contexto exitosas para campo ID: {}", idCampo);
 
-        log.debug("Paso 2: Usando servicio especializado...");
+        // 3. Guardar respuesta
         RespuestaCampoResponseDTO respuesta = respuestaCampoService.guardarRespuestaCampo(
                 codigoProduccion, idCampo, request);
-        log.debug("Persistencia de respuesta de campo OK.");
+        
+        log.info("Respuesta de campo guardada correctamente.");
 
+        // 4. Publicar evento
         produccionEventPublisher.publicarRespuestaCampoGuardada(
                 this,
                 produccion.getCodigoProduccion(),
@@ -135,36 +153,38 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 respuesta.getValor()
         );
 
-        log.debug("Finalizado guardado de respuesta para campo. Producción: {}, Campo ID: {}. Evento publicado.",
-                codigoProduccion, idCampo);
         return respuesta;
     }
 
+    /**
+     * Guarda la respuesta a una celda de tabla en una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param idTabla ID de la tabla.
+     * @param idFila ID de la fila.
+     * @param idColumna ID de la columna.
+     * @param request DTO con el valor de la respuesta.
+     * @return DTO con la respuesta guardada.
+     */
     @Override
     public RespuestaCeldaTablaResponseDTO guardarRespuestaCeldaTabla(String codigoProduccion, Long idTabla, Long idFila, Long idColumna, RespuestaTablaRequestDTO request) {
-
-        log.debug("Iniciando guardado de respuesta para celda. Producción: {}, Tabla: {}, Fila: {}, Columna: {}", codigoProduccion, idTabla, idFila, idColumna);
-
+        log.debug("Iniciando guardado de respuesta para celda [T:{}, F:{}, C:{}] en producción: {}", idTabla, idFila, idColumna, codigoProduccion);
 
         usuarioValidationService.validarUsuarioAutorizado(request.getEmailCreador());
 
-        log.debug("Paso 1: Validando contexto...");
+        // 1. Validar contexto
         ProduccionModel produccion = productionManagerServiceValidator.validarProduccionParaEdicion(codigoProduccion);
-        log.debug("Validación de producción OK. Producción encontrada: {}", produccion.getCodigoProduccion());
-
         productionManagerServiceValidator.validarTablaPertenceAVersionProduccion(produccion.getVersionReceta(), idTabla);
-        log.debug("Validación de pertenencia de tabla a versión OK.");
-
         productionManagerServiceValidator.combinacionFilaColumnaPerteneceTabla(idFila, idColumna, idTabla);
-        log.debug("Validación de combinación fila-columna OK.");
+        
+        log.debug("Validaciones de contexto exitosas para celda de tabla.");
 
-        log.debug("Paso 2: Usando servicio especializado...");
-
+        // 2. Guardar respuesta
         RespuestaCeldaTablaResponseDTO respuesta = respuestaTablaService.guardarRespuestaTabla(codigoProduccion, idTabla, idFila, idColumna, request);
+        
+        log.info("Respuesta de celda de tabla guardada correctamente.");
 
-
-        log.debug("Persistencia de respuesta de tabla OK.");
-
+        // 3. Publicar evento
         produccionEventPublisher.publicarRespuestaTablaGuardada(
                 this,
                 produccion.getCodigoProduccion(),
@@ -174,31 +194,31 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 respuesta.valor()
         );
 
-        log.debug("Finalizado guardado de respuesta para celda. Evento publicado.");
-
         return respuesta;
     }
 
-
+    /**
+     * Obtiene las últimas respuestas registradas para una producción, junto con su progreso.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @return DTO con las respuestas y el progreso.
+     */
     @Override
     @Transactional(readOnly = true)
     public UltimasRespuestasProduccionResponseDTO getUltimasRespuestas(String codigoProduccion) {
+        log.info("Recuperando últimas respuestas para producción: {}", codigoProduccion);
+        
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
-        log.debug("ProduccionModel obtenida");
-
         ProduccionMetadataResponseDTO produccionMetadata = produccionMapper.modelToResponseDTO(produccion);
-        log.debug("produccionMetadata obtenida");
 
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
-
         VersionEstructuraPublicResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
-        log.debug("estructura obtenida");
+
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoService.buscarTodasRespuestasPorProduccion(produccion);
-        log.debug("respuestasCampos obtenida");
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaService.buscarTodasRespuestasPorProduccion(produccion);
-        log.debug("respuestasTablas obtenida");
+        
+        log.debug("Calculando progreso con {} respuestas de campo y {} respuestas de tabla.", respuestasCampos.size(), respuestasTablas.size());
         ProgresoProduccionResponseDTO progreso = produccionProgressService.calcularProgreso(estructura.totalCampos(), estructura.totalCeldas(), respuestasCampos, respuestasTablas);
-        log.debug("progreso obtenida");
 
         return new UltimasRespuestasProduccionResponseDTO(
                 produccionMetadata,
@@ -214,28 +234,31 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         return null;
     }
 
+    /**
+     * Actualiza la metadata (lote, encargado, observaciones) de una producción.
+     *
+     * @param codigoProduccion Código de la producción.
+     * @param request DTO con los datos a actualizar.
+     */
     @Override
     public void updateMetadata(String codigoProduccion, ProduccionMetadataModifyRequestDTO request) {
+        log.info("Actualizando metadata para producción: {}", codigoProduccion);
 
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
-        log.debug("ProduccionModel obtenida");
-
         productionManagerServiceValidator.validarUpdateMetadata(codigoProduccion, request);
-        log.debug("update de metadata es valido");
 
         if (request.encargado() != null) {
             produccion.setEncargado(request.encargado());
         }
-
         if (request.lote() != null) {
             produccion.setLote(request.lote());
         }
-
         if (request.observaciones() != null) {
             produccion.setObservaciones(request.observaciones());
         }
 
         produccionRepository.save(produccion);
+        log.info("Metadata actualizada correctamente en base de datos.");
 
         produccionEventPublisher.publicarMetadataActualizada(
                 this,
@@ -244,15 +267,14 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 produccion.getEncargado(),
                 produccion.getObservaciones()
         );
-
-        log.debug("Metadata actualizada para la producción {}. Evento publicado.", codigoProduccion);
-
-
+        log.debug("Evento de metadata actualizada publicado.");
     }
 
     private ProduccionModel buscarProduccionPorCodigo(String codigo) {
         return produccionRepository.findByCodigoProduccion(codigo)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producción no encontrada: " + codigo));
+                .orElseThrow(() -> {
+                    log.error("Producción no encontrada: {}", codigo);
+                    return new RecursoNoEncontradoException("Producción no encontrada: " + codigo);
+                });
     }
-
 }

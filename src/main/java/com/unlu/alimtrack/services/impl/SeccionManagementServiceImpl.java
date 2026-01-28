@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación del servicio para la gestión de secciones dentro de una versión de receta.
+ * Maneja la creación, recuperación y estructuración de secciones y sus componentes (campos, grupos, tablas).
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,10 +44,18 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     private final ColumnaTablaMapper columnaTablaMapper;
     private final FilaTablaMapper filaTablaMapper;
 
+    /**
+     * Crea una nueva sección en una versión de receta.
+     *
+     * @param codigoReceta Código de la versión de receta.
+     * @param seccionDTO DTO con los datos de la sección a crear.
+     * @return El modelo de la sección creada.
+     * @throws RecursoNoEncontradoException Si la versión de receta o el usuario creador no existen.
+     */
     @Override
     @Transactional
     public SeccionModel crearSeccion(String codigoReceta, SeccionCreateDTO seccionDTO) {
-        log.info("Creando nueva sección para la versión de receta: {}", codigoReceta);
+        log.info("Iniciando creación de nueva sección '{}' para la versión de receta: {}", seccionDTO.titulo(), codigoReceta);
 
         validarPrecondicionesCreacion(codigoReceta, seccionDTO.emailCreador());
         seccionValidator.validarCreacionSeccion(codigoReceta, seccionDTO);
@@ -57,6 +69,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         seccion.setTitulo(seccionDTO.titulo().trim());
         seccion.setOrden(seccionDTO.orden());
 
+        log.debug("Poblando colecciones (campos, grupos, tablas) para la nueva sección.");
         poblarColecciones(seccion, seccionDTO);
 
         SeccionModel seccionGuardada = seccionRepository.save(seccion);
@@ -67,9 +80,11 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
 
     private void validarPrecondicionesCreacion(String codigoReceta, String email) {
         if (!versionRecetaQueryService.existsByCodigoVersion(codigoReceta)) {
+            log.error("Versión de receta no encontrada: {}", codigoReceta);
             throw new RecursoNoEncontradoException("Versión de receta no encontrada con código: " + codigoReceta);
         }
         if (!usuarioService.existsByEmail(email)) {
+            log.error("Usuario creador no encontrado: {}", email);
             throw new RecursoNoEncontradoException("Usuario creador no encontrado con el email: " + email);
         }
     }
@@ -82,6 +97,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
 
     private void llenarCamposSimples(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.camposSimples() != null && !seccionDTO.camposSimples().isEmpty()) {
+            log.trace("Agregando {} campos simples a la sección.", seccionDTO.camposSimples().size());
             Set<CampoSimpleModel> camposSimples = seccionDTO.camposSimples().stream().map(dto -> {
                 CampoSimpleModel campo = campoSimpleMapper.toModel(dto);
                 campo.setSeccion(seccion);
@@ -94,6 +110,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
 
     private void llenarGrupoCampos(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.gruposCampos() != null && !seccionDTO.gruposCampos().isEmpty()) {
+            log.trace("Agregando {} grupos de campos a la sección.", seccionDTO.gruposCampos().size());
             Set<GrupoCamposModel> gruposCampos = seccionDTO.gruposCampos().stream().map(dto -> {
                 GrupoCamposModel grupo = grupoCamposMapper.toModel(dto);
                 grupo.setSeccion(seccion);
@@ -114,6 +131,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
 
     private void llenarTablas(SeccionModel seccion, SeccionCreateDTO seccionDTO) {
         if (seccionDTO.tablas() != null && !seccionDTO.tablas().isEmpty()) {
+            log.trace("Agregando {} tablas a la sección.", seccionDTO.tablas().size());
             Set<TablaModel> tablas = seccionDTO.tablas().stream().map(dto -> {
                 TablaModel tabla = tablaMapper.toModel(dto);
                 tabla.setSeccion(seccion);
@@ -137,27 +155,41 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         }
     }
 
+    /**
+     * Obtiene la lista completa de secciones (con todos sus componentes) para una versión de receta, mapeada a DTOs.
+     *
+     * @param codigoVersion Código de la versión de receta.
+     * @return Lista de DTOs de secciones completas.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<SeccionResponseDTO> obtenerSeccionesDTOCompletasPorVersion(String codigoVersion) {
-        log.info("Iniciando obtención de DTOs de sección completos para la versión: {}", codigoVersion);
+        log.info("Obteniendo estructura completa de secciones para la versión: {}", codigoVersion);
         VersionRecetaModel versionReceta = versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
         List<SeccionModel> seccionesCompletas = obtenerSeccionesCompletasPorVersion(versionReceta);
         return seccionMapperManual.toResponseDTOList(seccionesCompletas);
     }
 
+    /**
+     * Obtiene la lista de modelos de secciones completas para una versión de receta, optimizando la carga de datos.
+     *
+     * @param versionReceta Modelo de la versión de receta.
+     * @return Lista de modelos de secciones con sus relaciones cargadas.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<SeccionModel> obtenerSeccionesCompletasPorVersion(VersionRecetaModel versionReceta) {
-        log.debug("Iniciando carga SECUENCIAL de la estructura para la versión: {}", versionReceta.getCodigoVersionReceta());
+        log.debug("Iniciando carga optimizada de secciones para la versión: {}", versionReceta.getCodigoVersionReceta());
 
         // Paso 1: Cargar las secciones básicas.
         List<SeccionModel> secciones = seccionRepository.findSeccionesBasicas(versionReceta);
         if (secciones.isEmpty()) {
+            log.debug("No se encontraron secciones para la versión {}", versionReceta.getCodigoVersionReceta());
             return new ArrayList<>();
         }
 
         // Paso 2: Cargar colecciones de primer nivel en consultas separadas.
+        log.trace("Cargando campos simples, grupos y tablas para {} secciones.", secciones.size());
         seccionRepository.fetchCamposSimples(secciones);
         seccionRepository.fetchGruposCampos(secciones);
         // NUEVO: Cargar explícitamente los campos dentro de los grupos de campos
@@ -165,7 +197,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         seccionRepository.fetchTablas(secciones);
 
         // Paso 3: Dejar que @BatchSize se encargue del resto al momento del mapeo.
-        log.info("Carga secuencial de {} secciones y sus colecciones de primer nivel completada.", secciones.size());
+        log.debug("Carga de estructura completada para {} secciones.", secciones.size());
         return secciones;
     }
 

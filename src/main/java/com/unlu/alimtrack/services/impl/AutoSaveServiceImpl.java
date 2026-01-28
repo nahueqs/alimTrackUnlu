@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación del servicio de guardado automático (AutoSave) para producciones.
+ * Permite guardar y recuperar el estado de una producción de forma asíncrona o síncrona.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,50 +33,64 @@ public class AutoSaveServiceImpl implements AutoSaveService {
 
     private final AutoSaveRepository autoSaveRepository;
     private final RespuestaCampoRepository respuestaCampoRepository;
-    private final RespuestaTablaRepository respuestaTablaRepository; // Inyectado
+    private final RespuestaTablaRepository respuestaTablaRepository;
     private final ProduccionRepository produccionRepository;
     private final ObjectMapper objectMapper;
-    // Removed private final NotificationService notificationService;
 
+    /**
+     * Ejecuta el guardado automático de una producción de forma asíncrona.
+     *
+     * @param produccion La producción a guardar.
+     */
     @Override
     @Async
     public void ejecutarAutoSaveInmediato(ProduccionModel produccion) {
         try {
-            log.debug("Buscando producción con ID: {} para guardar su estado", produccion);
-
-
-            log.info("Iniciando auto-save asíncrono para producción codigo: {}", produccion.getCodigoProduccion());
+            log.debug("Iniciando proceso de auto-save asíncrono para producción ID: {}", produccion.getProduccion());
+            log.info("Ejecutando auto-save para producción código: {}", produccion.getCodigoProduccion());
+            
             guardarAutoSave(produccion);
-            // Removed notificationService.notifyAutoSave(produccion.getCodigoProduccion());
-            log.info("Auto-save para producción codigo: {} completado exitosamente.", produccion.getCodigoProduccion());
+            
+            log.info("Auto-save para producción código: {} completado exitosamente.", produccion.getCodigoProduccion());
         } catch (Exception e) {
-            log.error("Error durante el auto-save asíncrono para producción codigo: {}", produccion, e);
+            log.error("Error crítico durante el auto-save asíncrono para producción código: {}", produccion.getCodigoProduccion(), e);
         }
     }
 
+    /**
+     * Guarda el estado actual de una producción en la base de datos.
+     * Si ya existe un registro de auto-save, lo actualiza.
+     *
+     * @param produccion La producción a guardar.
+     */
     @Override
     @Transactional
     public void guardarAutoSave(ProduccionModel produccion) {
+        log.debug("Obteniendo estado actual completo de la producción {}", produccion.getCodigoProduccion());
+        
+        try {
+            Map<String, Object> estadoActual = obtenerEstadoActualProduccion(produccion);
 
-        log.debug("Obteniendo estado actual de la producción {}", produccion.getCodigoProduccion());
-        Map<String, Object> estadoActual = obtenerEstadoActualProduccion(produccion);
+            AutoSaveProduccionModel autoSave = autoSaveRepository
+                    .findByProduccion(produccion)
+                    .orElse(new AutoSaveProduccionModel());
 
-        AutoSaveProduccionModel autoSave = autoSaveRepository
-                .findByProduccion(produccion)
-                .orElse(new AutoSaveProduccionModel());
+            if (autoSave.getId() == null) {
+                log.debug("Creando nuevo registro de auto-save para la producción {}", produccion.getCodigoProduccion());
+                autoSave.setProduccion(produccion);
+            } else {
+                log.debug("Actualizando registro de auto-save existente (ID: {}) para la producción {}", autoSave.getId(), produccion.getCodigoProduccion());
+            }
 
-        if (autoSave.getId() == null) {
-            log.debug("Creando nuevo registro de auto-save para la producción {}", produccion.getCodigoProduccion());
-            autoSave.setProduccion(produccion);
-        } else {
-            log.debug("Actualizando registro de auto-save existente para la producción {}", produccion.getCodigoProduccion());
+            autoSave.setDatos(estadoActual);
+            autoSave.setTimestamp(LocalDateTime.now());
+
+            autoSaveRepository.save(autoSave);
+            log.debug("Auto-save persistido correctamente para producción {}", produccion.getCodigoProduccion());
+        } catch (Exception e) {
+            log.error("Error al persistir el auto-save para la producción {}: {}", produccion.getCodigoProduccion(), e.getMessage());
+            throw e;
         }
-
-        autoSave.setDatos(estadoActual);
-        autoSave.setTimestamp(LocalDateTime.now());
-
-        autoSaveRepository.save(autoSave);
-        log.debug("Auto-save para producción {} guardado en la base de datos", produccion.getCodigoProduccion());
     }
 
     private Map<String, Object> obtenerEstadoActualProduccion(ProduccionModel produccion) {
@@ -97,12 +115,13 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaRepository.findAllUltimasRespuestasByProduccion(produccion.getProduccion());
         Map<String, String> respuestasTablasMap = respuestasTablas.stream()
                 .collect(Collectors.toMap(
-                        respuesta -> respuesta.getId().toString(),  // Asegúrate que getIdTabla() exista
+                        respuesta -> respuesta.getId().toString(),
                         respuesta -> {
                             if (respuesta.getColumna() != null && respuesta.getColumna().getTipoDato() != null) {
-                                return respuesta.getValor(respuesta.getColumna().getTipoDato()).toString();
+                                Object valor = respuesta.getValor(respuesta.getColumna().getTipoDato());
+                                return valor != null ? valor.toString() : "";
                             }
-                            return null;
+                            return "";
                         }
                 ));
         estado.put("respuestas_tablas", respuestasTablasMap);
@@ -110,22 +129,39 @@ public class AutoSaveServiceImpl implements AutoSaveService {
         return estado;
     }
 
+    /**
+     * Recupera los datos del último auto-save guardado para una producción.
+     *
+     * @param produccion La producción de la cual recuperar el auto-save.
+     * @return Un mapa con los datos guardados, o un mapa vacío si no existe.
+     */
     @Override
     @Transactional(readOnly = true)
     public Map<String, Object> recuperarUltimoAutoSave(ProduccionModel produccion) {
         log.info("Recuperando último auto-save para la producción: {}", produccion.getCodigoProduccion());
         return autoSaveRepository.findByProduccion(produccion)
-                .map(AutoSaveProduccionModel::getDatos)
-                .orElse(new HashMap<>());
+                .map(autoSave -> {
+                    log.debug("Auto-save encontrado con timestamp: {}", autoSave.getTimestamp());
+                    return autoSave.getDatos();
+                })
+                .orElseGet(() -> {
+                    log.info("No se encontró ningún auto-save previo para la producción: {}", produccion.getCodigoProduccion());
+                    return new HashMap<>();
+                });
     }
 
+    /**
+     * Obtiene la fecha y hora del último auto-save realizado para una producción.
+     *
+     * @param produccion La producción consultada.
+     * @return LocalDateTime del último guardado, o null si no existe.
+     */
     @Override
     @Transactional(readOnly = true)
     public LocalDateTime obtenerUltimoAutoSaveTimestamp(ProduccionModel produccion) {
-        log.info("Obteniendo timestamp del último auto-save para la producción: {}", produccion.getCodigoProduccion());
+        log.debug("Consultando timestamp del último auto-save para la producción: {}", produccion.getCodigoProduccion());
         return autoSaveRepository.findByProduccion(produccion)
                 .map(AutoSaveProduccionModel::getTimestamp)
                 .orElse(null);
     }
-
 }

@@ -52,9 +52,9 @@ public class VersionRecetaController {
 
     @PostMapping("/recetas/versiones-receta")
     public ResponseEntity<VersionMetadataResponseDTO> saveVersionReceta(@Valid @RequestBody VersionRecetaCreateDTO dto) {
-        log.info("Solicitud para crear una nueva versión para la receta con código: {}", dto.codigoVersionReceta());
-        VersionMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(dto.codigoVersionReceta(), dto);
-        log.info("Versión creada exitosamente: {} para la receta: {}", created.codigoVersionReceta(), dto.codigoVersionReceta());
+        log.info("Solicitud para crear una nueva versión para la receta padre: {}", dto.codigoRecetaPadre());
+        VersionMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(dto.codigoRecetaPadre(), dto);
+        log.info("Versión creada exitosamente: {} para la receta: {}", created.codigoVersionReceta(), dto.codigoRecetaPadre());
         return ResponseEntity.created(
                         URI.create("/api/v1/versiones-receta/" + created.codigoVersionReceta()))
                 .body(created);

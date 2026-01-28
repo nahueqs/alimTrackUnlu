@@ -115,6 +115,13 @@ public class ProduccionController {
         return ResponseEntity.ok(produccion);
     }
 
+    @DeleteMapping("/{codigoProduccion}")
+    public ResponseEntity<Void> deleteProduccion(@PathVariable String codigoProduccion) {
+        log.info("Solicitud para eliminar la producción con código: {}", codigoProduccion);
+        produccionManagementService.deleteProduccion(codigoProduccion);
+        log.info("Producción {} eliminada exitosamente", codigoProduccion);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/test")
     public UltimasRespuestasProduccionResponseDTO test() {

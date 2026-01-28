@@ -270,6 +270,19 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         log.debug("Evento de metadata actualizada publicado.");
     }
 
+    /**
+     * Elimina una producción del sistema.
+     *
+     * @param codigoProduccion Código de la producción a eliminar.
+     */
+    @Override
+    public void deleteProduccion(String codigoProduccion) {
+        log.info("Intentando eliminar producción con código: {}", codigoProduccion);
+        ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
+        produccionRepository.delete(produccion);
+        log.info("Producción {} eliminada exitosamente.", codigoProduccion);
+    }
+
     private ProduccionModel buscarProduccionPorCodigo(String codigo) {
         return produccionRepository.findByCodigoProduccion(codigo)
                 .orElseThrow(() -> {

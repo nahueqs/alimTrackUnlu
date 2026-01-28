@@ -26,4 +26,6 @@ public interface ProduccionManagementService {
     UltimasRespuestasProduccionResponseDTO test();
 
     void updateMetadata(String codigoProduccion, @Valid ProduccionMetadataModifyRequestDTO request);
+
+    void deleteProduccion(String codigoProduccion);
 }

@@ -19,7 +19,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
         heartbeatScheduler.initialize();
 
-        // Habilitar heartbeats cada 10 segundos (10000ms) para entrada y salida
         config.enableSimpleBroker("/topic")
                 .setHeartbeatValue(new long[]{10000, 10000})
                 .setTaskScheduler(heartbeatScheduler);
@@ -30,7 +29,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOrigins(
+                        "http://localhost:5173",
+                        "https://alimtrack-front-vercel.vercel.app"
+                )
+                .withSockJS()
+                .setClientLibraryUrl("https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js");
     }
 }

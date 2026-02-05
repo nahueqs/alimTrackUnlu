@@ -49,16 +49,28 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error"
                                 ).permitAll()
+
                                 .requestMatchers("/api/v1/auth/**").permitAll()
+
                                 .requestMatchers("/api/v1/public/**").permitAll()
+
                                 .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
-                                .requestMatchers("/ws/**").permitAll() // Permit WebSocket endpoint
+
+                                .requestMatchers("/ws/**").permitAll()
+
+                                .requestMatchers("/sockjs-node/**").permitAll()
+
+                                .requestMatchers("/websocket/**").permitAll()
+
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authenticationProvider(authProvider)
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 
@@ -66,22 +78,40 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://alimtrack-front-vercel.vercel.app"
 
         ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"
+        ));
+
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials"
+        ));
+
         configuration.setMaxAge(3600L);
 
+        configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
-        source.registerCorsConfiguration("/health", configuration);  // Específico para health
-        source.registerCorsConfiguration("/actuator/**", configuration);  // Para actuator
-        source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 

@@ -49,7 +49,7 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error"
                                 ).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
+                                .requestMatchers("/v1/auth/**").permitAll()
                                 .requestMatchers("/v1/public/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/v1/producciones/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll()

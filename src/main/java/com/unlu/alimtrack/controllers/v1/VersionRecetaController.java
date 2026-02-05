@@ -6,6 +6,8 @@ import com.unlu.alimtrack.DTOS.response.VersionReceta.protegido.VersionMetadataR
 import com.unlu.alimtrack.DTOS.response.VersionReceta.publico.VersionEstructuraPublicResponseDTO;
 import com.unlu.alimtrack.services.VersionRecetaEstructuraService;
 import com.unlu.alimtrack.services.VersionRecetaMetadataService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +21,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
+@Tag(name = "Versiones de Receta", description = "Gestión de versiones y estructura de recetas")
 public class VersionRecetaController {
 
     private final VersionRecetaMetadataService versionRecetaMetadataService;
     private final VersionRecetaEstructuraService versionEstructuraService;
 
+    @Operation(summary = "Listar todas las versiones", description = "Obtiene la metadata de todas las versiones de recetas")
     @GetMapping("/versiones-receta")
     public ResponseEntity<List<VersionMetadataResponseDTO>> getAllVersiones() {
         log.info("Solicitud para obtener todas las versiones de recetas");
@@ -32,6 +36,7 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versiones);
     }
 
+    @Operation(summary = "Obtener versión por código", description = "Devuelve la metadata de una versión específica")
     @GetMapping("/versiones-receta/{codigoVersion}")
     public ResponseEntity<VersionMetadataResponseDTO> getByCodigoVersion(
             @PathVariable String codigoVersion) {
@@ -41,6 +46,7 @@ public class VersionRecetaController {
         return ResponseEntity.ok(version);
     }
 
+    @Operation(summary = "Listar versiones de una receta", description = "Obtiene todas las versiones asociadas a una receta padre")
     @GetMapping("/recetas/{codigoReceta}/versiones-receta")
     public ResponseEntity<List<VersionMetadataResponseDTO>> getAllByCodigoReceta(
             @PathVariable String codigoReceta) {
@@ -50,6 +56,7 @@ public class VersionRecetaController {
         return ResponseEntity.ok(versiones);
     }
 
+    @Operation(summary = "Crear versión de receta", description = "Crea una nueva versión para una receta existente")
     @PostMapping("/recetas/versiones-receta")
     public ResponseEntity<VersionMetadataResponseDTO> saveVersionReceta(@Valid @RequestBody VersionRecetaCreateDTO dto) {
         log.info("Solicitud para crear una nueva versión para la receta padre: {}", dto.codigoRecetaPadre());
@@ -60,6 +67,7 @@ public class VersionRecetaController {
                 .body(created);
     }
 
+    @Operation(summary = "Actualizar versión", description = "Modifica la metadata de una versión de receta")
     @PutMapping("/versiones-receta/{codigoVersion}")
     public ResponseEntity<VersionMetadataResponseDTO> updateVersionReceta(@PathVariable String codigoVersion,
                                                                           @Valid @RequestBody VersionRecetaModifyDTO receta) {
@@ -69,6 +77,7 @@ public class VersionRecetaController {
         return ResponseEntity.ok(actualizada);
     }
 
+    @Operation(summary = "Eliminar versión", description = "Borra una versión de receta si no tiene producciones asociadas")
     @DeleteMapping("/versiones-receta/{codigoVersion}")
     public ResponseEntity<Void> deleteVersionReceta(@PathVariable String codigoVersion) {
         log.info("Solicitud para eliminar la versión de receta con código: {}", codigoVersion);
@@ -77,6 +86,7 @@ public class VersionRecetaController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Obtener estructura completa", description = "Devuelve la estructura jerárquica completa (secciones, campos, tablas) de una versión")
     @GetMapping("/versiones-receta/{codigoVersion}/estructura-completa")
     public ResponseEntity<VersionEstructuraPublicResponseDTO> obtenerEstructuraCompleta(
             @PathVariable String codigoVersion) {

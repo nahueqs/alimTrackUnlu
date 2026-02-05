@@ -87,9 +87,6 @@ public class RecetaServiceImpl implements RecetaService {
         
         if (model == null) {
             log.error("No se encontró la receta con código: {}", codigoReceta);
-            // Asumiendo que validateModel lanza la excepción si es null, o lanzándola aquí explícitamente
-            // Si validateModel no lanza excepción para null, deberíamos lanzarla aquí.
-            // Por seguridad, lanzamos si es null antes de validar.
              throw new RecursoNoEncontradoException("No se encontró la receta con código: " + codigoReceta);
         }
         

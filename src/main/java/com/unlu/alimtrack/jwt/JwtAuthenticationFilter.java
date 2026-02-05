@@ -40,15 +40,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api/v1/auth/**",
-            "/api/v1/public/**",
+            "/v1/auth/**",
+            "/v1/public/**",
             "/ws/**",
             "/websocket/**",
             "/sockjs-node/**"
     );
 
     private final List<String> PUBLIC_GET_ENDPOINTS = List.of(
-            "/api/v1/producciones/**"
+            "/v1/producciones/**"
     );
 
     @Override
@@ -98,7 +98,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
+        String requestURI = request.getServletPath();
         String method = request.getMethod();
 
         log.debug("Checking if should filter: {} {}", method, requestURI);

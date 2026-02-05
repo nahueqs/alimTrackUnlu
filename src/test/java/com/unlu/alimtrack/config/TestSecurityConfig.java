@@ -20,10 +20,29 @@ public class TestSecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/actuator/health/**",
+                        "/actuator/info",
+                        "/health",
+                        "/ping",
+                        "/",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/error"
+                ).permitAll()
+
                 .requestMatchers("/api/v1/auth/**").permitAll()
+
                 .requestMatchers("/api/v1/public/**").permitAll()
+
                 .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
+
                 .requestMatchers("/ws/**").permitAll()
+
+                .requestMatchers("/sockjs-node/**").permitAll()
+
+                .requestMatchers("/websocket/**").permitAll()
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

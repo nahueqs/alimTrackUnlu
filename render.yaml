@@ -9,14 +9,5 @@ services:
     plan: free
     autoDeploy: true
     numInstances: 1
-    # HEALTH CHECK CRÍTICO para que no se suspenda
     healthCheckPath: /api/health
     healthCheckTimeout: 10
-    # IMPORTANTE: Reducir inactividad
-    scaling:
-      minInstances: 1
-      maxInstances: 1
-
-    envVars:
-      - key: PORT
-        value: 8080

@@ -13,7 +13,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Configurar el planificador para los heartbeats
+
         ThreadPoolTaskScheduler heartbeatScheduler = new ThreadPoolTaskScheduler();
         heartbeatScheduler.setPoolSize(1);
         heartbeatScheduler.setThreadNamePrefix("wss-heartbeat-thread-");

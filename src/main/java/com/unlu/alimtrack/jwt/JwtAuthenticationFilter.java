@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -57,11 +60,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String token = getTokenFromRequest(request);
         final String username;
 
+        log.debug("Processing request to: {} {}", request.getMethod(), request.getRequestURI());
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            log.debug("Skipping JWT filter for OPTIONS request");
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (token == null) {
+            log.debug("No JWT token found, continuing filter chain");
             filterChain.doFilter(request, response);
             return;
         }
 
+        log.debug("JWT token found, validating...");
         username = jwtService.getUsernameFromToken(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -75,6 +87,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                log.debug("User authenticated successfully: {}", username);
+            } else {
+                log.debug("Invalid JWT token for user: {}", username);
             }
         }
 
@@ -86,9 +101,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
-        // Check if it's a public endpoint
+        log.debug("Checking if should filter: {} {}", method, requestURI);
+
         for (String pattern : PUBLIC_ENDPOINTS) {
             if (pathMatcher.match(pattern, requestURI)) {
+                log.debug("Skipping JWT filter for public endpoint: {} matches pattern: {}",
+                        requestURI, pattern);
                 return true;
             }
         }
@@ -97,10 +115,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if ("GET".equalsIgnoreCase(method)) {
             for (String pattern : PUBLIC_GET_ENDPOINTS) {
                 if (pathMatcher.match(pattern, requestURI)) {
+                    log.debug("Skipping JWT filter for public GET endpoint: {} matches pattern: {}",
+                            requestURI, pattern);
                     return true;
                 }
             }
         }
+        log.debug("JWT filter will be applied to: {} {}", method, requestURI);
 
         return false;
     }

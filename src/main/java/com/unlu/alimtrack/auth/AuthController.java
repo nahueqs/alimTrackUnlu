@@ -1,7 +1,7 @@
 package com.unlu.alimtrack.auth;
 
 import com.unlu.alimtrack.DTOS.response.Usuario.UsuarioResponseDTO;
-import com.unlu.alimtrack.services.impl.UsuarioServiceImpl;
+import com.unlu.alimtrack.services.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class AuthController {
 
     private final AuthService authService;
-    private final UsuarioServiceImpl userService;
+    private final UsuarioService userService;
 
     @PostMapping(value = "/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequestDTO request) {

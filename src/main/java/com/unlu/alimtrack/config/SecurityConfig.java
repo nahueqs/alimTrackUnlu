@@ -49,19 +49,12 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error"
                                 ).permitAll()
-
-                                .requestMatchers("/api/v1/auth/**").permitAll()
-
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
-
                                 .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
-
                                 .requestMatchers("/ws/**").permitAll()
-
                                 .requestMatchers("/sockjs-node/**").permitAll()
-
                                 .requestMatchers("/websocket/**").permitAll()
-
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -79,11 +72,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
+        configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "https://alimtrack-front-vercel.vercel.app"
-
         ));
+        
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"
         ));

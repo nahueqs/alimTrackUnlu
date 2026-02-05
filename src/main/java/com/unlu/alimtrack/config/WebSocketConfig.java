@@ -22,14 +22,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/topic")
                 .setHeartbeatValue(new long[]{10000, 10000})
                 .setTaskScheduler(heartbeatScheduler);
-                
+
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(
+                .setAllowedOriginPatterns(
                         "http://localhost:5173",
                         "https://alimtrack-front-vercel.vercel.app"
                 )

@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1")
+@RequestMapping("/api/v1")
 @Tag(name = "Versiones de Receta", description = "Gestión de versiones y estructura de recetas")
 public class VersionRecetaController {
 

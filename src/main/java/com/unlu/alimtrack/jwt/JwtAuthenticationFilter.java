@@ -40,15 +40,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/v1/auth/**",
-            "/v1/public/**",
+            "/api/v1/auth/**",
+            "/api/v1/public/**",
             "/ws/**",
             "/websocket/**",
             "/sockjs-node/**"
     );
 
     private final List<String> PUBLIC_GET_ENDPOINTS = List.of(
-            "/v1/producciones/**"
+            "/api/v1/producciones/**"
     );
 
     @Override

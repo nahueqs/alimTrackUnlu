@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/producciones")
+@RequestMapping("/api/v1/producciones")
 @Tag(name = "Producciones", description = "Gestión de procesos productivos")
 public class ProduccionController {
 

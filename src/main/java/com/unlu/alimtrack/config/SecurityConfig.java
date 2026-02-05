@@ -49,12 +49,12 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error"
                                 ).permitAll()
-                                .requestMatchers("/v1/auth/**").permitAll()
-                                .requestMatchers("/v1/public/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/v1/producciones/**").permitAll()
-                                .requestMatchers("/ws/**").permitAll()
-                                .requestMatchers("/sockjs-node/**").permitAll()
-                                .requestMatchers("/websocket/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/public/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
+                                .requestMatchers("/api/ws/**").permitAll()
+                                .requestMatchers("/api/sockjs-node/**").permitAll()
+                                .requestMatchers("/api/websocket/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

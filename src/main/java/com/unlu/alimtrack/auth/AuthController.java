@@ -21,7 +21,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Autenticación", description = "Endpoints para login, registro y gestión de tokens")
 public class AuthController {

@@ -245,7 +245,6 @@ public class ProduccionControllerTest {
         mockMvc.perform(put("/api/v1/producciones/PROD-1/cambiar-estado")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-
                 .andExpect(status().isNoContent());
     }
 

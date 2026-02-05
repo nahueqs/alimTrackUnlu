@@ -57,7 +57,7 @@ public class VersionRecetaController {
     }
 
     @Operation(summary = "Crear versión de receta", description = "Crea una nueva versión para una receta existente")
-    @PostMapping("/recetas/versiones-receta")
+    @PostMapping("/versiones-receta")
     public ResponseEntity<VersionMetadataResponseDTO> saveVersionReceta(@Valid @RequestBody VersionRecetaCreateDTO dto) {
         log.info("Solicitud para crear una nueva versión para la receta padre: {}", dto.codigoRecetaPadre());
         VersionMetadataResponseDTO created = versionRecetaMetadataService.saveVersionReceta(dto.codigoRecetaPadre(), dto);

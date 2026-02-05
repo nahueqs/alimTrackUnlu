@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/recetas")
+@RequestMapping("/v1/recetas")
 @Tag(name = "Recetas", description = "Gestión de recetas base")
 public class RecetaController {
 

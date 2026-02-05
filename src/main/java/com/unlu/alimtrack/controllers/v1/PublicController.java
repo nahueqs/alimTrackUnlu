@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/public")
+@RequestMapping("/v1/public")
 @Tag(name = "Público", description = "Endpoints de acceso público sin autenticación")
 public class PublicController {
 

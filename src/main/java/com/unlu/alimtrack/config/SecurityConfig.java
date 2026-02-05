@@ -39,6 +39,16 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+                                .requestMatchers(
+                                        "/actuator/health/**",
+                                        "/actuator/info",
+                                        "/health",
+                                        "/ping",
+                                        "/",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/error"
+                                ).permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
@@ -56,13 +66,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://alimtrack-front-vercel.vercel.app"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://alimtrack-front-vercel.vercel.app"
+
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/health", configuration);  // Específico para health
+        source.registerCorsConfiguration("/actuator/**", configuration);  // Para actuator
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

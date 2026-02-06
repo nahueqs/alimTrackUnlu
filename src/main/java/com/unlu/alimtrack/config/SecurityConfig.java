@@ -33,12 +33,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(
-                        AbstractHttpConfigurer::disable
-                )
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+                                // Endpoints de infraestructura y documentación
                                 .requestMatchers(
                                         "/actuator/health/**",
                                         "/actuator/info",
@@ -49,12 +48,20 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/error"
                                 ).permitAll()
-                                .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/v1/public/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
-                                .requestMatchers("/api/ws/**").permitAll()
-                                .requestMatchers("/api/sockjs-node/**").permitAll()
-                                .requestMatchers("/api/websocket/**").permitAll()
+                                
+                                // WebSockets (Prioridad alta para evitar bloqueos)
+                                .requestMatchers("/ws/**", "/ws/info", "/ws/**/websocket").permitAll()
+                                .requestMatchers("/sockjs-node/**").permitAll()
+                                .requestMatchers("/websocket/**").permitAll()
+
+                                // Auth y Públicos
+                                .requestMatchers("/v1/auth/**").permitAll()
+                                .requestMatchers("/v1/public/**").permitAll()
+                                
+                                // GETs públicos específicos
+                                .requestMatchers(HttpMethod.GET, "/v1/producciones/**").permitAll()
+
+                                // Todo lo demás requiere autenticación
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

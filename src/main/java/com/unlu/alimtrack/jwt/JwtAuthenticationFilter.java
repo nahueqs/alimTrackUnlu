@@ -43,12 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/**",
             "/api/v1/public/**",
             "/ws/**",
+            "/ws/info",
             "/websocket/**",
             "/sockjs-node/**"
     );
 
     private final List<String> PUBLIC_GET_ENDPOINTS = List.of(
-            "/api/v1/producciones/**"
+            "/v1/producciones/**"
     );
 
     @Override

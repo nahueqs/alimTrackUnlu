@@ -2,6 +2,9 @@
 > **Planta Piloto – Universidad Nacional de Luján (CIDETA)**
 > [www.cideta.unlu.edu.ar](https://www.cideta.unlu.edu.ar/)
 
+Página de estado para ver si la app está funcionando 
+https://stats.uptimerobot.com/QGOCuP1tVl
+
 AlimTrack es una plataforma integral para la gestión, seguimiento y visualización de producciones alimenticias en tiempo real. Desarrollado para el **CIDETA-UNLu**, el sistema digitaliza la captura de datos en planta, permitiendo una trazabilidad total y eliminando la dependencia de registros físicos mediante una arquitectura moderna y robusta.
 
 ## 🎯 Objetivo del Proyecto

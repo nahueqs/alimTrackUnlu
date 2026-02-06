@@ -55,11 +55,11 @@ public class SecurityConfig {
                                 .requestMatchers("/websocket/**").permitAll()
 
                                 // Auth y Públicos
-                                .requestMatchers("/v1/auth/**").permitAll()
-                                .requestMatchers("/v1/public/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/public/**").permitAll()
                                 
                                 // GETs públicos específicos
-                                .requestMatchers(HttpMethod.GET, "/v1/producciones/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/producciones/**").permitAll()
 
                                 // Todo lo demás requiere autenticación
                                 .anyRequest().authenticated()

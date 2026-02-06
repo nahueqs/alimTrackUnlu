@@ -14,11 +14,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -85,6 +88,9 @@ public class AuthController {
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         log.debug("=== /me endpoint called ===");
         log.debug("Authentication object: {}", authentication);
+        log.debug("Authentication class: {}", authentication != null ? authentication.getClass().getName() : "null");
+        log.debug("Is authenticated: {}", authentication != null && authentication.isAuthenticated());
+        log.debug("Is anonymous: {}", authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken);
 
         // Verificar si el usuario está autenticado
         if (authentication == null ||
@@ -92,12 +98,16 @@ public class AuthController {
                 authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
 
             log.info("Usuario no autenticado intentando acceder a /me");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of(
-                            "status", 403,
-                            "message", "No autenticado",
-                            "path", "/api/v1/auth/me"
-                    ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 403);
+            errorResponse.put("message", "No autenticado");
+            errorResponse.put("path", "/api/v1/auth/me");
+            errorResponse.put("timestamp", LocalDateTime.now().toString());
+
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(errorResponse);
         }
 
         try {
@@ -110,12 +120,17 @@ public class AuthController {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             log.error("Error al obtener usuario: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of(
-                            "status", 500,
-                            "message", "Error al obtener usuario",
-                            "path", "/api/v1/auth/me"
-                    ));
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 500);
+            errorResponse.put("message", "Error al obtener usuario: " + e.getMessage());
+            errorResponse.put("path", "/api/v1/auth/me");
+            errorResponse.put("timestamp", LocalDateTime.now().toString());
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)  // ← CRÍTICO: Forzar JSON
+                    .body(errorResponse);
         }
     }
 }

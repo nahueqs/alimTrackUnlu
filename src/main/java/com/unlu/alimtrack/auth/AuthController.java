@@ -13,11 +13,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -80,11 +82,40 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "No autenticado")
     })
     @GetMapping("/me")
-    public ResponseEntity<UsuarioResponseDTO> getCurrentUser(Authentication authentication) {
-        String username = authentication.getName();
-        log.info("Solicitud para obtener el usuario actual: {}", username);
-        UsuarioResponseDTO user = userService.getUsuarioByEmail(username);
-        log.debug("Retornando información para el usuario: {}", user.email());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        log.debug("=== /me endpoint called ===");
+        log.debug("Authentication object: {}", authentication);
+
+        // Verificar si el usuario está autenticado
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+
+            log.info("Usuario no autenticado intentando acceder a /me");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of(
+                            "status", 403,
+                            "message", "No autenticado",
+                            "path", "/api/v1/auth/me"
+                    ));
+        }
+
+        try {
+            String username = authentication.getName();
+            log.info("Solicitud para obtener el usuario actual: {}", username);
+
+            UsuarioResponseDTO user = userService.getUsuarioByEmail(username);
+            log.debug("Retornando información para el usuario: {}", user.email());
+
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            log.error("Error al obtener usuario: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", 500,
+                            "message", "Error al obtener usuario",
+                            "path", "/api/v1/auth/me"
+                    ));
+        }
     }
 }

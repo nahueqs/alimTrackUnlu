@@ -55,7 +55,7 @@ public class SecurityConfig {
                                 .requestMatchers("/websocket/**").permitAll()
 
                                 // Auth y Públicos
-                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**", "/api/v1/auth/me").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
                                 
                                 // GETs públicos específicos

@@ -19,6 +19,9 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
+# Instalar tzdata para soporte de zonas horarias en Alpine
+RUN apk add --no-cache tzdata
+
 # Crea un usuario no-root por seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
 RUN mkdir -p /app/logs && chown -R spring:spring /app/logs
@@ -41,6 +44,7 @@ ENTRYPOINT ["java", \
     "-Xss512k", \
     "-XX:+UseSerialGC", \
     "-Djava.security.egd=file:/dev/./urandom", \
+    "-Duser.timezone=America/Argentina/Buenos_Aires", \
     "-Dspring.profiles.active=prod", \
     "-jar", \
     "app.jar"]

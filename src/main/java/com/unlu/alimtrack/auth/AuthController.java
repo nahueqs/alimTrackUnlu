@@ -49,6 +49,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /*
     @Operation(summary = "Registrar usuario", description = "Registra un nuevo usuario en el sistema")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Registro exitoso",
@@ -63,6 +64,7 @@ public class AuthController {
         log.info("Registro exitoso para el usuario: {}. Token generado.", request.email());
         return ResponseEntity.ok(response);
     }
+    */
 
     @Operation(summary = "Refrescar token", description = "Renueva el token de acceso usando un refresh token válido")
     @ApiResponses(value = {

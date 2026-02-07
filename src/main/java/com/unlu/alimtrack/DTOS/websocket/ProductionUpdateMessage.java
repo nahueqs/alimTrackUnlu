@@ -29,7 +29,8 @@ public record ProductionUpdateMessage(
     public static ProductionUpdateMessage metadataUpdated(String codigoProduccion, ProductionMetadataUpdatePayload payload) {
         return new ProductionUpdateMessage("PRODUCTION_METADATA_UPDATED", codigoProduccion, LocalDateTime.now(), payload);
     }
+
+    public static ProductionUpdateMessage productionDeleted(String codigoProduccion) {
+        return new ProductionUpdateMessage("PRODUCTION_DELETED", codigoProduccion, LocalDateTime.now(), null);
+    }
 }
-
-
-

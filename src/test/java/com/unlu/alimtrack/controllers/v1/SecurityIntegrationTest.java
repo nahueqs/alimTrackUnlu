@@ -77,6 +77,7 @@ public class SecurityIntegrationTest {
                 });
     }
     
+    /*
     @Test
     void whenAccessingAuthRegister_thenReturns200() throws Exception {
         RegisterRequestDTO registerRequest = new RegisterRequestDTO("new@example.com", "password", "New User");
@@ -90,6 +91,7 @@ public class SecurityIntegrationTest {
                     }
                 });
     }
+    */
 
     @Test
     void whenAccessingAuthMeWithoutToken_thenReturns403() throws Exception {

@@ -71,4 +71,22 @@ public class NotificationServiceImpl implements NotificationService {
             log.error("Error al enviar notificación de cambio de estado global a {}: {}", destination, e.getMessage());
         }
     }
+
+    /**
+     * Notifica la eliminación de una producción.
+     * Envía el mensaje al tópico global /topic/produccion/deleted.
+     *
+     * @param message El mensaje con los detalles de la producción eliminada.
+     */
+    @Override
+    public void notifyProductionDeleted(ProductionUpdateMessage message) {
+        String destination = "/topic/produccion/deleted";
+        log.debug("Enviando notificación de eliminación de producción al tópico: {}", destination);
+        try {
+            messagingTemplate.convertAndSend(destination, message);
+            log.trace("Mensaje enviado a {}: {}", destination, message);
+        } catch (Exception e) {
+            log.error("Error al enviar notificación de eliminación de producción a {}: {}", destination, e.getMessage());
+        }
+    }
 }

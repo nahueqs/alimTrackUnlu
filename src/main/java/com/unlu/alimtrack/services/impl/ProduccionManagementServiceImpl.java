@@ -281,6 +281,9 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
         produccionRepository.delete(produccion);
         log.info("Producción {} eliminada exitosamente.", codigoProduccion);
+
+        produccionEventPublisher.publicarProduccionEliminada(this, codigoProduccion);
+        log.debug("Evento de producción eliminada publicado.");
     }
 
     private ProduccionModel buscarProduccionPorCodigo(String codigo) {

@@ -11,4 +11,7 @@ public interface NotificationService {
 
     // New method for notifying about production state changes globally (for list updates)
     void notifyProductionStateChangedGlobal(ProductionUpdateMessage message);
+
+    // Method for notifying about deleted productions (for list updates)
+    void notifyProductionDeleted(ProductionUpdateMessage message);
 }

@@ -49,6 +49,11 @@ public class ProduccionEventPublisher {
                 source, codigoProduccion, codigoVersionReceta, lote, fechaInicio, fechaFin));
     }
 
+    public void publicarProduccionEliminada(Object source, String codigoProduccion) {
+        log.debug("Publicando evento: Producción eliminada. Código: {}", codigoProduccion);
+        eventPublisher.publishEvent(new ProduccionEliminadaEvent(source, codigoProduccion));
+    }
+
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAfterCommit(RespuestaCampoGuardadaEvent event) {
         log.debug("Evento procesado después de commit: {}", event.getTipoEvento());

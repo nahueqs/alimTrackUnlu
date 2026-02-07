@@ -155,6 +155,21 @@ public class ProductionNotificationEventListener {
         }
     }
 
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleProduccionEliminada(ProduccionEliminadaEvent event) {
+        log.info("Procesando notificación WebSocket para PRODUCCIÓN ELIMINADA. Código: {}", event.getCodigoProduccion());
+
+        try {
+            ProductionUpdateMessage message = ProductionUpdateMessage.productionDeleted(event.getCodigoProduccion());
+            notificationService.notifyProductionDeleted(message);
+            log.debug("Notificación de eliminación enviada: {}", message);
+
+        } catch (Exception e) {
+            log.error("Error al procesar notificación de producción eliminada", e);
+        }
+    }
+
     // Método auxiliar para convertir valores de forma segura y consistente
     private String convertirValorAString(Object valor) {
         if (valor == null) {

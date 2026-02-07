@@ -69,4 +69,19 @@ class NotificationServiceTest {
         // Assert
         verify(messagingTemplate).convertAndSend(eq(expectedDestination), eq(message));
     }
+
+    @Test
+    void notifyProductionDeleted_ShouldSendToDeletedTopic() {
+        // Arrange
+        ProductionUpdateMessage message = new ProductionUpdateMessage(
+                "PRODUCTION_DELETED", "PROD-DEL", LocalDateTime.now(), null
+        );
+        String expectedDestination = "/topic/produccion/deleted";
+
+        // Act
+        notificationService.notifyProductionDeleted(message);
+
+        // Assert
+        verify(messagingTemplate).convertAndSend(eq(expectedDestination), eq(message));
+    }
 }

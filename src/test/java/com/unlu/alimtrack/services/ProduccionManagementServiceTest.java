@@ -51,7 +51,7 @@ class ProduccionManagementServiceTest {
     private ProduccionStateService produccionStateService;
     
     // Mocks adicionales necesarios para el constructor
-    @Mock private VersionRecetaEstructuraService versionRecetaEstructuraService;
+    @Mock private VersionRecetaService versionRecetaService; // Reemplazado VersionRecetaEstructuraService
     @Mock private VersionRecetaValidator versionRecetaValidator;
     @Mock private RespuestaCampoMapper respuestaCampoMapper;
     @Mock private RespuestaTablaMapper respuestaTablasMapper;

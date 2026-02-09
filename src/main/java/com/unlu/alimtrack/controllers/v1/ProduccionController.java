@@ -43,7 +43,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "200", description = "Lista de producciones recuperada exitosamente")
     })
     @GetMapping
-    public ResponseEntity<List<ProduccionMetadataResponseDTO>> getAllProduccionesMetadata(@ModelAttribute ProduccionFilterRequestDTO filtros) {
+    public ResponseEntity<List<ProduccionMetadataResponseDTO>> getAllProducciones(@ModelAttribute ProduccionFilterRequestDTO filtros) {
         log.info("Solicitud para obtener todas las producciones con filtros: {}", filtros);
         List<ProduccionMetadataResponseDTO> producciones = produccionQueryService.getAllProduccionesMetadata(filtros);
         log.debug("Retornando {} producciones", producciones.size());
@@ -57,7 +57,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción no encontrada")
     })
     @GetMapping("/{codigoProduccion}")
-    public ResponseEntity<ProduccionMetadataResponseDTO> getMetadataByCodigoProduccion(
+    public ResponseEntity<ProduccionMetadataResponseDTO> getProduccionByCodigo(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener la producción con código: {}", codigoProduccion);
         ProduccionMetadataResponseDTO produccion = produccionQueryService.findByCodigoProduccion(codigoProduccion);
@@ -74,7 +74,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "400", description = "Datos de creación inválidos")
     })
     @PostMapping()
-    public ResponseEntity<ProduccionMetadataResponseDTO> iniciarProduccion(@Valid @RequestBody ProduccionCreateDTO createDTO) {
+    public ResponseEntity<ProduccionMetadataResponseDTO> saveProduccion(@Valid @RequestBody ProduccionCreateDTO createDTO) {
         log.info("Solicitud para iniciar una nueva producción con código: {}", createDTO.codigoProduccion());
         ProduccionMetadataResponseDTO created = produccionManagementService.iniciarProduccion(createDTO);
         log.info("Producción {} iniciada exitosamente", created.codigoProduccion());
@@ -89,7 +89,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción o campo no encontrado")
     })
     @PutMapping("/{codigoProduccion}/campos/{idCampo}")
-    public ResponseEntity<RespuestaCampoResponseDTO> guardarRespuestaCampo(
+    public ResponseEntity<RespuestaCampoResponseDTO> updateRespuestaCampo(
             @PathVariable String codigoProduccion,
             @PathVariable Long idCampo,
             @Valid @RequestBody RespuestaCampoRequestDTO request) {
@@ -108,7 +108,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción, tabla, fila o columna no encontrada")
     })
     @PutMapping("/{codigoProduccion}/tablas/{idTabla}/{idFila}/{idColumna}")
-    public ResponseEntity<RespuestaCeldaTablaResponseDTO> guardarRespuestaCeldaTabla(
+    public ResponseEntity<RespuestaCeldaTablaResponseDTO> updateRespuestaTabla(
             @PathVariable String codigoProduccion,
             @PathVariable Long idTabla,
             @PathVariable Long idFila,
@@ -126,7 +126,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción no encontrada")
     })
     @GetMapping("/{codigoProduccion}/ultimas-respuestas")
-    public ResponseEntity<UltimasRespuestasProduccionResponseDTO> getUltimasRespuestas(
+    public ResponseEntity<UltimasRespuestasProduccionResponseDTO> getProduccionRespuestasByCodigo(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener el estado actual completo de la producción: {}", codigoProduccion);
         UltimasRespuestasProduccionResponseDTO estado = produccionManagementService.getUltimasRespuestas(codigoProduccion);
@@ -141,7 +141,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "403", description = "Operación no permitida (ej. usuario inactivo)")
     })
     @PutMapping("/{codigoProduccion}/cambiar-estado")
-    public ResponseEntity<Void> cambiarEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
+    public ResponseEntity<Void> updateProduccionEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
         log.info("Solicitud para cambiar el estado de la producción {} a {}", codigoProduccion, request.valor());
         produccionManagementService.updateEstado(codigoProduccion, request);
         log.info("Estado de la producción {} cambiado exitosamente a {}", codigoProduccion, request.valor());
@@ -154,7 +154,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción no encontrada")
     })
     @PutMapping("/{codigoProduccion}/metadata")
-    public ResponseEntity<Void> updateMetadata(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionMetadataModifyRequestDTO request) {
+    public ResponseEntity<Void> updateProduccionMetadata(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionMetadataModifyRequestDTO request) {
         log.info("Solicitud para cambiar la metadata de la producción {}", codigoProduccion);
         produccionManagementService.updateMetadata(codigoProduccion, request);
         log.info("Estado de la producción {} metadata cambiado exitosamente", codigoProduccion);
@@ -168,7 +168,7 @@ public class ProduccionController {
             @ApiResponse(responseCode = "404", description = "Producción no encontrada")
     })
     @GetMapping("/{codigoProduccion}/estado-actual")
-    public ResponseEntity<EstadoProduccionPublicoResponseDTO> getEstadoProduccion(
+    public ResponseEntity<EstadoProduccionPublicoResponseDTO> getProduccionEstadoPublico(
             @PathVariable String codigoProduccion) {
         log.info("Solicitud para obtener la información pública de la producción: {}", codigoProduccion);
         EstadoProduccionPublicoResponseDTO produccion = produccionQueryService.getEstadoProduccion(codigoProduccion);

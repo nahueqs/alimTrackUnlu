@@ -6,9 +6,9 @@ import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.*;
 import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.SeccionRepository;
+import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.SeccionManagementService;
 import com.unlu.alimtrack.services.UsuarioService;
-import com.unlu.alimtrack.services.VersionRecetaMetadataService;
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.SeccionValidator;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SeccionManagementServiceImpl implements SeccionManagementService {
 
-    private final VersionRecetaMetadataService versionRecetaMetadataService;
+    // Eliminada dependencia circular: private final VersionRecetaMetadataService versionRecetaMetadataService;
+    private final VersionRecetaRepository versionRecetaRepository;
     @Lazy
     private final VersionRecetaQueryService versionRecetaQueryService;
     private final SeccionRepository seccionRepository;
@@ -60,7 +61,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         validarPrecondicionesCreacion(codigoReceta, seccionDTO.emailCreador());
         seccionValidator.validarCreacionSeccion(codigoReceta, seccionDTO);
 
-        VersionRecetaModel versionRecetaPadre = versionRecetaMetadataService.findVersionModelByCodigo(codigoReceta);
+        VersionRecetaModel versionRecetaPadre = findVersionModelByCodigo(codigoReceta);
         UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(seccionDTO.emailCreador().trim());
 
         SeccionModel seccion = new SeccionModel();
@@ -165,7 +166,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     @Transactional(readOnly = true)
     public List<SeccionResponseDTO> obtenerSeccionesDTOCompletasPorVersion(String codigoVersion) {
         log.info("Obteniendo estructura completa de secciones para la versión: {}", codigoVersion);
-        VersionRecetaModel versionReceta = versionRecetaMetadataService.findVersionModelByCodigo(codigoVersion);
+        VersionRecetaModel versionReceta = findVersionModelByCodigo(codigoVersion);
         List<SeccionModel> seccionesCompletas = obtenerSeccionesCompletasPorVersion(versionReceta);
         return seccionMapperManual.toResponseDTOList(seccionesCompletas);
     }
@@ -220,5 +221,13 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
                 .flatMap(seccion -> seccion.tablas().stream())
                 .mapToInt(tabla -> tabla.filas().size() * tabla.columnas().size())
                 .sum();
+    }
+
+    private VersionRecetaModel findVersionModelByCodigo(String codigoVersionReceta) {
+        return versionRecetaRepository.findByCodigoVersionReceta(codigoVersionReceta)
+                .orElseThrow(() -> {
+                    log.error("Versión de receta no encontrada con código: {}", codigoVersionReceta);
+                    return new RecursoNoEncontradoException("No existe ninguna versión de receta con el código " + codigoVersionReceta);
+                });
     }
 }

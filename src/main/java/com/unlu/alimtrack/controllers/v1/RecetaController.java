@@ -47,7 +47,7 @@ public class RecetaController {
             @ApiResponse(responseCode = "404", description = "Receta no encontrada")
     })
     @GetMapping("/{codigoReceta}")
-    public ResponseEntity<RecetaMetadataResponseDTO> getReceta(@PathVariable String codigoReceta) {
+    public ResponseEntity<RecetaMetadataResponseDTO> getRecetaByCodigo(@PathVariable String codigoReceta) {
         log.info("Solicitud para obtener la receta con código: {}", codigoReceta);
         RecetaMetadataResponseDTO receta = recetaService.findReceta(codigoReceta);
         log.debug("Retornando receta: {}", receta.codigoReceta());
@@ -77,9 +77,9 @@ public class RecetaController {
             @ApiResponse(responseCode = "400", description = "Datos de creación inválidos")
     })
     @PostMapping()
-    public ResponseEntity<RecetaMetadataResponseDTO> addReceta(
+    public ResponseEntity<RecetaMetadataResponseDTO> saveReceta(
             @Valid @RequestBody RecetaCreateDTO receta) {
-        log.info("Solicitud para crear una nueva receta con código: {}");
+        log.info("Solicitud para crear una nueva receta con código: {}", receta.codigoReceta());
         RecetaMetadataResponseDTO created = recetaService.addReceta(receta);
         log.info("Receta creada exitosamente: {}", created.codigoReceta());
         return ResponseEntity.created(URI.create("/api/v1/recetas/" + created.codigoReceta()))

@@ -11,7 +11,7 @@ import com.unlu.alimtrack.mappers.PublicMapper;
 import com.unlu.alimtrack.services.ProduccionManagementService;
 import com.unlu.alimtrack.services.ProduccionQueryService;
 import com.unlu.alimtrack.services.PublicRequestsService;
-import com.unlu.alimtrack.services.VersionRecetaEstructuraService;
+import com.unlu.alimtrack.services.VersionRecetaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class PublicRequestsServiceImpl implements PublicRequestsService {
 
     private final ProduccionQueryService produccionQueryService;
     private final ProduccionManagementService produccionManagementService;
-    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
+    private final VersionRecetaService versionRecetaService;
     private final PublicMapper publicMapper;
 
     /**
@@ -92,6 +92,6 @@ public class PublicRequestsServiceImpl implements PublicRequestsService {
         ProduccionMetadataResponseDTO produccion = produccionQueryService.findByCodigoProduccion(codigoProduccion);
         log.debug("Producción {} utiliza versión de receta: {}", codigoProduccion, produccion.codigoVersion());
         
-        return versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(produccion.codigoVersion());
+        return versionRecetaService.getVersionRecetaCompletaResponseDTOByCodigo(produccion.codigoVersion());
     }
 }

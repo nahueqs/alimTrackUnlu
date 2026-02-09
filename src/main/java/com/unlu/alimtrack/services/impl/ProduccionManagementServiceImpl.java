@@ -46,7 +46,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
     private final ProduccionEventPublisher produccionEventPublisher;
     private final ProduccionRepository produccionRepository;
-    private final VersionRecetaEstructuraService versionRecetaEstructuraService;
+    private final VersionRecetaService versionRecetaService;
     private final UsuarioValidationService usuarioValidationService;
     private final ProductionManagerServiceValidator productionManagerServiceValidator;
     private final VersionRecetaValidator versionRecetaValidator;
@@ -212,7 +212,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
         ProduccionMetadataResponseDTO produccionMetadata = produccionMapper.modelToResponseDTO(produccion);
 
         String codigoVersion = produccion.getVersionReceta().getCodigoVersionReceta();
-        VersionEstructuraPublicResponseDTO estructura = versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
+        VersionEstructuraPublicResponseDTO estructura = versionRecetaService.getVersionRecetaCompletaResponseDTOByCodigo(codigoVersion);
 
         List<RespuestaCampoModel> respuestasCampos = respuestaCampoService.buscarTodasRespuestasPorProduccion(produccion);
         List<RespuestaTablaModel> respuestasTablas = respuestaTablaService.buscarTodasRespuestasPorProduccion(produccion);

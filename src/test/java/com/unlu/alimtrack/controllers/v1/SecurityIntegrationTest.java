@@ -5,6 +5,7 @@ import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.create.RecetaCreateDTO;
 import com.unlu.alimtrack.DTOS.create.UsuarioCreateDTO;
 import com.unlu.alimtrack.DTOS.create.VersionRecetaCreateDTO;
+import com.unlu.alimtrack.DTOS.create.VersionRecetaLlenaCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.RecetaModifyDTO;
@@ -266,8 +267,10 @@ public class SecurityIntegrationTest {
 
     @Test
     void whenAccessingRecetasVersionesPostWithoutToken_thenReturns403() throws Exception {
-        VersionRecetaCreateDTO createDTO = new VersionRecetaCreateDTO("REC-1", "VER-1", "Nombre", "Desc", "email@test.com");
-        mockMvc.perform(post("/api/v1/recetas/versiones-receta")
+        VersionRecetaLlenaCreateDTO createDTO = new VersionRecetaLlenaCreateDTO(
+                "REC-1", "VER-1", "Nombre", "Desc", "email@test.com", Collections.emptyList()
+        );
+        mockMvc.perform(post("/api/v1/recetas/REC-1/versiones-receta")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDTO)))
                 .andExpect(status().isForbidden());

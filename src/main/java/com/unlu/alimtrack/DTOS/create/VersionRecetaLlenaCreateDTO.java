@@ -28,7 +28,6 @@ public record VersionRecetaLlenaCreateDTO(
         @Schema(description = "email del creador de la producción", example = "JuanPerez1@mail.com")
         String emailCreador,
 
-
         @NotNull
         @UniqueElements(message = "Los títulos de las estructura deben ser únicos")
         List<SeccionCreateDTO> secciones

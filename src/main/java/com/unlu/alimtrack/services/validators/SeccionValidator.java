@@ -58,43 +58,4 @@ public class SeccionValidator {
         }
     }
 
-//    /**
-//     * Valida los parámetros para la actualización de una sección
-//     *
-//     * @param id           ID de la sección a actualizar
-//     * @param codigoReceta Versión de receta a la que pertenece la sección
-//     * @param seccionDTO   Datos actualizados de la sección
-//     * @throws ValidationException si la validación falla
-//     */
-//    public void validarActualizacionSeccion(Long id, String codigoReceta, SeccionResponseDTO seccionDTO) {
-//        if (id == null) {
-//            throw new ValidationException("El ID de la sección es obligatorio");
-//        }
-//
-//        validarCreacionSeccion(codigoReceta, seccionDTO);
-//
-//        // Validar que si se cambia el título, no exista otro con el mismo título en la misma versión
-//        seccionService.obtenerSeccionesPorVersion(versionReceta).stream()
-//                .filter(seccion -> !seccion.getIdSeccion().equals(id)) // Excluir la sección actual
-//                .filter(seccion -> seccion.getTitulo().equals(seccionDTO.getNombre()))
-//                .findFirst()
-//                .ifPresent(seccion -> {
-//                    throw new ValidationException(
-//                            String.format("Ya existe otra sección con el título '%s' en esta versión de receta",
-//                                    seccionDTO.getNombre())
-//                    );
-//                });
-//
-//        // Validar que si se cambia el orden, no exista otro con el mismo orden en la misma versión
-//        seccionService.obtenerSeccionesPorVersion(versionReceta).stream()
-//                .filter(seccion -> !seccion.getIdSeccion().equals(id)) // Excluir la sección actual
-//                .filter(seccion -> seccion.getOrden().equals(seccionDTO.getOrden()))
-//                .findFirst()
-//                .ifPresent(seccion -> {
-//                    throw new ValidationException(
-//                            String.format("Ya existe otra sección con el orden '%d' en esta versión de receta",
-//                                    seccionDTO.getOrden())
-//                    );
-//                });
-//    }
 }

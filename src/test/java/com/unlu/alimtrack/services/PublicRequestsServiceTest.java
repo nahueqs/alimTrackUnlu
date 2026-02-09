@@ -28,7 +28,7 @@ class PublicRequestsServiceTest {
 
     @Mock private ProduccionQueryService produccionQueryService;
     @Mock private ProduccionManagementService produccionManagementService;
-    @Mock private VersionRecetaEstructuraService versionRecetaEstructuraService;
+    @Mock private VersionRecetaService versionRecetaService; // Reemplazado VersionRecetaEstructuraService
     @Mock private PublicMapper publicMapper;
 
     @InjectMocks
@@ -102,7 +102,7 @@ class PublicRequestsServiceTest {
         );
 
         when(produccionQueryService.findByCodigoProduccion(codigo)).thenReturn(produccion);
-        when(versionRecetaEstructuraService.getVersionRecetaCompletaResponseDTOByCodigo(version)).thenReturn(estructura);
+        when(versionRecetaService.getVersionRecetaCompletaResponseDTOByCodigo(version)).thenReturn(estructura);
 
         VersionEstructuraPublicResponseDTO result = publicRequestsService.getEstructuraProduccion(codigo);
 

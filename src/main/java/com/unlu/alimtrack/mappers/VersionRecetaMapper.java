@@ -13,15 +13,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {SeccionMapperManual.class})
 public interface VersionRecetaMapper {
 
-    // --- Mapeo para Estructura Completa (Público) ---
-
-    @Mapping(target = "metadata", source = "version")
-    @Mapping(target = "estructura", source = "secciones")
-    @Mapping(target = "totalCampos", expression = "java(version.getSecciones().stream().mapToInt(seccion -> seccion.getCamposSimples().size() + seccion.getGruposCampos().stream().mapToInt(grupo -> grupo.getCampos().size()).sum()).sum())")
-    @Mapping(target = "totalCeldas", expression = "java(version.getSecciones().stream().flatMap(s -> s.getTablas().stream()).mapToInt(t -> t.getFilas().size() * t.getColumnas().size()).sum())")
-    VersionEstructuraPublicResponseDTO toEstructuraDTO(VersionRecetaModel version);
-
-    List<VersionEstructuraPublicResponseDTO> toEstructuraDTOList(List<VersionRecetaModel> versions);
 
     // --- Mapeo para Metadatos Públicos ---
 

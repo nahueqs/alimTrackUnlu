@@ -62,7 +62,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Datos de usuario inválidos")
     })
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> addUsuario(@Valid @RequestBody UsuarioCreateDTO usuario) {
+    public ResponseEntity<UsuarioResponseDTO> saveUsuario(@Valid @RequestBody UsuarioCreateDTO usuario) {
         log.info("Solicitud para crear un nuevo usuario con email: {}", usuario.email());
         UsuarioResponseDTO saved = usuarioService.addUsuario(usuario);
         log.info("Usuario creado exitosamente con email: {}", saved.email());
@@ -76,7 +76,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Datos de modificación inválidos")
     })
     @PutMapping("/{email}")
-    public ResponseEntity<Void> modifyUsuario(@PathVariable String email,
+    public ResponseEntity<Void> updateUsuario(@PathVariable String email,
                                               @Valid @RequestBody UsuarioModifyDTO modificacion) {
         log.info("Solicitud para modificar el usuario con email: {}", email);
         usuarioService.modifyUsuario(email, modificacion);

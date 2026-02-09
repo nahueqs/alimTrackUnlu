@@ -8,6 +8,7 @@ import com.unlu.alimtrack.models.SeccionModel;
 import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.models.VersionRecetaModel;
 import com.unlu.alimtrack.repositories.SeccionRepository;
+import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.impl.SeccionManagementServiceImpl;
 import com.unlu.alimtrack.services.validators.SeccionValidator;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SeccionManagementServiceTest {
 
-    @Mock private VersionRecetaMetadataService versionRecetaMetadataService;
+    @Mock private VersionRecetaRepository versionRecetaRepository;
     @Mock private VersionRecetaQueryService versionRecetaQueryService;
     @Mock private SeccionRepository seccionRepository;
     @Mock private SeccionValidator seccionValidator;
@@ -56,7 +58,7 @@ class SeccionManagementServiceTest {
 
         when(versionRecetaQueryService.existsByCodigoVersion(codigoReceta)).thenReturn(true);
         when(usuarioService.existsByEmail("user@test.com")).thenReturn(true);
-        when(versionRecetaMetadataService.findVersionModelByCodigo(codigoReceta)).thenReturn(version);
+        when(versionRecetaRepository.findByCodigoVersionReceta(codigoReceta)).thenReturn(Optional.of(version));
         when(usuarioService.getUsuarioModelByEmail("user@test.com")).thenReturn(usuario);
         when(seccionRepository.save(any(SeccionModel.class))).thenReturn(seccionGuardada);
 
@@ -93,7 +95,7 @@ class SeccionManagementServiceTest {
                 1L, "VER-1", "Titulo", 1, Collections.emptyList(), Collections.emptyList(), Collections.emptyList()
         );
 
-        when(versionRecetaMetadataService.findVersionModelByCodigo(codigo)).thenReturn(version);
+        when(versionRecetaRepository.findByCodigoVersionReceta(codigo)).thenReturn(Optional.of(version));
         when(seccionRepository.findSeccionesBasicas(version)).thenReturn(List.of(seccion));
         when(seccionMapperManual.toResponseDTOList(any())).thenReturn(List.of(dto));
 

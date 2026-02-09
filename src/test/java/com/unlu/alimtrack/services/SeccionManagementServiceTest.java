@@ -47,8 +47,9 @@ class SeccionManagementServiceTest {
     void crearSeccion_ShouldSave_WhenValid() {
         // Arrange
         String codigoReceta = "VER-1";
+        // Corregido: Eliminado argumento "TIPO" que ya no existe en el DTO
         SeccionCreateDTO dto = new SeccionCreateDTO(
-                codigoReceta, "user@test.com", "Titulo", "TIPO", 1, null, null, null
+                codigoReceta, "user@test.com", "Titulo", 1, null, null, null
         );
         
         VersionRecetaModel version = new VersionRecetaModel();
@@ -75,8 +76,9 @@ class SeccionManagementServiceTest {
     @Test
     void crearSeccion_ShouldThrow_WhenVersionNotFound() {
         String codigoReceta = "VER-INEXISTENTE";
+        // Corregido: Eliminado argumento "TIPO" que ya no existe en el DTO
         SeccionCreateDTO dto = new SeccionCreateDTO(
-                codigoReceta, "u", "T", "TIPO", 1, null, null, null
+                codigoReceta, "u", "T", 1, null, null, null
         );
         
         when(versionRecetaQueryService.existsByCodigoVersion(codigoReceta)).thenReturn(false);

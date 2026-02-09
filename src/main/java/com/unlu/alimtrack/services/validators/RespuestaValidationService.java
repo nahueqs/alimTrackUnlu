@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException;
 @Service
 public class RespuestaValidationService {
 
-    private static final int MAX_LONGITUD_TEXTO = 1000;
+    private static final int MAX_LONGITUD_TEXTO = 255;
     private static final BigDecimal MAX_VALOR_NUMERICO = new BigDecimal("999999999999.99");
     private static final BigDecimal MIN_VALOR_NUMERICO = new BigDecimal("-999999999999.99");
     private static final DateTimeFormatter FECHA_FORMATTER =

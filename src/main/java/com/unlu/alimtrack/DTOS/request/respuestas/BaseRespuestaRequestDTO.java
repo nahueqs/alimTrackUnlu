@@ -19,6 +19,7 @@ public abstract class BaseRespuestaRequestDTO {
 
     // Campos comunes para todos los tipos de respuesta
     private String valorTexto;
+
     private BigDecimal valorNumerico;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

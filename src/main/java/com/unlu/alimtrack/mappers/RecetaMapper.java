@@ -11,17 +11,16 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(uses = UsuarioMapper.class, componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RecetaMapper {
 
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     RecetaMetadataResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);
 
-    @Mapping(target = "creadoPor.email", source = "emailCreador")
+    @Mapping(target = "creadoPor", ignore = true) // Se asigna manualmente en el servicio
     RecetaModel recetaCreateDTOtoModel(RecetaCreateDTO receta);
 
     void updateModelFromModifyDTO(RecetaModifyDTO dto, @MappingTarget RecetaModel model);
 
     List<RecetaMetadataResponseDTO> recetaModelsToRecetaResponseDTOs(List<RecetaModel> recetas);
-
 }

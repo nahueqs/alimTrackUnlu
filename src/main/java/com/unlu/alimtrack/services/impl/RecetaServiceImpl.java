@@ -9,6 +9,7 @@ import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import com.unlu.alimtrack.services.RecetaQueryService;
 import com.unlu.alimtrack.services.RecetaService;
@@ -110,6 +111,11 @@ public class RecetaServiceImpl implements RecetaService {
         try {
             verificarCreacionValida(receta.codigoReceta(), receta);
             RecetaModel model = crearModelByCreateDTO(receta);
+            
+            // Asignar el usuario creador explícitamente
+            UsuarioModel creador = usuarioService.getUsuarioModelByEmail(receta.emailCreador());
+            model.setCreadoPor(creador);
+            
             recetaRepository.save(model);
             log.info("Receta {} creada y guardada exitosamente.", model.getCodigoReceta());
             return recetaMapper.recetaModeltoRecetaResponseDTO(model);

@@ -74,7 +74,8 @@ public class SeccionMapperManual {
                 idGrupo,
                 campo.getNombre(),
                 tipoDato != null ? tipoDato.getValue() : null,
-                campo.getOrden()
+                campo.getOrden(),
+                campo.getDescripcion()
         );
     }
 
@@ -102,7 +103,8 @@ public class SeccionMapperManual {
                                 grupo.getId(),
                                 campo.getNombre(),
                                 campo.getTipoDato() != null ? campo.getTipoDato().getValue() : null,
-                                campo.getOrden()
+                                campo.getOrden(),
+                                campo.getDescripcion()
                         ))
                         .collect(Collectors.toList()) : List.of();
 

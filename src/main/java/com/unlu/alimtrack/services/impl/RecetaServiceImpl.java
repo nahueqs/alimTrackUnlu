@@ -55,7 +55,7 @@ public class RecetaServiceImpl implements RecetaService {
             recetaValidator.validateModelList(recetas);
         }
         
-        log.debug("Retornando {} recetas.", recetas.size());
+        log.info("Retornando {} recetas.", recetas.size());
         return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);
     }
 
@@ -72,7 +72,7 @@ public class RecetaServiceImpl implements RecetaService {
         log.info("Buscando receta con código: {}", codigoReceta);
         recetaValidator.validateCodigoReceta(codigoReceta);
         RecetaModel model = findRecetaModelByCodigoReceta(codigoReceta);
-        log.debug("Receta {} encontrada. Mapeando a DTO.", codigoReceta);
+        log.info("Receta {} encontrada. Mapeando a DTO.", codigoReceta);
         return recetaMapper.recetaModeltoRecetaResponseDTO(model);
     }
 
@@ -116,9 +116,11 @@ public class RecetaServiceImpl implements RecetaService {
             // Asignar el usuario creador explícitamente
             UsuarioModel creador = usuarioService.getUsuarioModelByEmail(receta.emailCreador());
             model.setCreadoPor(creador);
+            
+            // Asignar fecha de creación
             model.setFechaCreacion(LocalDateTime.now());
+            
             recetaRepository.save(model);
-
             log.info("Receta {} creada y guardada exitosamente.", model.getCodigoReceta());
             return recetaMapper.recetaModeltoRecetaResponseDTO(model);
         } catch (Exception e) {
@@ -197,7 +199,7 @@ public class RecetaServiceImpl implements RecetaService {
         if (recetas.isEmpty()) {
             log.info("No se encontraron recetas para el usuario {}", email);
         } else {
-            log.debug("Encontradas {} recetas para el usuario {}", recetas.size(), email);
+            log.info("Encontradas {} recetas para el usuario {}", recetas.size(), email);
         }
         
         return recetaMapper.recetaModelsToRecetaResponseDTOs(recetas);

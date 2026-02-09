@@ -45,4 +45,7 @@ public class CampoSimpleModel {
     @Column(name = "orden")
     private Integer orden;
 
+    @Column(name = "descripcion", length = 500)
+    private String descripcion;
+
 }

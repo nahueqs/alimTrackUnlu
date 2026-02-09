@@ -17,7 +17,9 @@ public interface RecetaMapper {
     @Mapping(target = "creadaPor", source = "creadoPor.nombre")
     RecetaMetadataResponseDTO recetaModeltoRecetaResponseDTO(RecetaModel receta);
 
-    @Mapping(target = "creadoPor", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "versiones", ignore = true)
+    @Mapping(target = "creadoPor", ignore = true) // Se asigna manualmente en el servicio
     @Mapping(target = "fechaCreacion", ignore = true)
     RecetaModel recetaCreateDTOtoModel(RecetaCreateDTO receta);
 

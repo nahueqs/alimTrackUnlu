@@ -19,7 +19,9 @@ public record CampoSimpleResponseDTO(
         String tipoDato,
 
         @NotNull
-        Integer orden
+        Integer orden,
+
+        String descripcion
 ) {
 
 }

@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
             throw new RecursoNoEncontradoException("No se encontraron versiones de recetas.");
         }
         
-        log.debug("Retornando {} versiones de recetas.", versiones.size());
+        log.info("Retornando {} versiones de recetas.", versiones.size());
         return versionRecetaMapper.toMetadataResponseDTOList(versiones);
     }
 
@@ -63,7 +64,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
     public VersionMetadataResponseDTO findByCodigoVersion(String codigoVersion) {
         log.info("Buscando versión de receta con código: {}", codigoVersion);
         VersionRecetaModel model = findVersionModelByCodigo(codigoVersion);
-        log.debug("Versión de receta {} encontrada. Mapeando a DTO.", codigoVersion);
+        log.info("Versión de receta {} encontrada. Mapeando a DTO.", codigoVersion);
         return versionRecetaMapper.toMetadataResponseDTO(model);
     }
 
@@ -78,7 +79,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
             throw new RecursoNoEncontradoException("No se encontraron versiones para la receta con código " + codigoRecetaPadre);
         }
         
-        log.debug("Retornando {} versiones para la receta {}", versiones.size(), codigoRecetaPadre);
+        log.info("Retornando {} versiones para la receta {}", versiones.size(), codigoRecetaPadre);
         return versionRecetaMapper.toMetadataResponseDTOList(versiones);
     }
 
@@ -95,6 +96,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
         
         versionModel.setRecetaPadre(recetaPadre);
         versionModel.setCreadoPor(creador);
+        versionModel.setFechaCreacion(LocalDateTime.now());
 
         VersionRecetaModel versionGuardada = versionRecetaRepository.save(versionModel);
         log.info("Versión de receta {} creada y guardada exitosamente con ID: {}", versionGuardada.getCodigoVersionReceta(), versionGuardada.getId());
@@ -123,15 +125,18 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
 
         versionModel.setRecetaPadre(recetaPadre);
         versionModel.setCreadoPor(creador);
+        versionModel.setFechaCreacion(LocalDateTime.now());
 
         VersionRecetaModel versionGuardada = versionRecetaRepository.save(versionModel);
         log.info("Metadata de versión {} guardada. Procediendo a crear estructura.", versionGuardada.getCodigoVersionReceta());
 
         if (dto.secciones() != null && !dto.secciones().isEmpty()) {
-            log.debug("Procesando {} secciones para la versión {}", dto.secciones().size(), dto.codigoVersionReceta());
+            log.info("Procesando {} secciones para la versión {}", dto.secciones().size(), dto.codigoVersionReceta());
             dto.secciones().forEach(seccionDTO -> {
                 seccionManagementService.crearSeccion(versionGuardada.getCodigoVersionReceta(), seccionDTO);
             });
+        } else {
+            log.warn("La versión {} se creó sin secciones.", dto.codigoVersionReceta());
         }
 
         log.info("Versión completa {} creada exitosamente.", versionGuardada.getCodigoVersionReceta());
@@ -193,12 +198,12 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
 
         // 2. Obtener estructura detallada (secciones)
         List<SeccionResponseDTO> seccionesCompletas = seccionManagementService.obtenerSeccionesDTOCompletasPorVersion(codigoVersion);
-        log.debug("Secciones recuperadas: {}", seccionesCompletas.size());
+        log.info("Secciones recuperadas: {}", seccionesCompletas.size());
 
         // 3. Calcular totales
         Integer totalCampos = seccionManagementService.getCantidadCampos(seccionesCompletas);
         Integer totalCeldas = seccionManagementService.getCantidadCeldasTablas(seccionesCompletas);
-        log.debug("Totales calculados - Campos: {}, Celdas: {}", totalCampos, totalCeldas);
+        log.info("Totales calculados - Campos: {}, Celdas: {}", totalCampos, totalCeldas);
 
         log.info("Estructura completa de versión {} construida exitosamente.", codigoVersion);
 

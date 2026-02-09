@@ -1,5 +1,6 @@
 package com.unlu.alimtrack.DTOS.create.secciones;
 
+import com.unlu.alimtrack.services.validators.annotations.ValidTableStructure;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -7,6 +8,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 import java.util.List;
 import java.util.Objects;
 
+@ValidTableStructure
 public record TablaCreateDTO(
         @NotNull
         @Size(min = 2, max = 255)

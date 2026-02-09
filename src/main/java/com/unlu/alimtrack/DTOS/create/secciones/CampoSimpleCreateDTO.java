@@ -17,7 +17,10 @@ public record CampoSimpleCreateDTO(
         Integer idGrupo,
 
         @NotNull
-        Integer orden
+        Integer orden,
+
+        @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
+        String descripcion
 ) {
     @Override
     public boolean equals(Object o) {

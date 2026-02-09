@@ -21,7 +21,7 @@ public record VersionRecetaLlenaCreateDTO(
         @Size(min = 2, max = 255, message = "El nombre debe tener entre 2 y 255 caracteres")
         String nombre,
 
-        @Size(min = 2, max = 255, message = "El nombre debe tener entre 2 y 255 caracteres")
+        @Size(max = 255, message = "El nombre debe tener entre 2 y 255 caracteres")
         String descripcion,
 
         @NotNull @Size(min = 1, max = 50)

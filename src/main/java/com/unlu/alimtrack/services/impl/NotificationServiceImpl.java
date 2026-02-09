@@ -4,6 +4,7 @@ import com.unlu.alimtrack.DTOS.websocket.ProductionUpdateMessage;
 import com.unlu.alimtrack.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param message El mensaje con los detalles de la actualización.
      */
+    @Async
     @Override
     public void notifyProductionUpdate(ProductionUpdateMessage message) {
         String destination = "/topic/produccion/" + message.codigoProduccion();
@@ -42,6 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param message El mensaje con los detalles de la nueva producción.
      */
+    @Async
     @Override
     public void notifyProductionCreated(ProductionUpdateMessage message) {
         String destination = "/topic/produccion/created";
@@ -60,6 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param message El mensaje con los detalles del cambio de estado.
      */
+    @Async
     @Override
     public void notifyProductionStateChangedGlobal(ProductionUpdateMessage message) {
         String destination = "/topic/producciones/state-changed";
@@ -78,6 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
      *
      * @param message El mensaje con los detalles de la producción eliminada.
      */
+    @Async
     @Override
     public void notifyProductionDeleted(ProductionUpdateMessage message) {
         String destination = "/topic/produccion/deleted";

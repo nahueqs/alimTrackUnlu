@@ -38,7 +38,7 @@ public class SeccionModel {
     private VersionRecetaModel versionRecetaPadre;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT) // Assuming RESTRICT is desired for FK
+    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "creado_por", referencedColumnName = "id_usuario", nullable = false)
     private UsuarioModel creadoPor;
 

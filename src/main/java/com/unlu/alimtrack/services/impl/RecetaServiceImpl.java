@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -115,8 +116,9 @@ public class RecetaServiceImpl implements RecetaService {
             // Asignar el usuario creador explícitamente
             UsuarioModel creador = usuarioService.getUsuarioModelByEmail(receta.emailCreador());
             model.setCreadoPor(creador);
-            
+            model.setFechaCreacion(LocalDateTime.now());
             recetaRepository.save(model);
+
             log.info("Receta {} creada y guardada exitosamente.", model.getCodigoReceta());
             return recetaMapper.recetaModeltoRecetaResponseDTO(model);
         } catch (Exception e) {

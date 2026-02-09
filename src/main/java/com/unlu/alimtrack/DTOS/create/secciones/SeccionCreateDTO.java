@@ -27,10 +27,6 @@ public record SeccionCreateDTO(
         @NotNull
         String titulo,
 
-        @NotBlank(message = "El tipo de la sección es obligatorio")
-        @NotNull
-        String tipo,
-
         @NotBlank(message = "El orden de la sección es obligatorio")
         @NotNull
         Integer orden,

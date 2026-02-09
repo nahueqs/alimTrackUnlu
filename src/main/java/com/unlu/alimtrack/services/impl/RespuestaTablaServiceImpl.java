@@ -205,6 +205,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
         log.debug("No existe respuesta previa. Creando nueva.");
         RespuestaTablaModel nuevaRespuesta = new RespuestaTablaModel();
         nuevaRespuesta.setProduccion(produccion);
+        nuevaRespuesta.setTabla(tabla); // Asignación de la tabla corregida
         nuevaRespuesta.setFila(fila);
         nuevaRespuesta.setColumna(columna);
         nuevaRespuesta.setCreadoPor(usuario);

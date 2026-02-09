@@ -15,6 +15,7 @@ import com.unlu.alimtrack.repositories.ProduccionRepository;
 import com.unlu.alimtrack.repositories.RespuestaCampoRepository;
 import com.unlu.alimtrack.services.RespuestaCampoService;
 import com.unlu.alimtrack.services.UsuarioService;
+import com.unlu.alimtrack.services.UsuarioValidationService;
 import com.unlu.alimtrack.services.base.BaseRespuestaService;
 import com.unlu.alimtrack.services.validators.RespuestaValidationService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
     private final ProduccionRepository produccionRepository;
     private final CampoSimpleRepository campoSimpleRepository;
     private final UsuarioService usuarioService;
+    private final UsuarioValidationService usuarioValidationService;
     private final RespuestaCampoMapper respuestaCampoMapper;
 
     // Constructor que llama al constructor padre
@@ -48,6 +50,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
             ProduccionRepository produccionRepository,
             CampoSimpleRepository campoSimpleRepository,
             UsuarioService usuarioService,
+            UsuarioValidationService usuarioValidationService,
             RespuestaCampoMapper respuestaCampoMapper) {
 
         // LLAMAR AL CONSTRUCTOR PADRE
@@ -57,6 +60,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         this.produccionRepository = produccionRepository;
         this.campoSimpleRepository = campoSimpleRepository;
         this.usuarioService = usuarioService;
+        this.usuarioValidationService = usuarioValidationService;
         this.respuestaCampoMapper = respuestaCampoMapper;
     }
 
@@ -83,7 +87,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         CampoSimpleModel campo = obtenerCampo(idCampo);
         TipoDatoCampo tipoCampo = campo.getTipoDato();
 
-        // 3. Obtener usuario
+        // 3. Obtener usuario validado
         UsuarioModel usuario = obtenerUsuario(request.getEmailCreador());
 
         // 4. Buscar producción
@@ -124,7 +128,7 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
         log.info("Iniciando vaciado de respuesta para campo ID: {} en producción: {}", idCampo, codigoProduccion);
 
         try {
-            // 1. Obtener usuario (para validar existencia)
+            // 1. Obtener usuario validado
             obtenerUsuario(emailUsuario);
 
             // 2. Buscar producción
@@ -249,7 +253,8 @@ public class RespuestaCampoServiceImpl extends BaseRespuestaService<RespuestaCam
     }
 
     private UsuarioModel obtenerUsuario(String email) {
-        return usuarioService.getUsuarioModelByEmail(email);
+        // Usar el servicio de validación para asegurar que el usuario existe, está activo y es el autenticado
+        return usuarioValidationService.validarUsuarioAutorizado(email);
     }
 
     private ProduccionModel buscarProduccion(String codigoProduccion) {

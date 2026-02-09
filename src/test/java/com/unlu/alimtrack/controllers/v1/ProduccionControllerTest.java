@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unlu.alimtrack.DTOS.create.ProduccionCreateDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionCambioEstadoRequestDTO;
 import com.unlu.alimtrack.DTOS.modify.ProduccionMetadataModifyRequestDTO;
+import com.unlu.alimtrack.DTOS.request.ProduccionFilterRequestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaCampoRequestDTO;
 import com.unlu.alimtrack.DTOS.request.respuestas.RespuestaTablaRequestDTO;
 import com.unlu.alimtrack.DTOS.response.Produccion.protegido.ProduccionMetadataResponseDTO;
@@ -238,25 +239,39 @@ public class ProduccionControllerTest {
     }
 
     @Test
-    void cambiarEstado_ShouldReturnNoContent() throws Exception {
+    void cambiarEstado_ShouldReturnOk() throws Exception {
         ProduccionCambioEstadoRequestDTO request = new ProduccionCambioEstadoRequestDTO(TipoEstadoProduccion.FINALIZADA.toString(), "test@test.com");
-        doNothing().when(produccionManagementService).updateEstado(eq("PROD-1"), any(ProduccionCambioEstadoRequestDTO.class));
+        ProduccionMetadataResponseDTO response = new ProduccionMetadataResponseDTO(
+                "PROD-1", "VER-1", "Encargado", "email", "Lote", "FINALIZADA",
+                LocalDateTime.now(), LocalDateTime.now(), null, "Obs"
+        );
+        
+        when(produccionManagementService.updateEstado(eq("PROD-1"), any(ProduccionCambioEstadoRequestDTO.class)))
+                .thenReturn(response);
 
         mockMvc.perform(put("/api/v1/producciones/PROD-1/cambiar-estado")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("FINALIZADA"));
     }
 
     @Test
-    void updateMetadata_ShouldReturnNoContent() throws Exception {
+    void updateMetadata_ShouldReturnOk() throws Exception {
         ProduccionMetadataModifyRequestDTO request = new ProduccionMetadataModifyRequestDTO("Lote", "Encargado", "Obs");
-        doNothing().when(produccionManagementService).updateMetadata(eq("PROD-1"), any(ProduccionMetadataModifyRequestDTO.class));
+        ProduccionMetadataResponseDTO response = new ProduccionMetadataResponseDTO(
+                "PROD-1", "VER-1", "Encargado", "email", "Lote", "EN_PROCESO",
+                LocalDateTime.now(), null, null, "Obs"
+        );
+        
+        when(produccionManagementService.updateMetadata(eq("PROD-1"), any(ProduccionMetadataModifyRequestDTO.class)))
+                .thenReturn(response);
 
         mockMvc.perform(put("/api/v1/producciones/PROD-1/metadata")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lote").value("Lote"));
     }
 
     @Test

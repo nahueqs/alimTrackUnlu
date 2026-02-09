@@ -14,6 +14,7 @@ import com.unlu.alimtrack.repositories.RecetaRepository;
 import com.unlu.alimtrack.services.RecetaQueryService;
 import com.unlu.alimtrack.services.RecetaService;
 import com.unlu.alimtrack.services.UsuarioService;
+import com.unlu.alimtrack.services.UsuarioValidationService;
 import com.unlu.alimtrack.services.validators.RecetaValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class RecetaServiceImpl implements RecetaService {
     private final RecetaValidator recetaValidator;
     private final RecetaQueryService recetaQueryService;
     private final UsuarioService usuarioService;
+    private final UsuarioValidationService usuarioValidationService;
 
     /**
      * Obtiene todas las recetas registradas en el sistema.
@@ -113,8 +115,8 @@ public class RecetaServiceImpl implements RecetaService {
             verificarCreacionValida(receta.codigoReceta(), receta);
             RecetaModel model = crearModelByCreateDTO(receta);
             
-            // Asignar el usuario creador explícitamente
-            UsuarioModel creador = usuarioService.getUsuarioModelByEmail(receta.emailCreador());
+            // Asignar el usuario creador explícitamente usando el servicio de validación
+            UsuarioModel creador = usuarioValidationService.validarUsuarioAutorizado(receta.emailCreador());
             model.setCreadoPor(creador);
             
             // Asignar fecha de creación
@@ -214,7 +216,7 @@ public class RecetaServiceImpl implements RecetaService {
         log.debug("Validando datos para creación de receta {}", codigoReceta);
         verificarConsistenciaCodigoReceta(codigoReceta, recetaCreateDTO.codigoReceta());
         verificarUnicidadCodigoReceta(recetaCreateDTO.codigoReceta());
-        verificarUsuarioExiste(recetaCreateDTO.emailCreador());
+        // La validación del usuario se hace ahora en addReceta con usuarioValidationService
         log.debug("Validaciones exitosas para receta {}", codigoReceta);
     }
 
@@ -229,18 +231,6 @@ public class RecetaServiceImpl implements RecetaService {
         if (recetaRepository.existsByCodigoReceta(codigoReceta)) {
             log.warn("Intento de crear receta duplicada: {}", codigoReceta);
             throw new RecursoDuplicadoException("Ya existe una receta con el código: " + codigoReceta);
-        }
-    }
-
-    private void verificarUsuarioExiste(String email) {
-        if (!usuarioService.existsByEmail(email)) {
-            log.warn("Intento de crear receta con usuario inexistente: {}", email);
-            throw new OperacionNoPermitida("El usuario creador especificado no existe: " + email);
-        }
-
-        if (!usuarioService.estaActivoByEmail(email)) {
-            log.warn("Intento de crear receta con usuario inactivo: {}", email);
-            throw new OperacionNoPermitida("El usuario creador especificado no está activo: " + email);
         }
     }
 

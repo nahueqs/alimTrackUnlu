@@ -35,6 +35,7 @@ class RespuestaCampoServiceTest {
     @Mock private ProduccionRepository produccionRepository;
     @Mock private CampoSimpleRepository campoSimpleRepository;
     @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioValidationService usuarioValidationService;
     @Mock private RespuestaCampoMapper respuestaCampoMapper;
     @Mock private RespuestaValidationService validationService;
 
@@ -64,7 +65,7 @@ class RespuestaCampoServiceTest {
         RespuestaCampoResponseDTO responseDTO = RespuestaCampoResponseDTO.builder().valor("valor").build();
 
         when(campoSimpleRepository.findById(idCampo)).thenReturn(Optional.of(campo));
-        when(usuarioService.getUsuarioModelByEmail("user@test.com")).thenReturn(usuario);
+        when(usuarioValidationService.validarUsuarioAutorizado("user@test.com")).thenReturn(usuario);
         when(produccionRepository.findByCodigoProduccion(codigo)).thenReturn(Optional.of(produccion));
         when(respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(produccion, campo))
                 .thenReturn(Optional.empty()); // No existe previa
@@ -107,7 +108,7 @@ class RespuestaCampoServiceTest {
         campo.setTipoDato(TipoDatoCampo.TEXTO);
 
         when(campoSimpleRepository.findById(idCampo)).thenReturn(Optional.of(campo));
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(codigo)).thenReturn(Optional.of(new ProduccionModel()));
         when(respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(any(), any()))
                 .thenReturn(Optional.empty());
@@ -139,7 +140,7 @@ class RespuestaCampoServiceTest {
 
         // Mocks necesarios para que el flujo llegue a la validación
         when(campoSimpleRepository.findById(idCampo)).thenReturn(Optional.of(campo));
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(codigo)).thenReturn(Optional.of(new ProduccionModel()));
         when(respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(any(), any()))
                 .thenReturn(Optional.empty());
@@ -168,7 +169,7 @@ class RespuestaCampoServiceTest {
         campo.setTipoDato(TipoDatoCampo.BOOLEANO);
 
         when(campoSimpleRepository.findById(idCampo)).thenReturn(Optional.of(campo));
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(any())).thenReturn(Optional.of(new ProduccionModel()));
         when(respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(any(), any()))
                 .thenReturn(Optional.empty());
@@ -198,7 +199,7 @@ class RespuestaCampoServiceTest {
         campo.setTipoDato(TipoDatoCampo.FECHA);
 
         when(campoSimpleRepository.findById(idCampo)).thenReturn(Optional.of(campo));
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(any())).thenReturn(Optional.of(new ProduccionModel()));
         when(respuestaCampoRepository.findTopByIdProduccionAndIdCampoOrderByTimestampDesc(any(), any()))
                 .thenReturn(Optional.empty());

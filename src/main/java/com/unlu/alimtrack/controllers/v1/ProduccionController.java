@@ -136,29 +136,31 @@ public class ProduccionController {
 
     @Operation(summary = "Cambiar estado", description = "Actualiza el estado de la producción (ej. EN_PROCESO a FINALIZADA)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Estado cambiado exitosamente"),
+            @ApiResponse(responseCode = "200", description = "Estado cambiado exitosamente",
+                    content = @Content(schema = @Schema(implementation = ProduccionMetadataResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Transición de estado inválida"),
             @ApiResponse(responseCode = "403", description = "Operación no permitida (ej. usuario inactivo)")
     })
     @PutMapping("/{codigoProduccion}/cambiar-estado")
-    public ResponseEntity<Void> updateProduccionEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
+    public ResponseEntity<ProduccionMetadataResponseDTO> updateProduccionEstado(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionCambioEstadoRequestDTO request) {
         log.info("Solicitud para cambiar el estado de la producción {} a {}", codigoProduccion, request.valor());
-        produccionManagementService.updateEstado(codigoProduccion, request);
+        ProduccionMetadataResponseDTO updated = produccionManagementService.updateEstado(codigoProduccion, request);
         log.info("Estado de la producción {} cambiado exitosamente a {}", codigoProduccion, request.valor());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(updated);
     }
 
     @Operation(summary = "Actualizar metadata", description = "Modifica datos básicos como lote, encargado u observaciones")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Metadata actualizada exitosamente"),
+            @ApiResponse(responseCode = "200", description = "Metadata actualizada exitosamente",
+                    content = @Content(schema = @Schema(implementation = ProduccionMetadataResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "Producción no encontrada")
     })
     @PutMapping("/{codigoProduccion}/metadata")
-    public ResponseEntity<Void> updateProduccionMetadata(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionMetadataModifyRequestDTO request) {
+    public ResponseEntity<ProduccionMetadataResponseDTO> updateProduccionMetadata(@PathVariable String codigoProduccion, @Valid @RequestBody ProduccionMetadataModifyRequestDTO request) {
         log.info("Solicitud para cambiar la metadata de la producción {}", codigoProduccion);
-        produccionManagementService.updateMetadata(codigoProduccion, request);
+        ProduccionMetadataResponseDTO updated = produccionManagementService.updateMetadata(codigoProduccion, request);
         log.info("Estado de la producción {} metadata cambiado exitosamente", codigoProduccion);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(updated);
     }
 
     @Operation(summary = "Obtener estado público", description = "Devuelve información resumida y pública de la producción")

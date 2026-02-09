@@ -9,6 +9,7 @@ import com.unlu.alimtrack.repositories.SeccionRepository;
 import com.unlu.alimtrack.repositories.VersionRecetaRepository;
 import com.unlu.alimtrack.services.SeccionManagementService;
 import com.unlu.alimtrack.services.UsuarioService;
+import com.unlu.alimtrack.services.UsuarioValidationService;
 import com.unlu.alimtrack.services.VersionRecetaQueryService;
 import com.unlu.alimtrack.services.validators.SeccionValidator;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
     private final SeccionRepository seccionRepository;
     private final SeccionValidator seccionValidator;
     private final UsuarioService usuarioService;
+    private final UsuarioValidationService usuarioValidationService;
     private final SeccionMapperManual seccionMapperManual;
     private final CampoSimpleMapper campoSimpleMapper;
     private final GrupoCamposMapper grupoCamposMapper;
@@ -62,7 +64,8 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
         seccionValidator.validarCreacionSeccion(codigoReceta, seccionDTO);
 
         VersionRecetaModel versionRecetaPadre = findVersionModelByCodigo(codigoReceta);
-        UsuarioModel usuarioCreador = usuarioService.getUsuarioModelByEmail(seccionDTO.emailCreador().trim());
+        // Usar el servicio de validación para obtener el usuario autorizado
+        UsuarioModel usuarioCreador = usuarioValidationService.validarUsuarioAutorizado(seccionDTO.emailCreador().trim());
 
         SeccionModel seccion = new SeccionModel();
         seccion.setVersionRecetaPadre(versionRecetaPadre);
@@ -84,10 +87,7 @@ public class SeccionManagementServiceImpl implements SeccionManagementService {
             log.error("Versión de receta no encontrada: {}", codigoReceta);
             throw new RecursoNoEncontradoException("Versión de receta no encontrada con código: " + codigoReceta);
         }
-        if (!usuarioService.existsByEmail(email)) {
-            log.error("Usuario creador no encontrado: {}", email);
-            throw new RecursoNoEncontradoException("Usuario creador no encontrado con el email: " + email);
-        }
+        // La validación del usuario se delega a usuarioValidationService en crearSeccion
     }
 
     private void poblarColecciones(SeccionModel seccion, SeccionCreateDTO seccionDTO) {

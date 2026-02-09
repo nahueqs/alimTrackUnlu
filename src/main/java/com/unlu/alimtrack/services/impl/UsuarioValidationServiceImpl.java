@@ -7,6 +7,8 @@ import com.unlu.alimtrack.services.UsuarioService;
 import com.unlu.alimtrack.services.UsuarioValidationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,6 +34,10 @@ public class UsuarioValidationServiceImpl implements UsuarioValidationService {
     public UsuarioModel validarUsuarioAutorizado(String email) {
         log.debug("Iniciando validación de autorización para usuario: {}", email);
 
+        // 1. Validar que el usuario autenticado sea el mismo que el solicitado (o admin)
+        validarUsuarioAutenticado(email);
+
+        // 2. Obtener y validar estado activo
         UsuarioModel usuario = obtenerUsuario(email);
         validarUsuarioActivo(usuario);
 
@@ -61,6 +67,41 @@ public class UsuarioValidationServiceImpl implements UsuarioValidationService {
         }
 
         return usuario;
+    }
+
+    /**
+     * Valida que el usuario autenticado en el contexto de seguridad coincida con el email objetivo.
+     *
+     * @param emailObjetivo Email con el que se intenta realizar la operación.
+     * @throws OperacionNoPermitida Si no hay usuario autenticado o no coincide.
+     */
+    @Override
+    public void validarUsuarioAutenticado(String emailObjetivo) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            log.warn("Intento de operación sin autenticación válida.");
+            throw new OperacionNoPermitida("Debe estar autenticado para realizar esta operación.");
+        }
+
+        String emailAutenticado = authentication.getName();
+        
+        // Permitir si es el mismo usuario
+        if (emailAutenticado.equals(emailObjetivo)) {
+            return;
+        }
+
+        // Opcional: Permitir si es ADMIN (descomentar si se desea)
+        /*
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return;
+        }
+        */
+
+        log.warn("Usuario autenticado {} intentó operar como {}", emailAutenticado, emailObjetivo);
+        throw new OperacionNoPermitida("No tiene permisos para realizar operaciones en nombre de otro usuario.");
     }
 
     private UsuarioModel obtenerUsuario(String email) {

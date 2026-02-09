@@ -31,6 +31,7 @@ class RespuestaTablaServiceTest {
     @Mock private FilaTablaRepository filaTablaRepository;
     @Mock private ColumnaTablaRepository columnaTablaRepository;
     @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioValidationService usuarioValidationService;
     @Mock private RespuestaTablaMapper respuestaTablaMapper;
     @Mock private RespuestaValidationService validationService;
 
@@ -67,9 +68,9 @@ class RespuestaTablaServiceTest {
 
         RespuestaTablaModel respuestaModel = new RespuestaTablaModel();
         respuestaModel.setTimestamp(LocalDateTime.now());
-        respuestaModel.setValorTexto("valor"); // IMPORTANTE: Setear el valor en el modelo mockeado
+        respuestaModel.setValorTexto("valor");
 
-        when(usuarioService.getUsuarioModelByEmail("user@test.com")).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado("user@test.com")).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(codigo)).thenReturn(Optional.of(produccion));
         when(tablaRepository.findById(idTabla)).thenReturn(Optional.of(tabla));
         when(filaTablaRepository.findById(idFila)).thenReturn(Optional.of(fila));
@@ -108,7 +109,18 @@ class RespuestaTablaServiceTest {
         columna.setId(idColumna);
         columna.setTabla(otraTabla); // Columna pertenece a otra tabla
 
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        // Eliminado mock innecesario de usuarioService
+        // when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
+        
+        // El test falla antes de llamar al usuario, en validarRequestBasico o al obtener entidades?
+        // validarRequestBasico solo chequea nulos.
+        // Luego llama a obtenerUsuario.
+        // Luego buscarProduccion.
+        // Luego obtenerTabla, Fila, Columna.
+        // Luego validarRelaciones.
+        
+        // Necesitamos mockear lo previo para llegar a validarRelaciones
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(any())).thenReturn(Optional.of(new ProduccionModel()));
         when(tablaRepository.findById(idTabla)).thenReturn(Optional.of(tabla));
         when(filaTablaRepository.findById(any())).thenReturn(Optional.of(new FilaTablaModel()));
@@ -138,7 +150,7 @@ class RespuestaTablaServiceTest {
         columna.setTabla(tabla);
         columna.setTipoDato(TipoDatoCampo.TEXTO);
 
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(any())).thenReturn(Optional.of(new ProduccionModel()));
         when(tablaRepository.findById(any())).thenReturn(Optional.of(tabla));
         when(filaTablaRepository.findById(any())).thenReturn(Optional.of(fila));
@@ -171,7 +183,7 @@ class RespuestaTablaServiceTest {
         columna.setTabla(tabla);
         columna.setTipoDato(TipoDatoCampo.ENTERO);
 
-        when(usuarioService.getUsuarioModelByEmail(any())).thenReturn(new UsuarioModel());
+        when(usuarioValidationService.validarUsuarioAutorizado(any())).thenReturn(new UsuarioModel());
         when(produccionRepository.findByCodigoProduccion(any())).thenReturn(Optional.of(new ProduccionModel()));
         when(tablaRepository.findById(any())).thenReturn(Optional.of(tabla));
         when(filaTablaRepository.findById(any())).thenReturn(Optional.of(fila));

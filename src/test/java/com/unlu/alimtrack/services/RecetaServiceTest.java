@@ -9,6 +9,7 @@ import com.unlu.alimtrack.exceptions.RecursoDuplicadoException;
 import com.unlu.alimtrack.exceptions.RecursoNoEncontradoException;
 import com.unlu.alimtrack.mappers.RecetaMapper;
 import com.unlu.alimtrack.models.RecetaModel;
+import com.unlu.alimtrack.models.UsuarioModel;
 import com.unlu.alimtrack.repositories.RecetaRepository;
 import com.unlu.alimtrack.services.impl.RecetaServiceImpl;
 import com.unlu.alimtrack.services.validators.RecetaValidator;
@@ -40,6 +41,8 @@ class RecetaServiceTest {
     private RecetaQueryService recetaQueryService;
     @Mock
     private UsuarioService usuarioService;
+    @Mock
+    private UsuarioValidationService usuarioValidationService;
 
     @InjectMocks
     private RecetaServiceImpl recetaService;
@@ -97,13 +100,14 @@ class RecetaServiceTest {
         );
         RecetaModel model = new RecetaModel();
         model.setCodigoReceta("REC-NEW");
+        UsuarioModel usuario = new UsuarioModel();
+        
         RecetaMetadataResponseDTO responseDTO = new RecetaMetadataResponseDTO(
                 "REC-NEW", "Desc", "Nombre", "user@test.com", LocalDateTime.now()
         );
 
         when(recetaRepository.existsByCodigoReceta("REC-NEW")).thenReturn(false);
-        when(usuarioService.existsByEmail("user@test.com")).thenReturn(true);
-        when(usuarioService.estaActivoByEmail("user@test.com")).thenReturn(true);
+        when(usuarioValidationService.validarUsuarioAutorizado("user@test.com")).thenReturn(usuario);
         when(recetaMapper.recetaCreateDTOtoModel(createDTO)).thenReturn(model);
         when(recetaRepository.save(model)).thenReturn(model);
         when(recetaMapper.recetaModeltoRecetaResponseDTO(model)).thenReturn(responseDTO);
@@ -128,12 +132,13 @@ class RecetaServiceTest {
     }
 
     @Test
-    void addReceta_ShouldThrow_WhenUserNotFound() {
+    void addReceta_ShouldThrow_WhenUserNotAuthorized() {
         RecetaCreateDTO createDTO = new RecetaCreateDTO(
                 "REC-NEW", "Nombre", "Desc", "unknown@test.com"
         );
         when(recetaRepository.existsByCodigoReceta("REC-NEW")).thenReturn(false);
-        when(usuarioService.existsByEmail("unknown@test.com")).thenReturn(false);
+        when(usuarioValidationService.validarUsuarioAutorizado("unknown@test.com"))
+                .thenThrow(new OperacionNoPermitida("Usuario no autorizado"));
 
         assertThrows(OperacionNoPermitida.class, () -> 
             recetaService.addReceta(createDTO)

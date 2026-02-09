@@ -96,9 +96,10 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
      *
      * @param codigoProduccion Código de la producción.
      * @param nuevoEstadoDTO DTO con el nuevo estado y usuario responsable.
+     * @return DTO con la metadata actualizada de la producción.
      */
     @Override
-    public void updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO) {
+    public ProduccionMetadataResponseDTO updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO) {
         log.info("Solicitud de cambio de estado para producción {} a {}", codigoProduccion, nuevoEstadoDTO.valor());
 
         usuarioValidationService.validarUsuarioAutorizado(nuevoEstadoDTO.emailCreador());
@@ -115,6 +116,8 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
 
         log.info("Estado de producción {} actualizado exitosamente a {}. Evento publicado.",
                 codigoProduccion, nuevoEstadoDTO.valor());
+        
+        return produccionMapper.modelToResponseDTO(produccion);
     }
 
     /**
@@ -239,10 +242,12 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
      *
      * @param codigoProduccion Código de la producción.
      * @param request DTO con los datos a actualizar.
+     * @return DTO con la metadata actualizada de la producción.
      */
     @Override
-    public void updateMetadata(String codigoProduccion, ProduccionMetadataModifyRequestDTO request) {
+    public ProduccionMetadataResponseDTO updateMetadata(String codigoProduccion, ProduccionMetadataModifyRequestDTO request) {
         log.info("Actualizando metadata para producción: {}", codigoProduccion);
+
 
         ProduccionModel produccion = buscarProduccionPorCodigo(codigoProduccion);
         productionManagerServiceValidator.validarUpdateMetadata(codigoProduccion, request);
@@ -257,7 +262,7 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
             produccion.setObservaciones(request.observaciones());
         }
 
-        produccionRepository.save(produccion);
+        ProduccionModel produccionGuardada = produccionRepository.save(produccion);
         log.info("Metadata actualizada correctamente en base de datos.");
 
         produccionEventPublisher.publicarMetadataActualizada(
@@ -268,6 +273,8 @@ public class ProduccionManagementServiceImpl implements ProduccionManagementServ
                 produccion.getObservaciones()
         );
         log.debug("Evento de metadata actualizada publicado.");
+        
+        return produccionMapper.modelToResponseDTO(produccionGuardada);
     }
 
     /**

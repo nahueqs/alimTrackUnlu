@@ -7,4 +7,6 @@ public interface UsuarioValidationService {
     UsuarioModel validarUsuarioAutorizado(String email);
 
     UsuarioModel validarUsuarioActivo(UsuarioModel usuario);
+
+    void validarUsuarioAutenticado(String emailObjetivo);
 }

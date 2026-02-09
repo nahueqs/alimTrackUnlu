@@ -39,6 +39,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
     private final VersionRecetaValidator versionRecetaValidator;
     private final ProduccionQueryService produccionQueryService;
     private final UsuarioService usuarioService;
+    private final UsuarioValidationService usuarioValidationService;
     private final SeccionManagementService seccionManagementService;
     private final PublicMapper publicMapper;
 
@@ -92,7 +93,9 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
 
         VersionRecetaModel versionModel = versionRecetaMapper.toModel(versionRecetaCreateDTO);
         RecetaModel recetaPadre = recetaService.findRecetaModelByCodigo(codigoRecetaPadre);
-        UsuarioModel creador = usuarioService.getUsuarioModelByEmail(versionRecetaCreateDTO.emailCreador());
+        
+        // Usar el servicio de validación para obtener el usuario autorizado
+        UsuarioModel creador = usuarioValidationService.validarUsuarioAutorizado(versionRecetaCreateDTO.emailCreador());
         
         versionModel.setRecetaPadre(recetaPadre);
         versionModel.setCreadoPor(creador);
@@ -121,12 +124,13 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
 
         VersionRecetaModel versionModel = versionRecetaMapper.toModel(simpleDto);
         RecetaModel recetaPadre = recetaService.findRecetaModelByCodigo(codigoRecetaPadre);
-        UsuarioModel creador = usuarioService.getUsuarioModelByEmail(dto.emailCreador());
+        
+        // Usar el servicio de validación para obtener el usuario autorizado
+        UsuarioModel creador = usuarioValidationService.validarUsuarioAutorizado(dto.emailCreador());
 
         versionModel.setRecetaPadre(recetaPadre);
         versionModel.setCreadoPor(creador);
         versionModel.setFechaCreacion(LocalDateTime.now());
-
 
         VersionRecetaModel versionGuardada = versionRecetaRepository.save(versionModel);
         log.info("Metadata de versión {} guardada. Procediendo a crear estructura.", versionGuardada.getCodigoVersionReceta());
@@ -223,7 +227,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
         verificarIntegridadDatosCreacion(codigoRecetaPadre, dto);
         verificarVersionRepetida(dto.codigoVersionReceta());
         verificarRecetaExistente(dto.codigoRecetaPadre());
-        verificarUsuarioExiste(dto.emailCreador());
+        // La validación del usuario se hace ahora en saveVersionReceta con usuarioValidationService
         log.debug("Validaciones exitosas para versión {}", dto.codigoVersionReceta());
     }
 
@@ -238,17 +242,6 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
         if (!recetaService.existsByCodigoReceta(codigoReceta)) {
             log.warn("Intento de crear versión para receta inexistente: {}", codigoReceta);
             throw new RecursoNoEncontradoException("La receta padre especificada no existe: " + codigoReceta);
-        }
-    }
-
-    private void verificarUsuarioExiste(String email) {
-        if (!usuarioService.existsByEmail(email)) {
-            log.warn("Intento de crear versión con usuario inexistente: {}", email);
-            throw new OperacionNoPermitida("El usuario creador especificado no existe: " + email);
-        }
-        if (!usuarioService.estaActivoByEmail(email)) {
-            log.warn("Intento de crear versión con usuario inactivo: {}", email);
-            throw new OperacionNoPermitida("El usuario creador especificado no está activo: " + email);
         }
     }
 

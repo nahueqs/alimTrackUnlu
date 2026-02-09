@@ -15,7 +15,7 @@ public interface ProduccionManagementService {
 
     ProduccionMetadataResponseDTO iniciarProduccion(ProduccionCreateDTO createDTO);
 
-    void updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO);
+    ProduccionMetadataResponseDTO updateEstado(String codigoProduccion, ProduccionCambioEstadoRequestDTO nuevoEstadoDTO);
 
     RespuestaCampoResponseDTO guardarRespuestaCampo(String codigoProduccion, Long idCampo, RespuestaCampoRequestDTO request);
 
@@ -25,7 +25,7 @@ public interface ProduccionManagementService {
 
     UltimasRespuestasProduccionResponseDTO test();
 
-    void updateMetadata(String codigoProduccion, @Valid ProduccionMetadataModifyRequestDTO request);
+    ProduccionMetadataResponseDTO updateMetadata(String codigoProduccion, @Valid ProduccionMetadataModifyRequestDTO request);
 
     void deleteProduccion(String codigoProduccion);
 }

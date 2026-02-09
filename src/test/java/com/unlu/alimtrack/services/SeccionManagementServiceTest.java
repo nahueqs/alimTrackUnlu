@@ -33,6 +33,7 @@ class SeccionManagementServiceTest {
     @Mock private SeccionRepository seccionRepository;
     @Mock private SeccionValidator seccionValidator;
     @Mock private UsuarioService usuarioService;
+    @Mock private UsuarioValidationService usuarioValidationService;
     @Mock private SeccionMapperManual seccionMapperManual;
     @Mock private CampoSimpleMapper campoSimpleMapper;
     @Mock private GrupoCamposMapper grupoCamposMapper;
@@ -47,7 +48,6 @@ class SeccionManagementServiceTest {
     void crearSeccion_ShouldSave_WhenValid() {
         // Arrange
         String codigoReceta = "VER-1";
-        // Corregido: Eliminado argumento "TIPO" que ya no existe en el DTO
         SeccionCreateDTO dto = new SeccionCreateDTO(
                 codigoReceta, "user@test.com", "Titulo", 1, null, null, null
         );
@@ -58,9 +58,8 @@ class SeccionManagementServiceTest {
         seccionGuardada.setId(1L);
 
         when(versionRecetaQueryService.existsByCodigoVersion(codigoReceta)).thenReturn(true);
-        when(usuarioService.existsByEmail("user@test.com")).thenReturn(true);
         when(versionRecetaRepository.findByCodigoVersionReceta(codigoReceta)).thenReturn(Optional.of(version));
-        when(usuarioService.getUsuarioModelByEmail("user@test.com")).thenReturn(usuario);
+        when(usuarioValidationService.validarUsuarioAutorizado("user@test.com")).thenReturn(usuario);
         when(seccionRepository.save(any(SeccionModel.class))).thenReturn(seccionGuardada);
 
         // Act
@@ -76,7 +75,6 @@ class SeccionManagementServiceTest {
     @Test
     void crearSeccion_ShouldThrow_WhenVersionNotFound() {
         String codigoReceta = "VER-INEXISTENTE";
-        // Corregido: Eliminado argumento "TIPO" que ya no existe en el DTO
         SeccionCreateDTO dto = new SeccionCreateDTO(
                 codigoReceta, "u", "T", 1, null, null, null
         );

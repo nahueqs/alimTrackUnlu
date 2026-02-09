@@ -10,6 +10,7 @@ import com.unlu.alimtrack.models.*;
 import com.unlu.alimtrack.repositories.*;
 import com.unlu.alimtrack.services.RespuestaTablaService;
 import com.unlu.alimtrack.services.UsuarioService;
+import com.unlu.alimtrack.services.UsuarioValidationService;
 import com.unlu.alimtrack.services.base.BaseRespuestaService;
 import com.unlu.alimtrack.services.validators.RespuestaValidationService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
     private final FilaTablaRepository filaTablaRepository;
     private final ColumnaTablaRepository columnaTablaRepository;
     private final UsuarioService usuarioService;
+    private final UsuarioValidationService usuarioValidationService;
     private final RespuestaTablaMapper respuestaTablaMapper;
 
     // Constructor que llama al constructor padre
@@ -47,6 +49,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
             FilaTablaRepository filaTablaRepository,
             ColumnaTablaRepository columnaTablaRepository,
             UsuarioService usuarioService,
+            UsuarioValidationService usuarioValidationService,
             RespuestaTablaMapper respuestaTablaMapper) {
 
         // LLAMAR AL CONSTRUCTOR PADRE PRIMERO
@@ -58,6 +61,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
         this.filaTablaRepository = filaTablaRepository;
         this.columnaTablaRepository = columnaTablaRepository;
         this.usuarioService = usuarioService;
+        this.usuarioValidationService = usuarioValidationService;
         this.respuestaTablaMapper = respuestaTablaMapper;
     }
 
@@ -85,7 +89,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
         // 1. Validar request básico
         validarRequestBasico(request);
 
-        // 2. Obtener usuario
+        // 2. Obtener usuario validado
         UsuarioModel usuario = obtenerUsuario(request.getEmailCreador());
 
         // 3. Buscar producción
@@ -149,7 +153,7 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
     }
 
     private UsuarioModel obtenerUsuario(String email) {
-        return usuarioService.getUsuarioModelByEmail(email);
+        return usuarioValidationService.validarUsuarioAutorizado(email);
     }
 
     private ProduccionModel buscarProduccion(String codigoProduccion) {

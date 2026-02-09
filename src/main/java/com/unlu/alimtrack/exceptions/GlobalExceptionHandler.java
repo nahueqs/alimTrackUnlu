@@ -18,6 +18,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
-                "Error de integridad de datos: " + ex.getMessage(),
+                "Recurso no encontrado: " + ex.getMessage(), // Corregido mensaje
                 request.getRequestURL().toString()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
@@ -181,12 +182,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+        
+        // Concatenar errores en un solo string para mantener la estructura de ErrorResponse
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Error de validación: " + errorMessage,
+                request.getRequestURL().toString()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
@@ -242,7 +251,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InternalServiceException.class)
-    public ResponseEntity<String> handleInternal(InternalServiceException ex,
+    public ResponseEntity<ErrorResponse> handleInternal(InternalServiceException ex,
                                                  HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -250,8 +259,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURL().toString()
         );
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error interno del servidor");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     @ExceptionHandler(OperacionNoPermitida.class)

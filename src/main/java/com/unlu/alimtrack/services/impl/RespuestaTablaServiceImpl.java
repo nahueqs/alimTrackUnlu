@@ -14,6 +14,11 @@ import com.unlu.alimtrack.services.UsuarioValidationService;
 import com.unlu.alimtrack.services.base.BaseRespuestaService;
 import com.unlu.alimtrack.services.validators.RespuestaValidationService;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.LockAcquisitionException;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +81,16 @@ public class RespuestaTablaServiceImpl extends BaseRespuestaService<RespuestaTab
      * @return DTO con la respuesta guardada.
      */
     @Override
+    @Transactional
+    @Retryable(
+            retryFor = {
+                    LockAcquisitionException.class,
+                    ObjectOptimisticLockingFailureException.class,
+                    CannotAcquireLockException.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     public RespuestaCeldaTablaResponseDTO guardarRespuestaTabla(
             String codigoProduccion,
             Long idTabla,

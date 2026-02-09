@@ -23,6 +23,10 @@ public class ProduccionModel {
     @Column(name = "id_produccion", nullable = false)
     private Long produccion;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "id_version", nullable = false)

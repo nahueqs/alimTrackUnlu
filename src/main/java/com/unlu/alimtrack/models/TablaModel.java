@@ -2,7 +2,6 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +17,6 @@ import java.util.Set;
 @Setter
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 @Table(name = "tabla")
 public class TablaModel {
 

@@ -2,7 +2,6 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "seccion",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"id_version_receta_padre", "orden"}),

@@ -2,7 +2,6 @@ package com.unlu.alimtrack.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 @Table(name = "fila_tabla",
         uniqueConstraints = @UniqueConstraint(columnNames = {"id_tabla", "orden"}))
 

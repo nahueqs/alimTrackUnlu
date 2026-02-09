@@ -127,6 +127,7 @@ public class VersionRecetaServiceImpl implements VersionRecetaService {
         versionModel.setCreadoPor(creador);
         versionModel.setFechaCreacion(LocalDateTime.now());
 
+
         VersionRecetaModel versionGuardada = versionRecetaRepository.save(versionModel);
         log.info("Metadata de versión {} guardada. Procediendo a crear estructura.", versionGuardada.getCodigoVersionReceta());
 

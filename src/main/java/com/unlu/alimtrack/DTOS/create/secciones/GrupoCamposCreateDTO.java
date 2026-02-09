@@ -13,6 +13,9 @@ public record GrupoCamposCreateDTO(
         @Size(min = 2, max = 255)
         String subtitulo,
 
+        @NotNull
+        Integer orden,
+
         @UniqueElements(message = "Los nombres de los campos simples deben ser únicos")
         List<CampoSimpleCreateDTO> camposSimples
 

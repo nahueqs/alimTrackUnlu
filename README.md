@@ -37,6 +37,15 @@ Construido bajo un patrón de **Arquitectura en Capas (Layered Architecture)** p
 * **Documentación:** **OpenAPI 3 / Swagger UI** para la exposición y prueba de endpoints REST.
 * **Logging:** SLF4J con Logback para el rastreo de eventos de auditoría.
 
+## 🛠️ Ingeniería y Calidad de Software
+El proyecto sigue estándares de la industria para asegurar un código limpio, mantenible y escalable:
+
+* **Testing:** Cobertura exhaustiva con **JUnit 5** y **Mockito**. Tests de integración con **MockMvc** para validar seguridad y contratos de API.
+* **Arquitectura Orientada a Eventos:** Desacoplamiento de lógica mediante `Spring Events` para manejar notificaciones WebSocket sin impactar el rendimiento de las transacciones principales.
+* **Patrones de Diseño:** Uso extensivo de DTOs, Mappers (MapStruct) y Servicios Base para reutilización de código.
+* **Rendimiento:** Procesamiento asíncrono (`@Async`) de tareas no bloqueantes y gestión eficiente de transacciones (`@Transactional`).
+* **Manejo de Errores:** Respuestas HTTP estandarizadas y descriptivas mediante un `GlobalExceptionHandler` centralizado.
+
 ### 🎨 Frontend (React Stack) Respositorio: https://github.com/nahueqs/alimtrack-front
 Desarrollado como una **Single Page Application (SPA)** enfocada en la experiencia de usuario en entornos industriales.
 

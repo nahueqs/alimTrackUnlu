@@ -5,6 +5,9 @@
 Página de estado para ver si la app está funcionando 
 https://stats.uptimerobot.com/QGOCuP1tVl
 
+Documentación técnica detallada de la aplicación 
+https://docs.google.com/document/d/1yaOenWdKgp4qgxN-N-T2VKPGYcVe_pqCkQ6jJry0hLM/edit?usp=drivesdk
+
 AlimTrack es una plataforma integral para la gestión, seguimiento y visualización de producciones alimenticias en tiempo real. Desarrollado para el **CIDETA-UNLu**, el sistema digitaliza la captura de datos en planta, permitiendo una trazabilidad total y eliminando la dependencia de registros físicos mediante una arquitectura moderna y robusta.
 
 ## 🎯 Objetivo del Proyecto

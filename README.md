@@ -1,5 +1,5 @@
 # 📡 AlimTrack – Sistema de Monitoreo en Tiempo Real
-> **Planta Piloto – Universidad Nacional de Luján (CIDETA)**
+> Planta Piloto – Universidad Nacional de Luján (CIDETA)
 > [www.cideta.unlu.edu.ar](https://www.cideta.unlu.edu.ar/)
 
 Página de estado para ver si la app está funcionando 
@@ -8,37 +8,39 @@ https://stats.uptimerobot.com/QGOCuP1tVl
 Documentación técnica detallada de la aplicación 
 https://docs.google.com/document/d/1yaOenWdKgp4qgxN-N-T2VKPGYcVe_pqCkQ6jJry0hLM/edit?usp=drivesdk
 
-AlimTrack es una plataforma integral para la gestión, seguimiento y visualización de producciones alimenticias en tiempo real. Desarrollado para el **CIDETA-UNLu**, el sistema digitaliza la captura de datos en planta, permitiendo una trazabilidad total y eliminando la dependencia de registros físicos mediante una arquitectura moderna y robusta.
+AlimTrack es una plataforma integral para la gestión, seguimiento y visualización de producciones alimenticias en tiempo real. Desarrollado para el CIDETA-UNLu, el sistema digitaliza la captura de datos en planta, permitiendo una trazabilidad total y eliminando la dependencia de registros físicos mediante una arquitectura moderna y robusta.
 
 ## 🎯 Objetivo del Proyecto
 Modernizar el ecosistema productivo de la planta piloto, permitiendo:
-* **Estandarización:** Registro basado en recetas con control de versiones dinámicas.
-* **Monitoreo Live:** Seguimiento continuo de producciones activas desde múltiples dispositivos, en tiempo real.
-* **Auditoría:** Logs detallados de cada cambio y generación automática de reportes PDF.
+* Estandarización: Registro basado en recetas con control de versiones dinámicas.
+* Monitoreo Live: Seguimiento continuo de producciones activas desde múltiples dispositivos, en tiempo real.
+* Auditoría: Logs detallados de cada cambio y generación automática de reportes PDF.
 
-## ⚙️ Estado del Desarrollo
-### ✅ Versión 1.0 (En Producción)
-* **Gestión de Recetas:** Estructura flexible para registrar cualquier tipo de receta deseada por la planta, con estructuras anidadas de secciones, campos agrupados, tablas y campos simples.
-* **Seguridad Avanzada:** Autenticación y autorización mediante Spring Security 6 y JWT.
-* **Comunicación Real-Time:** Sincronización de datos entre planta y oficina vía WebSockets (STOMP).
-* **Sistema de Notificaciones:** Alertas push integradas para notificar cambios en las producciones en curso.
-* **Auditoría y Trazabilidad:** Registro histórico de cambios.
+# ⚙️ Estado del Desarrollo
+
+#✅ Versión 1.0 (En Producción)
+* Gestión de Recetas: Estructura flexible para registrar cualquier tipo de receta deseada por la planta, con estructuras anidadas de secciones, campos agrupados, tablas y campos simples.
+* Gestión de producciones: El sistema permite iniciar producciones en base a las recetas, completarlas y visualizarlas en páginas públicas en tiempo real. Se notifican los cambios de valores y de estado.
+* Seguridad Avanzada: Autenticación y autorización mediante Spring Security 6 y JWT.
+* Comunicación Real-Time: Sincronización de datos entre planta y oficina vía WebSockets (STOMP).
+* Sistema de Notificaciones: Alertas push integradas para notificar cambios en las producciones en curso.
+* Auditoría y Trazabilidad: Registro histórico de cambios.
   
-### 🟠 En Desarrollo 
-* **Dashboard de Gestión de Stock:** Control de insumos y materias primas vinculadas a producción.
-* **Módulo de KPIs:** Visualización de indicadores clave de rendimiento y eficiencia de planta.
+# 🟠 En Desarrollo 
+* Dashboard de Gestión de Stock: Control de insumos y materias primas vinculadas a producción.
+* Módulo de KPIs: Visualización de indicadores clave de rendimiento y eficiencia de planta.
 
 Stack tecnológico utilizado:
-### 💻 Backend (Java Stack)
-Construido bajo un patrón de **Arquitectura en Capas (Layered Architecture)** para garantizar mantenibilidad y escalabilidad.
+# 💻 Backend (Java Stack)
+Construido bajo un patrón de Arquitectura en Capas para garantizar mantenibilidad y escalabilidad.
 
-* **Core:** Java 17 con **Spring Boot 3.x**.
-* **Seguridad:** **Spring Security 6** con JWT.
-* **Persistencia:** **Spring Data JPA** con **Hibernate** como ORM, gestionando una base de datos **MySQL 8.0**.
-* **Mensajería Real-Time:** **Spring WebSocket** con protocolo **STOMP** sobre **SockJS** para garantizar compatibilidad.
-* **Validación:** JSR-303 (Hibernate Validator) para integridad de datos en el ingreso de producciones.
-* **Documentación:** **OpenAPI 3 / Swagger UI** para la exposición y prueba de endpoints REST.
-* **Logging:** SLF4J con Logback para el rastreo de eventos de auditoría.
+* Core: Java 17 con Spring Boot 3.
+* Seguridad: Spring Security 6 con JWT.
+* Persistencia: Spring Data JPA con Hibernate como ORM, gestionando una base de datos MySQL 8.0.
+* Mensajería Real-Time: pring WebSocket** con protocolo STOMP sobre SockJS para garantizar compatibilidad.
+* Validación: JSR-303 (Hibernate Validator) para integridad de datos en el ingreso de producciones.
+* Documentación: OpenAPI 3 / Swagger UI para la exposición y prueba de endpoints REST.
+* Logging: SLF4J con Logback para el rastreo de eventos de auditoría.
 
 ## 🛠️ Ingeniería y Calidad de Software
 El proyecto sigue estándares de la industria para asegurar un código limpio, mantenible y escalable:
